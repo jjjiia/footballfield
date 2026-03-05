@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mapbox + Screen-Centered, Screen-Vertical Field</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+<link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.1/mapbox-gl-geocoder.css" rel="stylesheet" />
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.css" rel="stylesheet" />
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
+  <style>
+    html, body { height: 100%; margin: 0; }
+#map {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:0;
+}
+#randomPoiBtn{
+  position:fixed;
+  top:20px;
+  right:20px;
+  z-index:20;
+  padding:10px 12px;
+  border:0;
+  border-radius:8px;
+  background:#000;
+  color:#fff;
+  font-size:14px;
+  cursor:pointer;
+}
+#randomPoiBtn:hover{ opacity:0.85; }#text {
+ position:fixed;
+  top: 20px;
+margin:5%;  
+width:90%;
+  z-index:10;
+  pointer-events:none;   /* allows map interaction through overlay */
+  display:flex;
+  align-items:left;
+  justify-content:left;
+  font-size:30px;
+  color:white;
+text-shadow:
+  0 0 4px rgba(0,0,0,1),
+  0 0 8px rgba(0,0,0,0.9),  
+    0 0 22px rgba(0,0,0,0.5);
+  font-family:sans-serif;
+}  
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+    <div id="text"></div>
+    <button id="randomPoiBtn" type="button">Random place</button>
+<script>
+const pois = [
+  {name:"White House", lat:38.897717, lng:-77.036568, zoom:16.5,bearing:90},
+  {name:"Statue of Liberty", lat:40.68945708304756, lng:74.04469574760498, zoom:16.27,bearing:150},
+   {name:"Times Square", lat:40.75853712277342, lng:-73.98536640126447, zoom:16.5,bearing:30},
+  {name:"Central Park", lat:40.78329073899022, lng:-73.9660477572873, zoom:13.34,bearing:29},
+   {name:"Grand Canyon", lat:36.109958720381826, lng:-112.12863105704415, zoom:10.5},
+  {name:"Niagara Falls", lat:43.07900427674076, lng:-79.0760266014956, zoom:17},
+  {name:"Eiffel Tower", lat:48.85823915371233, lng:2.2944672561380344, zoom:16.7,bearing:-45},
+   {name:"Colosseum", lat: 41.89018992337611, lng:12.492400648895995, zoom:17.2,bearing:-70},
+   {name:"Great Pyramid of Giza", lat:29.97934492063709, lng:31.133488131453902, zoom:16.3,bearing:-50}
+];
+
+mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNtbWM2dGwyaDAzNGoyb3B3NW9xaWxjZTUifQ.0KpoiXkcPXzsaYK9UXdioQ"
+    const STYLE = "mapbox://styles/jjjiia123/cmmb9euid00at01qr9mbfapn7";
+    const INITIAL_CENTER = [-121.96979950341608, 37.403187791716775]; // Hoboken-ish; change me
+
+
+
+  // Football field incl. end zones: 360ft x 160ft
+  const FIELD_FT = { length: 360, width: 160 };
+  const ftToM = (ft) => ft * 0.3048;
+  const widthM  = ftToM(FIELD_FT.width);
+  const heightM = ftToM(FIELD_FT.length);
+
+  // ---- Small-area meter<->degree helpers ----
+  function metersPerDeg(lat) {
+    const rad = lat * Math.PI / 180;
+    return {
+      mPerDegLat: 111132.92,
+      mPerDegLng: 111320.0 * Math.cos(rad)
+    };
+  }
+
+  // Build rectangle ring centered at `centerLngLat`, counter-rotated to stay vertical on screen
+  function buildScreenVerticalRectangle(centerLngLat, widthM, heightM, mapBearingDeg) {
+    const [lng0, lat0] = centerLngLat;
+    const { mPerDegLat, mPerDegLng } = metersPerDeg(lat0);
+
+    const hw = widthM / 2;
+    const hh = heightM / 2;
+
+    // local EN (meters), centered at (0,0)
+    const corners = [
+      [-hw, -hh],
+      [ hw, -hh],
+      [ hw,  hh],
+      [-hw,  hh],
+      [-hw, -hh]
+    ];
+
+    // counter-rotate by bearing
+    const theta = (-mapBearingDeg) * Math.PI / 180;
+    const cosT = Math.cos(theta);
+    const sinT = Math.sin(theta);
+
+    return corners.map(([x, y]) => {
+      const xr = x * cosT - y * sinT; // east (meters)
+      const yr = x * sinT + y * cosT; // north (meters)
+
+      const dLng = xr / mPerDegLng;
+      const dLat = yr / mPerDegLat;
+
+      return [lng0 + dLng, lat0 + dLat];
+    });
+  }
+
+  function makeFieldFeature(map) {
+    const c = map.getCenter();              // <-- viewport center in lng/lat
+    const center = [c.lng, c.lat];
+    const bearing = map.getBearing();
+
+    const ring = buildScreenVerticalRectangle(center, widthM, heightM, bearing);
+
+    // close the ring
+    ring.push(ring[0]);
+
+    return {
+      type: "Feature",
+      properties: { label: "Football field (screen-centered, screen-vertical)" },
+      geometry: { type: "Polygon", coordinates: [ring] }
+    };
+  }
+
+  const map = new mapboxgl.Map({
+    container: "map",
+    style: STYLE,
+    center: INITIAL_CENTER,
+    zoom: 17,
+    bearing: -29,
+    pitch: 0
+  });
+
+  map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "bottom-right");
+      // Search box
+   // After: const map = new mapboxgl.Map({...})
+console.log("MapboxGeocoder typeof:", typeof MapboxGeocoder);
+const geocoder = new MapboxGeocoder({
+  accessToken: mapboxgl.accessToken,
+  mapboxgl: mapboxgl,
+  marker: false,
+  placeholder: "Search places",
+  zoom: 16,
+  types: "poi,address,place"
+});
+
+
+map.addControl(geocoder, "bottom-left");
+map.on("move",()=>{
+    console.log(map.getCenter())
+    console.log(map.getZoom())
+})
+  map.on("load", () => {
+
+
+    map.addSource("field", {
+      type: "geojson",
+      data: { type: "FeatureCollection", features: [makeFieldFeature(map)] }
+    });
+
+    map.addLayer({
+      id: "field-fill",
+      type: "fill",
+      source: "field",
+       paint: { "fill-color": "#ffcf01", "fill-opacity": 0 }
+    });
+
+    map.addLayer({
+      id: "field-outline",
+      type: "line",
+      source: "field",
+      paint: { "line-color": "#fff", "line-width": 4 }
+    });
+
+    // map.addLayer({
+    //   id: "field-label",
+    //   type: "symbol",
+    //   source: "field",
+    //   layout: { "text-field": ["get", "label"], "text-size": 12 },
+    //   paint: { "text-color": "#000" }
+    //});
+
+    // --- Update on any camera change (pan/zoom/rotate/pitch) ---
+    let raf = null;
+    function update() {
+      raf = null;
+      const src = map.getSource("field");
+      if (!src) return;
+      src.setData({
+        type: "FeatureCollection",
+        features: [makeFieldFeature(map)]
+      });
+    }
+const randomBtn = document.getElementById("randomPoiBtn");
+
+function flyToRandomPOI() {
+
+  const poi = pois[Math.floor(Math.random() * pois.length)];
+
+  // Change button text to destination
+  randomBtn.textContent = poi.name;
+
+  map.flyTo({
+    center: [poi.lng, poi.lat],
+    zoom: poi.zoom ?? 15,
+    bearing:poi.bearing ?? 15,
+    speed: 1.2
+  });
+
+
+  // Optional: reset after movement finishes
+  map.once("moveend", () => {
+    randomBtn.textContent = "Random place";
+  });
+
+}
+
+randomBtn.addEventListener("click", flyToRandomPOI);
+
+document.getElementById("randomPoiBtn").addEventListener("click", flyToRandomPOI);
+    // 'move' fires for pan/zoom/rotate/pitch continuously
+    map.on("move", () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    });
+  });
+</script>
+
+
+<script>
+  // Football field incl. end zones: 360 ft x 160 ft
+  const FT_TO_M = 0.3048;
+ // const FIELD_FT = { length: 360, width: 160 };
+  const FIELD_AREA_M2 = (FIELD_FT.length * FT_TO_M) * (FIELD_FT.width * FT_TO_M);
+
+  /// WGS84 lon/lat -> Web Mercator meters (EPSG:3857)
+function lngLatToMercatorMeters(lng, lat) {
+  const R = 6378137;
+  const x = R * (lng * Math.PI / 180);
+  const y = R * Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI / 180) / 2));
+  return [x, y];
+}
+
+function polygonAreaMeters2(coordsXY) {
+  let area2 = 0;
+  const n = coordsXY.length;
+  for (let i = 0; i < n; i++) {
+    const [x1, y1] = coordsXY[i];
+    const [x2, y2] = coordsXY[(i + 1) % n];
+    area2 += (x1 * y2 - x2 * y1);
+  }
+  return Math.abs(area2) / 2;
+}
+
+function computeFieldsInView(map) {
+  const canvas = map.getCanvas();
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+
+  const nw = map.unproject([0, 0]);
+  const ne = map.unproject([w, 0]);
+  const se = map.unproject([w, h]);
+  const sw = map.unproject([0, h]);
+
+  const ringLngLat = [nw, ne, se, sw];
+  const ringXY = ringLngLat.map(p => lngLatToMercatorMeters(p.lng, p.lat));
+
+  // Area in Web Mercator "meters²" (distorted)
+  const areaMercatorM2 = polygonAreaMeters2(ringXY);
+
+  // Convert to approx ground area using local scale factor cos²(lat)
+  const latRef = map.getCenter().lat;
+  const cosLat = Math.cos(latRef * Math.PI / 180);
+  const areaGroundM2 = areaMercatorM2 * (cosLat * cosLat);
+
+  const FT_TO_M = 0.3048;
+  const FIELD_FT = { length: 360, width: 160 };
+  const FIELD_AREA_M2 = (FIELD_FT.length * FT_TO_M) * (FIELD_FT.width * FT_TO_M);
+
+  return {
+    corners: { nw, ne, se, sw },
+    areaGroundM2,
+    fields: areaGroundM2 / FIELD_AREA_M2
+  };
+  }
+
+function formatNumber(n) {
+  const abs = Math.abs(n);
+
+  if (abs < 1000) return (Math.round(n*10)/10).toString();
+
+  if (abs < 1_000_000)
+    return (n / 1_000).toFixed(1) + "K";
+
+  if (abs < 1_000_000_000)
+    return (n / 1_000_000).toFixed(1) + "M";
+
+  return (n / 1_000_000_000).toFixed(1) + "B";
+}
+  // Usage:
+map.on("load", () => {
+  const r = computeFieldsInView(map);
+  //console.log("ground area m²:", r.areaGroundM2, "fields:", r.fields);
+    document.getElementById("text").innerHTML = "This white rectangle is a football field. This map is about "+formatNumber(r.fields)+" football fields.";
+
+});map.on("moveend", () => {
+  const r = computeFieldsInView(map);
+  //console.log("ground area m²:", r.areaGroundM2, "fields:", r.fields);
+    document.getElementById("text").innerHTML = "This white rectangle is a football field. This map is about "+formatNumber(r.fields)+" football fields.";
+
+});</script>
+</body>
+</html>
