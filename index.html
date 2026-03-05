@@ -19,59 +19,179 @@
   width:100%;
   height:100%;
   z-index:0;
+}/* The overlay container is fixed */
+#labels{
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+
+  display: flex;
+  flex-direction: column;   /* stack text then button */
+  align-items: flex-start;
+  gap: 10px;
+
+  z-index: 20;
+  pointer-events: none;     /* map still draggable */
 }
+
+/* sentence text */
+#text{
+  font-size: 24px;
+  color: white;
+  font-family: sans-serif;
+    /* -webkit-text-stroke:2px black; */
+
+    text-shadow:
+    0 0 6px rgba(0,0,0,1),
+    0 0 14px rgba(0,0,0,1),
+    0 3px 6px rgba(0,0,0,1),
+    0 8px 20px rgba(0,0,0,0.7);
+}
+#place{
+  font-size: 24px;
+  color: white;
+  font-family: sans-serif;
+    /* -webkit-text-stroke:2px black; */
+
+    text-shadow:
+    0 0 6px rgba(0,0,0,1),
+    0 0 14px rgba(0,0,0,1),
+    0 3px 6px rgba(0,0,0,1),
+    0 8px 20px rgba(0,0,0,0.7);
+}
+/* button */
 #randomPoiBtn{
-  position:fixed;
-  top:20px;
-  right:20px;
-  z-index:20;
+  pointer-events: auto;     /* button remains clickable */
+
   padding:10px 12px;
   border:0;
-  border-radius:8px;
-  background:#000;
+  border-radius:0px;
+  background:none;
   color:#fff;
-  font-size:14px;
+  border:3px solid white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+
+  font-size:24px;
   cursor:pointer;
+
+    text-shadow:
+    0 0 6px rgba(0,0,0,1),
+    0 0 14px rgba(0,0,0,1),
+    0 3px 6px rgba(0,0,0,1),
+    0 8px 20px rgba(0,0,0,0.7);
 }
-#randomPoiBtn:hover{ opacity:0.85; }#text {
- position:fixed;
-  top: 20px;
-margin:5%;  
-width:90%;
-  z-index:10;
-  pointer-events:none;   /* allows map interaction through overlay */
-  display:flex;
-  align-items:left;
-  justify-content:left;
-  font-size:30px;
-  color:white;
-text-shadow:
-  0 0 4px rgba(0,0,0,1),
-  0 0 8px rgba(0,0,0,0.9),  
-    0 0 22px rgba(0,0,0,0.5);
-  font-family:sans-serif;
-}  
+
+#randomPoiBtn:hover{ opacity:0.85; }
 </style>
 </head>
 <body>
 
 <div id="map"></div>
-    <div id="text"></div>
-    <button id="randomPoiBtn" type="button">Random place</button>
+<div id="labels">
+  <span id="text"></span>
+  <span id="place">You are at Levi's Stadium in Santa Clara, California.</span>
+  <button id="randomPoiBtn" type="button">Go somewhere</button>
+</div>
 <script>
 const pois = [
-  {name:"White House", lat:38.897717, lng:-77.036568, zoom:16.5,bearing:90},
-  {name:"Statue of Liberty", lat:40.68945708304756, lng:74.04469574760498, zoom:16.27,bearing:150},
-   {name:"Times Square", lat:40.75853712277342, lng:-73.98536640126447, zoom:16.5,bearing:30},
-  {name:"Central Park", lat:40.78329073899022, lng:-73.9660477572873, zoom:13.34,bearing:29},
-   {name:"Grand Canyon", lat:36.109958720381826, lng:-112.12863105704415, zoom:10.5},
-  {name:"Niagara Falls", lat:43.07900427674076, lng:-79.0760266014956, zoom:17},
-  {name:"Eiffel Tower", lat:48.85823915371233, lng:2.2944672561380344, zoom:16.7,bearing:-45},
-   {name:"Colosseum", lat: 41.89018992337611, lng:12.492400648895995, zoom:17.2,bearing:-70},
-   {name:"Great Pyramid of Giza", lat:29.97934492063709, lng:31.133488131453902, zoom:16.3,bearing:-50}
+  {name:"White House", lat:38.897717, lng:-77.036568, zoom:16.5, bearing:90},
+  {name:"Statue of Liberty", lat:40.68945708304756, lng:-74.04469574760498, zoom:16.27, bearing:150},
+  {name:"Times Square", lat:40.75853712277342, lng:-73.98536640126447, zoom:16.5, bearing:30},
+  {name:"Central Park", lat:40.78329073899022, lng:-73.9660477572873, zoom:13.34, bearing:29},
+  {name:"Grand Canyon", lat:36.109958720381826, lng:-112.12863105704415, zoom:10.5, bearing:""},
+  {name:"Niagara Falls", lat:43.07900427674076, lng:-79.0760266014956, zoom:16.5, bearing:""},
+  {name:"Eiffel Tower", lat:48.85823915371233, lng:2.2944672561380344, zoom:16.7, bearing:-45},
+  {name:"Colosseum", lat:41.89018992337611, lng:12.492400648895995, zoom:17.2, bearing:-70},
+  {name:"Great Pyramid of Giza", lat:29.97934492063709, lng:31.133488131453902, zoom:16.3, bearing:-50},
+  {name:"Sydney Harbour", lat: -33.856893813065696, lng:151.21511948499176, zoom:16.6, bearing:"15"},
+ {name:"Mount Kilimanjaro", lat:-3.06390271622368, lng:37.354765563195, zoom:11, bearing:""},
+
+ {name:"Netherlands Tulip Fields", lat:52.280739270720545, lng:4.560654196249942, zoom:13.5, bearing:"135"},
+
+  {name:"Richat Structure (Eye of the Sahara)", lat:21.126599324177718, lng:-11.394722934237961, zoom:10.2, bearing:""},
+ {name:"Palm Jumeirah", lat:25.115452335664514, lng:55.136854219741764, zoom:13.5, bearing:"-50"},
+ {name:"Vatican City", lat:41.902235163316334, lng:12.457250513006926, zoom:15, bearing:"90"},
+
+  {name:"Bingham Canyon Mine", lat:40.5236, lng:-112.1510, zoom:12.5, bearing:""},
+
+ {name:"Norilsk Mines", lat: 69.35260060982873, lng:88.20228216039538, zoom:13.15, bearing:"-33"},
+  {name:"Angkor Wat", lat:13.412462021223362, lng:103.86691665863646, zoom:14.5, bearing:"0"},
+{name:"Forbidden City", lat:39.9163, lng:116.39088230477512, zoom:14.81867598448715, bearing:"-3"},
+{ name:"Hoover Dam", lat:36.01492183292203, lng:-114.7389850720343, zoom:16, bearing:"47" },
+{ name:"Davis–Monthan Aircraft Boneyard", lat:32.16809085452503, lng:110.85369197273056, zoom:15.845896774139103, bearing:"0" },
+{ name:"Chernobyl Reactor Site", lat:51.38925863874721, lng:30.098307462683323, zoom:14.5, bearing:"0" },
+
+{ name:"Panama Canal (Gatun Locks)", lat:9.266572595290683, lng:-79.91159474564441, zoom:15.2, bearing:"-9" },
+{ name:"Bhadla Solar Park", lat:27.47917748757129, lng:71.97601537639486, zoom:13, bearing:"-1" },
+
+{ name:"Benban Solar Park", lat:24.431967145580543, lng:32.71695662134272, zoom:12.305023874592562, bearing:"0" },
+
+{ name:"Switch SUPERNAP Data Center (Las Vegas)", lat:36.039520162349106, lng:-115.03402150523372, zoom:15, bearing:"90" },
+
+{ name:"Mall of America", lat:44.85475569542726, lng:-93.24184044359167, zoom:15.3, bearing:"" },
+{ name:"Tesla Gigafactory Nevada", lat:39.53809380556311, lng:-119.43965975618889, zoom:15.1, bearing:"" },
+
+ { name:"Kennedy Space Center Launch Complex 39A", lat:28.608317447021832, lng:-80.604077921993, zoom:15.377890093605705, bearing:"" },
+{ name:"City – Michael Heizer Land Art", lat:38.03283864268096, lng:-115.44225329479913, zoom:14.7, bearing:"-50" },
+{ name:"Spiral Jetty", lat:41.437774842000834, lng: -112.66838690223983,zoom:17, bearing:"-94" },
+{ name:"Uffington White Horse", lat:51.57772673719987, lng:-1.5667360178618708, zoom:17.386083801335545, bearing:"" },
+{ name:"Roden Crater (James Turrell)", lat:35.425844271447986, lng:-111.25880608430002, zoom:13.8, bearing:"55" }
+
+// { name:"Star Axis Earthwork", lat:36.9907, lng:-105.4692, zoom:14.5, bearing:"" },
+// { name:"Broken Circle / Spiral Hill", lat:52.9457, lng:6.6105, zoom:14.2, bearing:"" },
+// { name:"Lightning Field Land Art", lat:34.3072, lng:-108.8672, zoom:12.8, bearing:"" },
+
+// { name:"Vostochny Cosmodrome", lat:51.8160, lng:128.3330, zoom:14.0, bearing:"" }
+
+ // { name:"Baikonur Cosmodrome Launch Site", lat:45.9203, lng:63.3420, zoom:14.5, bearing:"" },
+// { name:"SpaceX Starbase Launch Site", lat:25.9971, lng:-97.1566, zoom:14.5, bearing:"" },
+// { name:"Guiana Space Centre Launch Complex", lat:5.2360, lng:-52.7680, zoom:14.5, bearing:"" }
+
+// { name:"NASA Neutral Buoyancy Laboratory", lat:29.5619, lng:-95.0835, zoom:15.5, bearing:"" }
+//{ name:"NASA Johnson Space Center", lat:29.5593, lng:-95.0891, zoom:14.5, bearing:"" }
+//{ name:"Dubai Mall", lat:25.1975, lng:55.2796, zoom:15, bearing:"" }
+// { name:"Google Data Center – The Dalles", lat:45.6130, lng:-121.1790, zoom:14.8, bearing:"" },
+// { name:"Microsoft Data Center – Quincy", lat:47.2110, lng:-119.8500, zoom:14.5, bearing:"" },
+// { name:"Facebook / Meta Data Center – Prineville", lat:44.2990, lng:-120.8630, zoom:14.5, bearing:"" },
+// { name:"Apple Data Center – Maiden", lat:35.5895, lng:-81.2053, zoom:14.8, bearing:"" },
+
+// { name:"Microsoft Data Center – Boydton (Azure)", lat:36.6650, lng:-78.3860, zoom:13.8, bearing:"" },
+// { name:"Equinix Ashburn Data Center Cluster", lat:39.0438, lng:-77.4874, zoom:14.2, bearing:"" },
+
+// { name:"Google Data Center – Hamina (Finland)", lat:60.5690, lng:27.1970, zoom:14.5, bearing:"" },
+// { name:"Facebook / Meta Data Center – Luleå", lat:65.5840, lng:22.1550, zoom:14.5, bearing:"" },
+
+// { name:"Alibaba Cloud Data Center – Zhangbei", lat:41.1610, lng:114.7010, zoom:13.8, bearing:"" }
+
+
+
+
+
+// { name:"The World Islands", lat:25.2460, lng:55.1610, zoom:12.2, bearing:"" }
+
+// { name:"Great Mosque of Djenné", lat:13.9066, lng:-4.5530, zoom:16.1, bearing:"" }
+
+
+//,
+//{ name:"Area 51 Airfield", lat:37.2350, lng:-115.8111, zoom:14.0, bearing:"" }//,
+// { name:"Brasília City Plan", lat:-15.7939, lng:-47.8828, zoom:12.5, bearing:"" }
+
+  // {name:"Nazca Lines", lat:-14.7390, lng:-75.1300, zoom:12, bearing:""},
+  // {name:"Three Gorges Dam", lat:30.8231, lng:111.0036, zoom:12.5, bearing:""},
+  // {name:"Singapore Port", lat:1.2650, lng:103.7300, zoom:12.5, bearing:""},
+  // {name:"Salar de Uyuni", lat:-20.1338, lng:-67.4891, zoom:9, bearing:""},
+  // {name:"Atacama Lithium Ponds", lat:-23.3005, lng:-68.2567, zoom:12, bearing:""},
+  // {name:"Great Barrier Reef", lat:-18.2871, lng:147.6992, zoom:9, bearing:""},
+  // {name:"Lake Retba (Pink Lake)", lat:14.8380, lng:-17.2350, zoom:12, bearing:""},
+ // {name:"Antarctic Dry Valleys", lat:-77.5000, lng:162.0000, zoom:9, bearing:""}
 ];
 
 mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNtbWM2dGwyaDAzNGoyb3B3NW9xaWxjZTUifQ.0KpoiXkcPXzsaYK9UXdioQ"
+  mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ";
+
+
+
     const STYLE = "mapbox://styles/jjjiia123/cmmb9euid00at01qr9mbfapn7";
     const INITIAL_CENTER = [-121.96979950341608, 37.403187791716775]; // Hoboken-ish; change me
 
@@ -154,7 +274,7 @@ mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNtbWM2dGwyaDAzNGoyb3B3N
   map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "bottom-right");
       // Search box
    // After: const map = new mapboxgl.Map({...})
-console.log("MapboxGeocoder typeof:", typeof MapboxGeocoder);
+//console.log("MapboxGeocoder typeof:", typeof MapboxGeocoder);
 const geocoder = new MapboxGeocoder({
   accessToken: mapboxgl.accessToken,
   mapboxgl: mapboxgl,
@@ -166,10 +286,10 @@ const geocoder = new MapboxGeocoder({
 
 
 map.addControl(geocoder, "bottom-left");
-map.on("move",()=>{
-    console.log(map.getCenter())
-    console.log(map.getZoom())
-})
+// map.on("move",()=>{
+//     console.log(map.getCenter())
+//     console.log(map.getZoom())
+// })
   map.on("load", () => {
 
 
@@ -177,7 +297,17 @@ map.on("move",()=>{
       type: "geojson",
       data: { type: "FeatureCollection", features: [makeFieldFeature(map)] }
     });
-
+map.addLayer({
+  id: "field-shadow",
+  type: "line",
+  source: "field",
+  paint: {
+    "line-color": "#000",
+    "line-width": 14,
+    "line-opacity": 0.4,
+    "line-blur": 6
+  }
+});
     map.addLayer({
       id: "field-fill",
       type: "fill",
@@ -218,19 +348,23 @@ function flyToRandomPOI() {
   const poi = pois[Math.floor(Math.random() * pois.length)];
 
   // Change button text to destination
-  randomBtn.textContent = poi.name;
+  randomBtn.textContent = "..."
+  document.getElementById("place").textContent="You are at the "+poi.name;
 
   map.flyTo({
     center: [poi.lng, poi.lat],
     zoom: poi.zoom ?? 15,
     bearing:poi.bearing ?? 15,
-    speed: 1.2
+    sspeed: 2.2,        // higher = faster
+  curve: 1.0,        // lower = less “high arc”
+  duration: 1800,    // ms (try 1200–2500)
+  essential: true
   });
 
 
   // Optional: reset after movement finishes
   map.once("moveend", () => {
-    randomBtn.textContent = "Random place";
+    randomBtn.textContent = "Go somewhere else";
   });
 
 }
