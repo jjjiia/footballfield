@@ -189,6 +189,9 @@ const pois = [
 
 mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNtbWM2dGwyaDAzNGoyb3B3NW9xaWxjZTUifQ.0KpoiXkcPXzsaYK9UXdioQ"
 
+  mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ";
+
+
 
 
 
@@ -279,11 +282,15 @@ mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNtbWM2dGwyaDAzNGoyb3B3N
 const geocoder = new MapboxGeocoder({
   accessToken: mapboxgl.accessToken,
   mapboxgl: mapboxgl,
-  marker: false,
-  placeholder: "Search places",
-  zoom: 16,
-  types: "poi,address,place"
+
+  proximity: null,
+  limit: 6,
+  autocomplete: true,
+  placeholder: ""
 });
+
+
+map.addControl(geocoder);
 
 
 map.addControl(geocoder, "bottom-left");
