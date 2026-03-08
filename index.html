@@ -195,6 +195,8 @@ mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNtbWM2dGwyaDAzNGoyb3B3N
 
 
 
+
+
     const STYLE = "mapbox://styles/jjjiia123/cmmb9euid00at01qr9mbfapn7";
     const INITIAL_CENTER = [-121.96979950341608, 37.403187791716775]; // Hoboken-ish; change me
 
@@ -300,6 +302,8 @@ map.addControl(geocoder, "bottom-left");
   map.on("load", () => {
 
 
+    let placeIndex = 0
+
     map.addSource("field", {
       type: "geojson",
       data: { type: "FeatureCollection", features: [makeFieldFeature(map)] }
@@ -351,8 +355,8 @@ map.addLayer({
 const randomBtn = document.getElementById("randomPoiBtn");
 
 function flyToRandomPOI() {
-
-  const poi = pois[Math.floor(Math.random() * pois.length)];
+placeIndex=placeIndex+1
+  const poi = pois[placeIndex%(pois.length-1)];
 
   // Change button text to destination
   randomBtn.textContent = "..."
