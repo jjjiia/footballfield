@@ -5,21 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Football Fields</title>
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.css" rel="stylesheet" />
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
   <style>
-    html, body { height: 100%; margin: 0; }
+    html, body { height: 100%; margin: 0; background: #fff; }
+
+/* intro header, before the map begins */
+#intro{
+  background: #fff;
+  color: #000;
+  padding: 100px 20px;
+}
+#intro-inner{
+  max-width: 700px;
+  margin: 0 auto;
+}
+#intro h1{
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 40px;
+  margin: 0 0 24px;
+}
+#intro p{
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* outro text, below the map */
+#outro{
+  background: #fff;
+  color: #000;
+  padding: 100px 20px;
+}
+#outro-inner{
+  max-width: 700px;
+  margin: 0 auto;
+}
+#outro p{
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* the map section: sticks to the viewport while the scroll-steps play out */
+#map-scrolly{
+  position: relative;
+}
+#map-wrapper{
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
 #map {
-  position:fixed;
+  position:absolute;
   top:0;
   left:0;
   width:100%;
   height:100%;
   z-index:0;
-}/* The overlay container is fixed */
+}/* The overlay container is absolutely positioned within #map-wrapper */
 #labels{
-  position: fixed;
+  position: absolute;
   top: 20px;
   left: 20px;
   right: 20px;
@@ -35,62 +93,191 @@
 
 /* sentence text */
 #text{
-  font-size: 24px;
+  font-size: 16px;
+  font-weight: 300;
   color: white;
-  font-family: sans-serif;
-    /* -webkit-text-stroke:2px black; */
-
-    text-shadow:
-    0 0 6px rgba(0,0,0,1),
-    0 0 14px rgba(0,0,0,1),
-    0 3px 6px rgba(0,0,0,1),
-    0 8px 20px rgba(0,0,0,0.7);
+  font-family: 'Open Sans', sans-serif;
+  background: #000;
 }
 #place{
   font-size: 24px;
+  font-weight: 300;
   color: white;
-  font-family: sans-serif;
-    /* -webkit-text-stroke:2px black; */
+  font-family: 'Open Sans', sans-serif;
+  background: #000;
+}
 
-    text-shadow:
+/* scrolly sections: invisible spacers that drive the tour via scroll position */
+#scroll-sections{
+  position: relative;
+  z-index: 1;
+}
+.scroll-step{
+  height: 100vh;
+}
+
+/* down-arrow scroll cue */
+#scrollDownBtn{
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  pointer-events: auto;
+  background: none;
+  border: none;
+  color: #fff;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 40px;
+  line-height: 1;
+  cursor: pointer;
+  text-shadow:
     0 0 6px rgba(0,0,0,1),
     0 0 14px rgba(0,0,0,1),
     0 3px 6px rgba(0,0,0,1),
     0 8px 20px rgba(0,0,0,0.7);
+  animation: bounce 1.6s infinite;
+  transition: opacity 0.4s ease;
 }
-/* button */
-#randomPoiBtn{
-  pointer-events: auto;     /* button remains clickable */
+#scrollDownBtn.hidden{
+  opacity: 0;
+  pointer-events: none;
+}
 
-  padding:10px 12px;
-  border:0;
-  border-radius:0px;
-  background:none;
-  color:#fff;
-  border:3px solid white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.6);
-
-  font-size:24px;
-  cursor:pointer;
-
-    text-shadow:
+/* "show more" button, shown once the current tour runs out of stops */
+#showMoreBtn{
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  pointer-events: auto;
+  padding: 10px 18px;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  text-shadow:
     0 0 6px rgba(0,0,0,1),
-    0 0 14px rgba(0,0,0,1),
-    0 3px 6px rgba(0,0,0,1),
-    0 8px 20px rgba(0,0,0,0.7);
+    0 0 14px rgba(0,0,0,1);
+  transition: opacity 0.3s ease;
+}
+#showMoreBtn:hover{ opacity: 0.85; }
+#showMoreBtn.hidden{
+  opacity: 0;
+  pointer-events: none;
 }
 
-#randomPoiBtn:hover{ opacity:0.85; }
+@keyframes bounce{
+  0%, 100% { transform: translate(-50%, 0); }
+  50%      { transform: translate(-50%, 10px); }
+}
+
+.mapboxgl-ctrl-logo,
+.mapboxgl-ctrl-attrib { display: none !important; }
+
+/* cross-fade shown while the camera jumps between locations */
+#fade-overlay{
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 15;
+  transition: opacity 0.45s ease;
+}
+#fade-overlay.visible{ opacity: 1; }
+
+/* search: collapsed to a round icon button until toggled open */
+#searchToggleBtn{
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  z-index: 25;
+  pointer-events: auto;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  text-shadow:
+    0 0 6px rgba(0,0,0,1),
+    0 0 14px rgba(0,0,0,1);
+  transition: opacity 0.2s ease;
+}
+#searchToggleBtn.hidden{
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mapboxgl-ctrl-geocoder{
+  opacity: 0;
+  transform: scale(0.92);
+  transform-origin: bottom left;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.mapboxgl-ctrl-geocoder.search-open{
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
 </style>
 </head>
 <body>
 
-<div id="map"></div>
-<div id="labels">
-  <span id="text"></span>
-  <span id="place">You are at Levi's Stadium in Santa Clara, California.</span>
-  <button id="randomPoiBtn" type="button">Go somewhere</button>
+<header id="intro">
+  <div id="intro-inner">
+    <h1>A Football Field</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  </div>
+</header>
+
+<div id="map-scrolly">
+  <div id="map-wrapper">
+    <div id="map"></div>
+    <div id="fade-overlay"></div>
+    <div id="labels">
+      <span id="place">You are at Levi's Stadium in Santa Clara, California.</span>
+      <span id="text"></span>
+    </div>
+    <button id="scrollDownBtn" type="button" aria-label="Scroll down">⌄</button>
+    <button id="showMoreBtn" class="hidden" type="button">Show more</button>
+    <button id="searchToggleBtn" type="button" aria-label="Search">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="10.5" cy="10.5" r="6.5"/>
+        <line x1="20" y1="20" x2="15.5" y2="15.5"/>
+      </svg>
+    </button>
+  </div>
+
+  <div id="scroll-sections">
+    <section class="scroll-step" data-index="0"></section>
+    <section class="scroll-step" data-index="1"></section>
+    <section class="scroll-step" data-index="2"></section>
+    <section class="scroll-step" data-index="3"></section>
+    <section class="scroll-step" data-index="4"></section>
+    <section class="scroll-step" data-index="5"></section>
+  </div>
 </div>
+
+<div id="outro">
+  <div id="outro-inner">
+    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+  </div>
+</div>
+
 <script>
 const pois = [
   {name:"the White House", lat:38.897717, lng:-77.036568, zoom:16.5, bearing:90},
@@ -135,7 +322,15 @@ const pois = [
 { name:"Spiral Jetty", lat:41.437774842000834, lng: -112.66838690223983,zoom:17, bearing:"-94" },
 { name:"Uffington White Horse", lat:51.57772673719987, lng:-1.5667360178618708, zoom:17.386083801335545, bearing:"" },
 { name:"Roden Crater (James Turrell)", lat:35.425844271447986, lng:-111.25880608430002, zoom:13.8, bearing:"55" },
-{ name:"the Buc-ee's in New Braunfels, Texas",  lat: 29.726397189390113, lng:-98.07829988773135, zoom:16, bearing:"45" }
+{ name:"the Buc-ee's in New Braunfels, Texas",  lat: 29.726397189390113, lng:-98.07829988773135, zoom:16, bearing:"45" },
+{ name:"Meteor Crater", lat:35.0275, lng:-111.0219, zoom:14.5, bearing:"" },
+{ name:"the Chuquicamata Copper Mine", lat:-22.2969, lng:-68.9032, zoom:13, bearing:"" },
+{ name:"the Ivanpah Solar Power Facility", lat:35.5581, lng:-115.4693, zoom:13.5, bearing:"" },
+{ name:"the Pentagon", lat:38.8719, lng:-77.0563, zoom:16.5, bearing:"" },
+{ name:"the Zhangye Danxia Rainbow Mountains", lat:38.9256, lng:100.1447, zoom:13, bearing:"" },
+{ name:"the Great Blue Hole", lat:17.3155, lng:-87.5349, zoom:14, bearing:"" },
+{ name:"the center-pivot irrigation circles of Kansas", lat:37.9, lng:-100.87, zoom:12, bearing:"" },
+{ name:"Fordlandia", lat:-3.7975, lng:-55.4903, zoom:14, bearing:"" }
 // { name:"Star Axis Earthwork", lat:36.9907, lng:-105.4692, zoom:14.5, bearing:"" },
 // { name:"Broken Circle / Spiral Hill", lat:52.9457, lng:6.6105, zoom:14.2, bearing:"" },
 // { name:"Lightning Field Land Art", lat:34.3072, lng:-108.8672, zoom:12.8, bearing:"" },
@@ -185,7 +380,7 @@ const pois = [
  // {name:"Antarctic Dry Valleys", lat:-77.5000, lng:162.0000, zoom:9, bearing:""}
 ];
 
-mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ"
+mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNtbWM2dGwyaDAzNGoyb3B3NW9xaWxjZTUifQ.0KpoiXkcPXzsaYK9UXdioQ"
 
 
 
@@ -275,6 +470,17 @@ mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzN
   });
 
   map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "bottom-right");
+
+  // The tour is driven by page scroll, not direct map gestures —
+  // disable manual interaction so wheel/touch scroll the page instead of the map.
+  map.scrollZoom.disable();
+  map.dragPan.disable();
+  map.dragRotate.disable();
+  map.doubleClickZoom.disable();
+  map.touchZoomRotate.disable();
+  map.touchPitch.disable();
+  map.keyboard.disable();
+  map.boxZoom.disable();
       // Search box
    // After: const map = new mapboxgl.Map({...})
 //console.log("MapboxGeocoder typeof:", typeof MapboxGeocoder);
@@ -290,14 +496,46 @@ const geocoder = new MapboxGeocoder({
 
 
 map.addControl(geocoder, "bottom-left");
+
+// Collapse the geocoder into a popup, opened via the magnifying-glass icon
+const searchToggleBtn = document.getElementById("searchToggleBtn");
+const geocoderEl = geocoder.container ?? document.querySelector(".mapboxgl-ctrl-geocoder");
+
+function openSearch() {
+  geocoderEl.classList.add("search-open");
+  searchToggleBtn.classList.add("hidden");
+  const input = geocoderEl.querySelector("input");
+  if (input) input.focus();
+}
+
+function closeSearch() {
+  geocoderEl.classList.remove("search-open");
+  searchToggleBtn.classList.remove("hidden");
+}
+
+searchToggleBtn.addEventListener("click", openSearch);
+
+document.addEventListener("click", (e) => {
+  if (
+    geocoderEl.classList.contains("search-open") &&
+    !geocoderEl.contains(e.target) &&
+    e.target !== searchToggleBtn
+  ) {
+    closeSearch();
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeSearch();
+});
+
+geocoder.on("result", closeSearch);
+
 // map.on("move",()=>{
 //     console.log(map.getCenter())
 //     console.log(map.getZoom())
 // })
   map.on("load", () => {
-
-
-    let placeIndex = 0
 
     map.addSource("field", {
       type: "geojson",
@@ -347,35 +585,115 @@ map.addLayer({
         features: [makeFieldFeature(map)]
       });
     }
-const randomBtn = document.getElementById("randomPoiBtn");
+    // --- Scrolly tour: index 0 is always the football field; ---
+    // --- indices 1-5 are 5 randomly chosen places from `pois`. ---
+    function pickRandomStops(list, n) {
+      const arr = list.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr.slice(0, n);
+    }
 
-function flyToRandomPOI() {
-placeIndex=placeIndex+1
-  const poi = pois[placeIndex%(pois.length-1)];
+    const HOME_PLACE_TEXT = "You are at Levi's Stadium in Santa Clara, California.";
+    const tour = [null, ...pickRandomStops(pois, 5)];
 
-  // Change button text to destination
-  randomBtn.textContent = "..."
-  document.getElementById("place").textContent="You are at "+poi.name;
+    const scrollDownBtn = document.getElementById("scrollDownBtn");
+    const showMoreBtn = document.getElementById("showMoreBtn");
+    const scrollSections = document.getElementById("scroll-sections");
+    const placeLabel = document.getElementById("place");
+    const fadeOverlay = document.getElementById("fade-overlay");
+    let currentStep = 0;
 
-  map.flyTo({
-    center: [poi.lng, poi.lat],
-    zoom: poi.zoom ?? 15,
-    bearing:poi.bearing ?? 15,
-    sspeed: 2.2,        // higher = faster
-  curve: 1.0,        // lower = less “high arc”
-  duration: 1800,    // ms (try 1200–2500)
-  essential: true
-  });
+    const FADE_MS = 450;
+    const ZOOM_OUT_DELTA = 2;
+    const ZOOM_IN_MS = 1400;
 
+    function updateEndControls() {
+      const atEnd = currentStep >= tour.length - 1;
+      scrollDownBtn.classList.toggle("hidden", atEnd);
+      showMoreBtn.classList.toggle("hidden", !atEnd);
+    }
 
-  // Optional: reset after movement finishes
-  map.once("moveend", () => {
-    randomBtn.textContent = "Go somewhere else";
-  });
+    function wait(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
 
-}
+    async function goToStep(index) {
+      if (index === currentStep) return;
+      currentStep = index;
+      const poi = tour[index];
 
-randomBtn.addEventListener("click", flyToRandomPOI);
+      const target = poi
+        ? { center: [poi.lng, poi.lat], zoom: poi.zoom ?? 15, bearing: poi.bearing || 0 }
+        : { center: INITIAL_CENTER, zoom: 17, bearing: -29 };
+
+      const zoomedOut = Math.max(target.zoom - ZOOM_OUT_DELTA, 0);
+
+      // zoom out a touch while fading to black
+      fadeOverlay.classList.add("visible");
+      map.easeTo({ zoom: zoomedOut, duration: FADE_MS, essential: true });
+      await wait(FADE_MS);
+
+      // hidden behind the overlay: jump straight to the new spot, still zoomed out
+      map.jumpTo({ center: target.center, bearing: target.bearing, zoom: zoomedOut });
+      placeLabel.textContent = poi ? "You are at " + poi.name : HOME_PLACE_TEXT;
+
+      // fade back in while easing in to the real zoom level
+      fadeOverlay.classList.remove("visible");
+      map.easeTo({ zoom: target.zoom, duration: ZOOM_IN_MS, essential: true });
+
+      updateEndControls();
+    }
+
+    const stepObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          goToStep(Number(entry.target.dataset.index));
+        }
+      });
+    }, { threshold: [0.5] });
+
+    document.querySelectorAll(".scroll-step").forEach((section) => {
+      stepObserver.observe(section);
+    });
+
+    scrollDownBtn.addEventListener("click", () => {
+      const next = Math.min(currentStep + 1, tour.length - 1);
+      document
+        .querySelector(`.scroll-step[data-index="${next}"]`)
+        .scrollIntoView({ behavior: "smooth" });
+    });
+
+    // Ran out of stops — pick 5 more (avoiding repeats where possible) and
+    // append new scroll-step sections so the visitor can keep scrolling.
+    function addMoreStops() {
+      const alreadyShown = new Set(tour.filter(Boolean).map((p) => p.name));
+      const remaining = pois.filter((p) => !alreadyShown.has(p.name));
+      const pool = remaining.length >= 5 ? remaining : pois;
+      const newStops = pickRandomStops(pool, 5);
+      const startIndex = tour.length;
+      tour.push(...newStops);
+
+      newStops.forEach((_, i) => {
+        const section = document.createElement("section");
+        section.className = "scroll-step";
+        section.dataset.index = String(startIndex + i);
+        scrollSections.appendChild(section);
+        stepObserver.observe(section);
+      });
+
+      showMoreBtn.classList.add("hidden");
+      scrollDownBtn.classList.remove("hidden");
+
+      document
+        .querySelector(`.scroll-step[data-index="${startIndex}"]`)
+        .scrollIntoView({ behavior: "smooth" });
+    }
+
+    showMoreBtn.addEventListener("click", addMoreStops);
+
     // 'move' fires for pan/zoom/rotate/pitch continuously
     map.on("move", () => {
       if (raf) return;
