@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Football Fields</title>
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
-<link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.1/mapbox-gl-geocoder.css" rel="stylesheet" />
-
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.css" rel="stylesheet" />
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
@@ -187,7 +185,7 @@ const pois = [
  // {name:"Antarctic Dry Valleys", lat:-77.5000, lng:162.0000, zoom:9, bearing:""}
 ];
 
-mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNtbWM2dGwyaDAzNGoyb3B3NW9xaWxjZTUifQ.0KpoiXkcPXzsaYK9UXdioQ"
+mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ"
 
 
 
@@ -291,9 +289,6 @@ const geocoder = new MapboxGeocoder({
 });
 
 
-map.addControl(geocoder);
-
-
 map.addControl(geocoder, "bottom-left");
 // map.on("move",()=>{
 //     console.log(map.getCenter())
@@ -381,8 +376,6 @@ placeIndex=placeIndex+1
 }
 
 randomBtn.addEventListener("click", flyToRandomPOI);
-
-document.getElementById("randomPoiBtn").addEventListener("click", flyToRandomPOI);
     // 'move' fires for pan/zoom/rotate/pitch continuously
     map.on("move", () => {
       if (raf) return;
