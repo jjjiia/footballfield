@@ -282,12 +282,12 @@
     </p>
 
     <p class="madlib">
-      If you stand at <input type="number" id="intersectionsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="intersectionNoun">intersection</span> a <select id="intersectionsPeriodSelect" class="inline-select">
+      If you stand at <input type="number" id="intersectionsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="intersectionNoun">traffic light</span> a <select id="intersectionsPeriodSelect" class="inline-select">
         <option value="day" selected>day</option>
         <option value="week">week</option>
         <option value="month">month</option>
         <option value="year">year</option>
-      </select>, you will stand at every intersection in New York City<sup class="sn">15</sup><span class="sidenote"><b>15.</b> 13,543 signalized intersections citywide, per <a href="https://www.nyc.gov/html/dot/html/infrastructure/signals.shtml" target="_blank" rel="noopener">NYC DOT</a> (March 2022). Thousands more unsignalized crossings exist but aren't counted here.</span> in <span class="result" id="intersectionYears">–</span>.
+      </select>, you will stand at every traffic light in New York City<sup class="sn">15</sup><span class="sidenote"><b>15.</b> 13,543 signalized intersections citywide, per <a href="https://www.nyc.gov/html/dot/html/infrastructure/signals.shtml" target="_blank" rel="noopener">NYC DOT</a> (March 2022).</span> in <span class="result" id="intersectionYears">–</span>.
     </p>
 
     <hr class="divider">
@@ -681,7 +681,7 @@
     restaurantsPeriodSelect.addEventListener("change", updateRestaurants);
     updateRestaurants();
 
-    // ---- "if you stand at 1 intersection a day..." ----
+    // ---- "if you stand at 1 traffic light a day..." ----
     const NYC_SIGNALIZED_INTERSECTIONS = 13543;
 
     const intersectionsPerDayInput = document.getElementById("intersectionsPerDayInput");
@@ -691,7 +691,7 @@
 
     function updateIntersections() {
       const rawRate = Number(intersectionsPerDayInput.value) || 0;
-      intersectionNoun.textContent = pluralize(rawRate, "intersection", "intersections");
+      intersectionNoun.textContent = pluralize(rawRate, "traffic light", "traffic lights");
       const periodDays = PLACES_PERIOD_DAYS[intersectionsPeriodSelect.value] || 1;
       intersectionYears.textContent = yearsToVisitAll(NYC_SIGNALIZED_INTERSECTIONS, rawRate / periodDays);
     }
