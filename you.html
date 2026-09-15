@@ -17,13 +17,6 @@
     .inner{
       max-width: 960px;
     }
-    h1{
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: 40px;
-      margin: 0 0 32px;
-    }
     .madlib{
       max-width: 620px;
       font-size: 28px;
@@ -144,7 +137,6 @@
     <a href="you.html">You</a>
   </nav>
   <div class="inner">
-    <h1>You</h1>
     <p class="madlib">
       If you walk <input type="number" id="stepsInput" class="blank-input" value="10000" min="1" step="500"> <span id="stepsNoun">steps</span> a day<sup class="sn">1</sup><span class="sidenote"><b>1.</b> Assumes ~2,000 steps per mile.</span>...<br>you will walk from Boston to New York<sup class="sn">2</sup><span class="sidenote"><b>2.</b> Straight-line distance, ~190 miles.</span> in <span class="result" id="bostonNyDays">–</span>, walk the entire length of the Great Wall of China<sup class="sn">3</sup><span class="sidenote"><b>3.</b> <a href="https://www.chinadiscovery.com/great-wall/facts/how-long-is-the-great-wall-of-china.html" target="_blank" rel="noopener">Full Ming-era length</a>, ~13,171 miles.</span> in <span class="result" id="wallDays">–</span>, walk around the world at the equator<sup class="sn">4</sup><span class="sidenote"><b>4.</b> <a href="https://en.wikipedia.org/wiki/Earth%27s_circumference" target="_blank" rel="noopener">Equatorial circumference</a>, ~24,901 miles.</span> in <span class="result" id="equatorDays">–</span>, reach the Moon<sup class="sn">5</sup><span class="sidenote">Average <a href="https://spaceplace.nasa.gov/moon-distance/en/" target="_blank" rel="noopener">Earth–Moon distance</a>, ~238,855 miles.</span> in <span class="result" id="moonDays">–</span>, and walk from
       <span class="geocoder-box" id="fromBox"></span>
@@ -808,6 +800,53 @@
     spendPeriodSelect.addEventListener("change", updateSpend);
     spendYearsInput.addEventListener("input", updateSpend);
     updateSpend();
+
+    // ---- on touch devices, drag up/down on a number blank to change it ----
+    // (a plain tap still opens the keyboard, for anyone who'd rather type)
+    function enableScrollAdjust(input) {
+      const step = parseFloat(input.step) || 1;
+      const min = input.min !== "" ? parseFloat(input.min) : -Infinity;
+      const max = input.max !== "" ? parseFloat(input.max) : Infinity;
+      const decimals = (String(step).split(".")[1] || "").length;
+      const PIXELS_PER_STEP = 12;
+
+      let startY = 0;
+      let startValue = 0;
+      let dragging = false;
+
+      input.addEventListener("touchstart", (e) => {
+        startY = e.touches[0].clientY;
+        startValue = parseFloat(input.value) || 0;
+        dragging = false;
+      }, { passive: true });
+
+      input.addEventListener("touchmove", (e) => {
+        const deltaY = startY - e.touches[0].clientY; // positive = dragged up
+
+        if (!dragging) {
+          if (Math.abs(deltaY) < 8) return;
+          dragging = true;
+          input.blur(); // dragging to adjust, not typing — dismiss/skip the keyboard
+        }
+
+        e.preventDefault();
+
+        let next = startValue + Math.round(deltaY / PIXELS_PER_STEP) * step;
+        next = Math.min(max, Math.max(min, next));
+        next = Number(next.toFixed(decimals));
+
+        if (next !== parseFloat(input.value)) {
+          input.value = next;
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      }, { passive: false });
+
+      input.addEventListener("touchend", () => {
+        dragging = false;
+      }, { passive: true });
+    }
+
+    document.querySelectorAll('input.blank-input[type="number"]').forEach(enableScrollAdjust);
   </script>
 </body>
 </html>
