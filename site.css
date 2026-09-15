@@ -1,0 +1,28 @@
+html, body { margin: 0; background: #fff; color: #000; }
+body{ font-family: 'Open Sans', sans-serif; }
+
+.inner{
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 100px 20px;
+}
+
+/* top site nav */
+.site-nav{
+  height: 24px;
+  background: #FFEF00; /* process yellow */
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 10px;
+}
+.site-nav a{
+  color: #000;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+.site-nav a:hover{ text-decoration: underline; }

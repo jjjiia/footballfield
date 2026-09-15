@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>You</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
+  <style>
+    /* this page needs a right margin column for sidenotes, so it's wider than the shared .inner */
+    .inner{
+      max-width: 960px;
+    }
+    h1{
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 40px;
+      margin: 0 0 32px;
+    }
+    .madlib{
+      max-width: 620px;
+      font-size: 28px;
+      font-weight: 400;
+      line-height: 1.7;
+      margin: 0 0 32px;
+    }
+    .madlib-spaced{
+      margin-top: 64px;
+    }
+    .divider{
+      max-width: 620px;
+      margin: 48px 0 0;
+      border: none;
+      border-top: 1px solid #ccc;
+    }
+    /* process yellow, matches the site nav — marks every part of the sentence you can change */
+    .blank-input{
+      width: 100px;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+      color: #000;
+      background: #f0f0f0;
+      border: none;
+      border-bottom: 2px solid #000;
+    }
+    .blank-input:focus{ outline: none; }
+    #activityInput{ width: 140px; }
+    #hoursPerDayInput, #yearsInput{ width: 60px; }
+    #dailySavingsInput{ width: 80px; }
+    #savingsYearsInput{ width: 60px; }
+    #wordsPerDayInput, #coffeeShopsPerDayInput, #restaurantsPerDayInput{ width: 60px; }
+    #talkAmountInput{ width: 60px; }
+    #parkActivityInput{ width: 160px; }
+    #parkFrequencyInput, #parkYearsInput{ width: 60px; }
+    #spendQuantityInput{ width: 50px; }
+    #spendYearsInput{ width: 60px; }
+    #intersectionsPerDayInput{ width: 60px; }
+    #citySearchInput{
+      width: 170px;
+      padding-right: 26px;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'><circle cx='10.5' cy='10.5' r='6.5'/><line x1='20' y1='20' x2='15.5' y2='15.5'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 2px center;
+      background-size: 16px 16px;
+    }
+    /* Safari/Firefox render a built-in dropdown indicator for list-backed inputs; hide it so only our icon shows */
+    #citySearchInput::-webkit-calendar-picker-indicator{ display: none; }
+    #wordsYearsInput, #peopleYearsInput{ width: 60px; }
+    .inline-select{
+      font-family: 'Open Sans', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: #000;
+      background: #f0f0f0;
+      border: none;
+      border-bottom: 2px solid #000;
+    }
+    .inline-select:focus{ outline: none; }
+    .madlib .result{
+      font-weight: 700;
+    }
+
+    /* footnote-style sidenotes, floated into the right margin next to where they occur */
+    .sn{
+      font-size: 13px;
+      font-weight: 700;
+      vertical-align: super;
+      line-height: 0;
+      color: #000;
+    }
+    .sidenote{
+      float: right;
+      clear: right;
+      width: 280px;
+      margin-right: -300px;
+      margin-top: 0.2em;
+      margin-bottom: 1em;
+      font-size: 12px;
+      font-weight: 300;
+      line-height: 1.4;
+      color: #000;
+      text-align: left;
+    }
+    .sidenote a{ color: #000; }
+
+    .geocoder-box{
+      display: inline-block;
+      vertical-align: middle;
+      width: 240px; /* matches the geocoder library's own min-width */
+    }
+    .geocoder-box .mapboxgl-ctrl-geocoder{
+      width: 100%;
+      max-width: none;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 18px;
+      background: #f0f0f0;
+      box-shadow: none;
+      border-bottom: 2px solid #000;
+      border-radius: 0;
+    }
+    .geocoder-box .mapboxgl-ctrl-geocoder input{
+      width: 100%;
+      box-sizing: border-box;
+      color: #000;
+      font-weight: 700;
+    }
+    .geocoder-box .suggestions-wrapper{ z-index: 30; }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="index.html">Football</a>
+    <a href="references.html">References</a>
+    <a href="zoom.html">Zoom</a>
+    <a href="you.html">You</a>
+  </nav>
+  <div class="inner">
+    <h1>You</h1>
+    <p class="madlib">
+      If you walk <input type="number" id="stepsInput" class="blank-input" value="10000" min="1" step="500"> <span id="stepsNoun">steps</span> a day<sup class="sn">1</sup><span class="sidenote"><b>1.</b> Assumes ~2,000 steps per mile.</span>...<br>you will walk from Boston to New York<sup class="sn">2</sup><span class="sidenote"><b>2.</b> Straight-line distance, ~190 miles.</span> in <span class="result" id="bostonNyDays">–</span>, walk the entire length of the Great Wall of China<sup class="sn">3</sup><span class="sidenote"><b>3.</b> <a href="https://www.chinadiscovery.com/great-wall/facts/how-long-is-the-great-wall-of-china.html" target="_blank" rel="noopener">Full Ming-era length</a>, ~13,171 miles.</span> in <span class="result" id="wallDays">–</span>, walk around the world at the equator<sup class="sn">4</sup><span class="sidenote"><b>4.</b> <a href="https://en.wikipedia.org/wiki/Earth%27s_circumference" target="_blank" rel="noopener">Equatorial circumference</a>, ~24,901 miles.</span> in <span class="result" id="equatorDays">–</span>, reach the Moon<sup class="sn">5</sup><span class="sidenote">Average <a href="https://spaceplace.nasa.gov/moon-distance/en/" target="_blank" rel="noopener">Earth–Moon distance</a>, ~238,855 miles.</span> in <span class="result" id="moonDays">–</span>, and walk from
+      <span class="geocoder-box" id="fromBox"></span>
+      to
+      <span class="geocoder-box" id="toBox"></span><sup class="sn">6</sup><span class="sidenote"><b>6.</b> Straight-line distance between the two points, at the same ~2,000 steps per mile.</span>
+      in <span class="result" id="routeDuration">–</span>.
+    </p>
+
+    <hr class="divider">
+
+    <p class="madlib madlib-spaced">
+      If you <input type="text" id="activityInput" class="blank-input" value="sleep"> <input type="number" id="hoursPerDayInput" class="blank-input" value="8" min="0" step="0.5"> <select id="hoursUnitSelect" class="inline-select">
+        <option value="seconds">seconds</option>
+        <option value="minutes">minutes</option>
+        <option value="hours" selected>hours</option>
+      </select> a <select id="periodUnitSelect" class="inline-select">
+        <option value="hour">hour</option>
+        <option value="day" selected>day</option>
+        <option value="month">month</option>
+        <option value="year">year</option>
+      </select>, in the next <input type="number" id="yearsInput" class="blank-input" value="20" min="1" step="1"> <select id="durationUnitSelect" class="inline-select">
+        <option value="hours">hours</option>
+        <option value="days">days</option>
+        <option value="months">months</option>
+        <option value="years" selected>years</option>
+      </select><sup class="sn">7</sup><span class="sidenote"><b>7.</b> A month is calculated as 30 days.</span>...<br>you will <span id="activityMirror">sleep</span> for <span class="result" id="totalHours">–</span>.
+    </p>
+
+    <p class="madlib">
+      If you <input type="text" id="parkActivityInput" class="blank-input" value="go to the park"> <input type="number" id="parkFrequencyInput" class="blank-input" value="2" min="0" step="1">x a <select id="parkPeriodSelect" class="inline-select">
+        <option value="day">day</option>
+        <option value="week" selected>week</option>
+        <option value="month">month</option>
+        <option value="year">year</option>
+      </select>, in the next <input type="number" id="parkYearsInput" class="blank-input" value="20" min="1" step="1"> years, you will <span id="parkActivityMirror">go to the park</span> <span class="result" id="parkTimes">–</span> times.
+    </p>
+
+    <p class="madlib">
+      If you talk to your <select id="talkRelationshipSelect" class="inline-select">
+        <option value="mom" selected>mom</option>
+        <option value="dad">dad</option>
+        <option value="partner">partner</option>
+        <option value="best friend">best friend</option>
+        <option value="sibling">sibling</option>
+      </select> for <input type="number" id="talkAmountInput" class="blank-input" value="5" min="0" step="1"> <select id="talkTimeUnitSelect" class="inline-select">
+        <option value="seconds">seconds</option>
+        <option value="minutes" selected>minutes</option>
+        <option value="hours">hours</option>
+      </select> a <select id="talkPeriodSelect" class="inline-select">
+        <option value="day" selected>day</option>
+        <option value="week">week</option>
+        <option value="month">month</option>
+        <option value="year">year</option>
+      </select>, in the next <select id="talkYearsSelect" class="inline-select">
+        <option value="1">1</option>
+        <option value="5" selected>5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="50">50</option>
+      </select> years, you will talk to them for <span class="result" id="talkDuration">–</span>.
+    </p>
+
+    <p class="madlib">
+      If you talk to a new person a <select id="peoplePeriodSelect" class="inline-select">
+        <option value="second">second</option>
+        <option value="minute">minute</option>
+        <option value="hour">hour</option>
+        <option value="day">day</option>
+        <option value="week" selected>week</option>
+        <option value="month">month</option>
+        <option value="year">year</option>
+      </select><sup class="sn">9</sup><span class="sidenote"><b>9.</b> Assumes 60 seconds/minute, 60 minutes/hour, 7 days/week, 30 days/month, 365 days/year.</span>, in the next <input type="number" id="peopleYearsInput" class="blank-input" value="20" min="1" step="1"> years, you will talk to <span class="result" id="peopleMet">–</span> strangers, and you will talk to everyone in <input type="text" id="citySearchInput" class="blank-input" list="cityDatalist" value="New York City" autocomplete="off"><datalist id="cityDatalist">
+        <option value="New York City">
+        <option value="Los Angeles">
+        <option value="Chicago">
+        <option value="Toronto">
+        <option value="Mexico City">
+        <option value="São Paulo">
+        <option value="London">
+        <option value="Paris">
+        <option value="Moscow">
+        <option value="Cairo">
+        <option value="Mumbai">
+        <option value="Delhi">
+        <option value="Beijing">
+        <option value="Shanghai">
+        <option value="Tokyo">
+      </datalist><sup class="sn">14</sup><span class="sidenote"><b>14.</b> City-proper populations from Wikipedia's <a href="https://en.wikipedia.org/wiki/List_of_largest_cities_by_population_in_2026" target="_blank" rel="noopener">List of largest cities by population in 2026</a>.</span> in <span class="result" id="cityYears">–</span>.
+    </p>
+
+    <hr class="divider">
+
+    <p class="madlib madlib-spaced">
+      If you buy <input type="number" id="spendQuantityInput" class="blank-input" value="1" min="0" step="1"> <select id="spendFoodSelect" class="inline-select">
+        <option value="coffee" selected>small black coffee from Starbucks</option>
+        <option value="happymeal">Happy Meal from McDonald's</option>
+        <option value="taco">taco from Taco Bell</option>
+        <option value="chickfila">chicken sandwich from Chick-fil-A</option>
+        <option value="dunkin">donut from Dunkin'</option>
+        <option value="chipotle">chicken burrito from Chipotle</option>
+        <option value="wendys">small Frosty from Wendy's</option>
+      </select> a <select id="spendPeriodSelect" class="inline-select">
+        <option value="day" selected>day</option>
+        <option value="week">week</option>
+        <option value="month">month</option>
+      </select>, in the next <input type="number" id="spendYearsInput" class="blank-input" value="10" min="1" step="1"> years, you will spend $<span class="result" id="spendTotal">–</span><sup class="sn">12</sup><span class="sidenote"><b>12.</b> Assumes ~$2.45 per <a href="https://starbucksmenu.us/brewed-coffee-menu/" target="_blank" rel="noopener">Starbucks short coffee</a>, ~$5.99 per <a href="https://www.mac-menus.com/happy-meal/" target="_blank" rel="noopener">McDonald's Happy Meal</a>, ~$1.99 per <a href="https://tacobellmenus.net/tacos/crunchy-taco-2/" target="_blank" rel="noopener">Taco Bell Crunchy Taco</a>, ~$5.25 per <a href="https://fastfoodmenuprices.com/chick-fil-a-prices/" target="_blank" rel="noopener">Chick-fil-A Original Chicken Sandwich</a>, ~$1.09 per <a href="https://dunkinmenu.org/" target="_blank" rel="noopener">Dunkin' classic donut</a>, ~$9.79 per <a href="https://usafoodjournal.com/chipotle-menu-with-prices" target="_blank" rel="noopener">Chipotle chicken burrito</a>, and ~$2.49 per <a href="https://hackthemenu.com/wendys/menu-prices/frosty/" target="_blank" rel="noopener">Wendy's small Frosty</a>.</span> at today's prices, or $<span class="result" id="spendTotalInflated">–</span> accounting for fast-food inflation<sup class="sn">13</sup><span class="sidenote"><b>13.</b> Assumes ~5.2%/year fast-food price inflation, compounded annually — the 2020–2025 average of the BLS <a href="https://fred.stlouisfed.org/series/IPUTN72251AT050000000" target="_blank" rel="noopener">Sectoral Output Price Deflator for Limited-Service Eating Places</a> (NAICS 72251A): 4.3%, 6.6%, 7.2%, 7.0%, 4.4%, 3.3%.</span>.
+    </p>
+
+    <p class="madlib">
+      If you learn <input type="number" id="wordsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="wordsNoun">word</span> a <select id="wordsPeriodSelect" class="inline-select">
+        <option value="day" selected>day</option>
+        <option value="week">week</option>
+        <option value="month">month</option>
+        <option value="year">year</option>
+      </select>, in the next <input type="number" id="wordsYearsInput" class="blank-input" value="1" min="1" step="1"> years, you will learn <span class="result" id="wordsLearned">–</span> words.
+    </p>
+
+    <p class="madlib">
+      If you go to <input type="number" id="coffeeShopsPerDayInput" class="blank-input" value="1" min="0" step="1"> new <span id="coffeeShopNoun">coffee shop</span> a <select id="coffeeShopsPeriodSelect" class="inline-select">
+        <option value="day" selected>day</option>
+        <option value="week">week</option>
+        <option value="month">month</option>
+        <option value="year">year</option>
+      </select>, you will go to all the coffee shops in Manhattan<sup class="sn">10</sup><span class="sidenote"><b>10.</b> 1,113 Coffee/Tea establishments in Manhattan, per <a href="https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Inspection-Results/43nn-pn8j" target="_blank" rel="noopener">NYC DOHMH restaurant inspection data</a>.</span> in <span class="result" id="coffeeShopYears">–</span>.
+    </p>
+
+    <p class="madlib">
+      If you go to <input type="number" id="restaurantsPerDayInput" class="blank-input" value="1" min="0" step="1"> new <span id="restaurantNoun">restaurant</span> a <select id="restaurantsPeriodSelect" class="inline-select">
+        <option value="day" selected>day</option>
+        <option value="week">week</option>
+        <option value="month">month</option>
+        <option value="year">year</option>
+      </select>, you will go to all the restaurants in Manhattan<sup class="sn">11</sup><span class="sidenote"><b>11.</b> 12,526 food establishments in Manhattan, per <a href="https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Inspection-Results/43nn-pn8j" target="_blank" rel="noopener">NYC DOHMH restaurant inspection data</a>.</span> in <span class="result" id="restaurantYears">–</span>.
+    </p>
+
+    <p class="madlib">
+      If you stand at <input type="number" id="intersectionsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="intersectionNoun">intersection</span> a <select id="intersectionsPeriodSelect" class="inline-select">
+        <option value="day" selected>day</option>
+        <option value="week">week</option>
+        <option value="month">month</option>
+        <option value="year">year</option>
+      </select>, you will stand at every intersection in New York City<sup class="sn">15</sup><span class="sidenote"><b>15.</b> 13,543 signalized intersections citywide, per <a href="https://www.nyc.gov/html/dot/html/infrastructure/signals.shtml" target="_blank" rel="noopener">NYC DOT</a> (March 2022). Thousands more unsignalized crossings exist but aren't counted here.</span> in <span class="result" id="intersectionYears">–</span>.
+    </p>
+
+    <hr class="divider">
+
+    <p class="madlib madlib-spaced">
+      If you save $<input type="number" id="dailySavingsInput" class="blank-input" value="1" min="0" step="0.5"> a <select id="savingsPeriodSelect" class="inline-select">
+        <option value="minute">minute</option>
+        <option value="hour">hour</option>
+        <option value="day" selected>day</option>
+        <option value="week">week</option>
+        <option value="month">month</option>
+        <option value="year">year</option>
+      </select>, you will save $<span class="result" id="simpleSavings">–</span> in the next <input type="number" id="savingsYearsInput" class="blank-input" value="20" min="1" step="1"> years (assuming 5% interest<sup class="sn">8</sup><span class="sidenote"><b>8.</b> Compounded annually; treats each year's daily savings as one annual deposit.</span> compounded annually, it will be $<span class="result" id="compoundSavings">–</span>).
+    </p>
+
+
+  </div>
+
+  <script>
+    // count === 1 -> singular, everything else (including 0 and fractions) -> plural
+    function pluralize(count, singular, plural) {
+      return count === 1 ? singular : plural;
+    }
+
+    const STEPS_PER_MILE = 2000;
+    const BOSTON_NY_MILES = 190; // straight-line
+    const GREAT_WALL_MILES = 13171;
+    const EQUATOR_MILES = 24901;
+    const MOON_MILES = 238855;
+
+    const MAPBOX_TOKEN = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ";
+
+    const stepsInput = document.getElementById("stepsInput");
+    const stepsNoun = document.getElementById("stepsNoun");
+    const bostonNyDays = document.getElementById("bostonNyDays");
+    const wallDays = document.getElementById("wallDays");
+    const equatorDays = document.getElementById("equatorDays");
+    const moonDays = document.getElementById("moonDays");
+    const routeDuration = document.getElementById("routeDuration");
+
+    function formatDuration(miles, milesPerDay) {
+      if (milesPerDay <= 0) return "–";
+
+      const totalDays = Math.round(miles / milesPerDay);
+      const years = Math.floor(totalDays / 365);
+      const days = totalDays % 365;
+
+      const parts = [];
+      if (years > 0) parts.push(years + " " + (years === 1 ? "year" : "years"));
+      parts.push(days + " " + (days === 1 ? "day" : "days"));
+
+      return parts.join(", ");
+    }
+
+    function milesPerDayFromSteps() {
+      const steps = Number(stepsInput.value) || 0;
+      return steps / STEPS_PER_MILE;
+    }
+
+    function update() {
+      stepsNoun.textContent = pluralize(Number(stepsInput.value) || 0, "step", "steps");
+      const milesPerDay = milesPerDayFromSteps();
+      bostonNyDays.textContent = formatDuration(BOSTON_NY_MILES, milesPerDay);
+      wallDays.textContent = formatDuration(GREAT_WALL_MILES, milesPerDay);
+      equatorDays.textContent = formatDuration(EQUATOR_MILES, milesPerDay);
+      moonDays.textContent = formatDuration(MOON_MILES, milesPerDay);
+      updateRoute();
+    }
+
+    // ---- "walk from X to Y" place search ----
+    function haversineMiles([lng1, lat1], [lng2, lat2]) {
+      const R = 3958.8; // Earth radius, miles
+      const toRad = (d) => (d * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLng = toRad(lng2 - lng1);
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    let fromCoords = [0, -72.822042];      // Antarctica
+    let toCoords = [25.730928, 66.50259];  // Rovaniemi, Finland (on the Arctic Circle)
+
+    function updateRoute() {
+      if (!fromCoords || !toCoords) {
+        routeDuration.textContent = "–";
+        return;
+      }
+      const miles = haversineMiles(fromCoords, toCoords);
+      routeDuration.textContent = formatDuration(miles, milesPerDayFromSteps());
+    }
+
+    // Use Mapbox's own search widget (the same one on the map page) for
+    // proper as-you-type place suggestions, instead of a hand-rolled dropdown.
+    mapboxgl.accessToken = MAPBOX_TOKEN;
+
+    const fromGeocoder = new MapboxGeocoder({
+      accessToken: MAPBOX_TOKEN,
+      mapboxgl: mapboxgl,
+      marker: false,
+      placeholder: "a place"
+    });
+    fromGeocoder.addTo("#fromBox");
+    fromGeocoder.setInput("Antarctica");
+
+    const toGeocoder = new MapboxGeocoder({
+      accessToken: MAPBOX_TOKEN,
+      mapboxgl: mapboxgl,
+      marker: false,
+      placeholder: "another place"
+    });
+    toGeocoder.addTo("#toBox");
+    toGeocoder.setInput("Arctic Circle");
+
+    fromGeocoder.on("result", (e) => {
+      fromCoords = e.result.center;
+      updateRoute();
+    });
+    fromGeocoder.on("clear", () => {
+      fromCoords = null;
+      updateRoute();
+    });
+
+    toGeocoder.on("result", (e) => {
+      toCoords = e.result.center;
+      updateRoute();
+    });
+    toGeocoder.on("clear", () => {
+      toCoords = null;
+      updateRoute();
+    });
+
+    stepsInput.addEventListener("input", update);
+    update();
+
+    // ---- "if you sleep 8 hours a day..." ----
+    const activityInput = document.getElementById("activityInput");
+    const activityMirror = document.getElementById("activityMirror");
+    const hoursPerDayInput = document.getElementById("hoursPerDayInput");
+    const hoursUnitSelect = document.getElementById("hoursUnitSelect");
+    const periodUnitSelect = document.getElementById("periodUnitSelect");
+    const yearsInput = document.getElementById("yearsInput");
+    const durationUnitSelect = document.getElementById("durationUnitSelect");
+    const totalHours = document.getElementById("totalHours");
+
+    const DAYS_PER_YEAR = 365;
+    const DAYS_PER_MONTH = 30;
+    const PERIOD_DAYS = { hour: 1 / 24, day: 1, month: DAYS_PER_MONTH, year: DAYS_PER_YEAR };
+    const DURATION_DAYS = { hours: 1 / 24, days: 1, months: DAYS_PER_MONTH, years: DAYS_PER_YEAR };
+
+    // Breaks a total (in hours) into a years/months/days/hours[/minutes[/seconds]]
+    // string. Only shown down to minutes or seconds when asked for, so a rate
+    // entered in whole hours doesn't produce a spurious "0 minutes".
+    function formatDurationBreakdown(totalHoursValue, showMinutes, showSeconds) {
+      let remainingSeconds = totalHoursValue * 3600;
+
+      let years = Math.floor(remainingSeconds / (24 * 3600 * DAYS_PER_YEAR));
+      remainingSeconds -= years * 24 * 3600 * DAYS_PER_YEAR;
+
+      let months = Math.floor(remainingSeconds / (24 * 3600 * DAYS_PER_MONTH));
+      remainingSeconds -= months * 24 * 3600 * DAYS_PER_MONTH;
+
+      let days = Math.floor(remainingSeconds / (24 * 3600));
+      remainingSeconds -= days * 24 * 3600;
+
+      let hours = Math.floor(remainingSeconds / 3600);
+      remainingSeconds -= hours * 3600;
+
+      let minutes = 0;
+      let seconds = 0;
+
+      if (showSeconds) {
+        minutes = Math.floor(remainingSeconds / 60);
+        remainingSeconds -= minutes * 60;
+        seconds = Math.round(remainingSeconds);
+        if (seconds === 60) { seconds = 0; minutes += 1; }
+      } else if (showMinutes) {
+        minutes = Math.round(remainingSeconds / 60);
+      } else {
+        hours += Math.round(remainingSeconds / 3600);
+      }
+
+      if (minutes === 60) { minutes = 0; hours += 1; }
+      if (hours === 24) { hours = 0; days += 1; }
+      if (days === DAYS_PER_MONTH) { days = 0; months += 1; }
+      if (months === 12) { months = 0; years += 1; }
+
+      const parts = [];
+      if (years > 0) parts.push(years.toLocaleString() + " " + (years === 1 ? "year" : "years"));
+      if (months > 0) parts.push(months + " " + (months === 1 ? "month" : "months"));
+      if (days > 0) parts.push(days + " " + (days === 1 ? "day" : "days"));
+      if (hours > 0) parts.push(hours + " " + (hours === 1 ? "hour" : "hours"));
+      if (showMinutes && minutes > 0) parts.push(minutes + " " + (minutes === 1 ? "minute" : "minutes"));
+      if (showSeconds && seconds > 0) parts.push(seconds + " " + (seconds === 1 ? "second" : "seconds"));
+
+      if (parts.length === 0) {
+        const zeroUnit = showSeconds ? "seconds" : showMinutes ? "minutes" : "hours";
+        parts.push("0 " + zeroUnit);
+      }
+
+      return parts.join(", ");
+    }
+
+    function updateSleep() {
+      activityMirror.textContent = activityInput.value.trim() || "sleep";
+
+      const rawValue = Number(hoursPerDayInput.value) || 0;
+      const rawHours =
+        hoursUnitSelect.value === "seconds" ? rawValue / 3600 :
+        hoursUnitSelect.value === "minutes" ? rawValue / 60 :
+        rawValue;
+      const periodDays = PERIOD_DAYS[periodUnitSelect.value] || 1;
+      const hoursPerDay = rawHours / periodDays;
+
+      const rawDuration = Number(yearsInput.value) || 0;
+      const durationDays = rawDuration * (DURATION_DAYS[durationUnitSelect.value] || DAYS_PER_YEAR);
+      const totalHoursValue = hoursPerDay * durationDays;
+
+      // Only break the output down into minutes/seconds when the rate
+      // was actually entered in those units — otherwise stop at hours.
+      const rateUnit = hoursUnitSelect.value;
+      const showMinutes = rateUnit === "minutes" || rateUnit === "seconds";
+      const showSeconds = rateUnit === "seconds";
+
+      totalHours.textContent = formatDurationBreakdown(totalHoursValue, showMinutes, showSeconds);
+    }
+
+    activityInput.addEventListener("input", updateSleep);
+    hoursPerDayInput.addEventListener("input", updateSleep);
+    hoursUnitSelect.addEventListener("change", updateSleep);
+    periodUnitSelect.addEventListener("change", updateSleep);
+    yearsInput.addEventListener("input", updateSleep);
+    durationUnitSelect.addEventListener("change", updateSleep);
+    updateSleep();
+
+    // ---- "if you save $1 a day..." ----
+    const dailySavingsInput = document.getElementById("dailySavingsInput");
+    const savingsPeriodSelect = document.getElementById("savingsPeriodSelect");
+    const savingsYearsInput = document.getElementById("savingsYearsInput");
+    const simpleSavings = document.getElementById("simpleSavings");
+    const compoundSavings = document.getElementById("compoundSavings");
+
+    const SAVINGS_RATE = 0.05;
+    const SAVINGS_PERIOD_DAYS = {
+      minute: 1 / 1440,
+      hour: 1 / 24,
+      day: 1,
+      week: 7,
+      month: DAYS_PER_MONTH,
+      year: DAYS_PER_YEAR
+    };
+
+    function updateSavings() {
+      const rawAmount = Number(dailySavingsInput.value) || 0;
+      const periodDays = SAVINGS_PERIOD_DAYS[savingsPeriodSelect.value] || 1;
+      const daily = rawAmount / periodDays;
+      const years = Number(savingsYearsInput.value) || 0;
+      const annualDeposit = daily * 365;
+
+      const simpleTotal = annualDeposit * years;
+      const compoundTotal =
+        annualDeposit * ((Math.pow(1 + SAVINGS_RATE, years) - 1) / SAVINGS_RATE);
+
+      simpleSavings.textContent = Math.round(simpleTotal).toLocaleString();
+      compoundSavings.textContent = Math.round(compoundTotal).toLocaleString();
+    }
+
+    dailySavingsInput.addEventListener("input", updateSavings);
+    savingsPeriodSelect.addEventListener("change", updateSavings);
+    savingsYearsInput.addEventListener("input", updateSavings);
+    updateSavings();
+
+    // ---- "if you learn 1 word a day..." ----
+    const wordsPerDayInput = document.getElementById("wordsPerDayInput");
+    const wordsPeriodSelect = document.getElementById("wordsPeriodSelect");
+    const wordsYearsInput = document.getElementById("wordsYearsInput");
+    const wordsLearned = document.getElementById("wordsLearned");
+    const wordsNoun = document.getElementById("wordsNoun");
+
+    const WORDS_PERIOD_DAYS = { day: 1, week: 7, month: DAYS_PER_MONTH, year: DAYS_PER_YEAR };
+
+    function updateWords() {
+      const rawRate = Number(wordsPerDayInput.value) || 0;
+      wordsNoun.textContent = pluralize(rawRate, "word", "words");
+      const periodDays = WORDS_PERIOD_DAYS[wordsPeriodSelect.value] || 1;
+      const perDay = rawRate / periodDays;
+      const years = Number(wordsYearsInput.value) || 0;
+      wordsLearned.textContent = Math.round(perDay * DAYS_PER_YEAR * years).toLocaleString();
+    }
+
+    wordsPerDayInput.addEventListener("input", updateWords);
+    wordsPeriodSelect.addEventListener("change", updateWords);
+    wordsYearsInput.addEventListener("input", updateWords);
+    updateWords();
+
+    // ---- "if you talk to a new person a week..." ----
+    const peoplePeriodSelect = document.getElementById("peoplePeriodSelect");
+    const peopleYearsInput = document.getElementById("peopleYearsInput");
+    const peopleMet = document.getElementById("peopleMet");
+    const citySearchInput = document.getElementById("citySearchInput");
+    const cityYears = document.getElementById("cityYears");
+
+    const PEOPLE_PERIOD_DAYS = {
+      second: 1 / 86400,
+      minute: 1 / 1440,
+      hour: 1 / 24,
+      day: 1,
+      week: 7,
+      month: DAYS_PER_MONTH,
+      year: DAYS_PER_YEAR
+    };
+
+    // City-proper populations, per Wikipedia's "List of largest cities by
+    // population in 2026" (sourced in footnote 14).
+    const CITY_POPULATIONS = {
+      "new york city": 8804190,
+      "los angeles": 3990456,
+      "chicago": 2746388,
+      "toronto": 2731571,
+      "mexico city": 9209944,
+      "são paulo": 12252023,
+      "sao paulo": 12252023,
+      "london": 8825001,
+      "paris": 2148271,
+      "moscow": 13200000,
+      "cairo": 10044894,
+      "mumbai": 12478447,
+      "delhi": 16753235,
+      "beijing": 21893095,
+      "shanghai": 24870895,
+      "tokyo": 13515271
+    };
+
+    function updatePeople() {
+      const periodDays = PEOPLE_PERIOD_DAYS[peoplePeriodSelect.value] || 7;
+      const perDay = 1 / periodDays;
+      const years = Number(peopleYearsInput.value) || 0;
+      peopleMet.textContent = Math.round(perDay * DAYS_PER_YEAR * years).toLocaleString();
+
+      const cityKey = citySearchInput.value.trim().toLowerCase();
+      const cityPopulation = CITY_POPULATIONS[cityKey];
+      cityYears.textContent = cityPopulation ? yearsToVisitAll(cityPopulation, perDay) : "–";
+    }
+
+    peoplePeriodSelect.addEventListener("change", updatePeople);
+    peopleYearsInput.addEventListener("input", updatePeople);
+    citySearchInput.addEventListener("input", updatePeople);
+    updatePeople();
+
+    // ---- "if you go to 1 new coffee shop / restaurant a day..." ----
+    const MANHATTAN_COFFEE_SHOPS = 1113;
+    const MANHATTAN_RESTAURANTS = 12526;
+    const PLACES_PERIOD_DAYS = { day: 1, week: 7, month: DAYS_PER_MONTH, year: DAYS_PER_YEAR };
+
+    function yearsToVisitAll(totalPlaces, perDay) {
+      if (perDay <= 0) return "–";
+      const totalDays = totalPlaces / perDay;
+      return formatDurationBreakdown(totalDays * 24, false, false);
+    }
+
+    const coffeeShopsPerDayInput = document.getElementById("coffeeShopsPerDayInput");
+    const coffeeShopsPeriodSelect = document.getElementById("coffeeShopsPeriodSelect");
+    const coffeeShopYears = document.getElementById("coffeeShopYears");
+    const coffeeShopNoun = document.getElementById("coffeeShopNoun");
+
+    function updateCoffeeShops() {
+      const rawRate = Number(coffeeShopsPerDayInput.value) || 0;
+      coffeeShopNoun.textContent = pluralize(rawRate, "coffee shop", "coffee shops");
+      const periodDays = PLACES_PERIOD_DAYS[coffeeShopsPeriodSelect.value] || 1;
+      coffeeShopYears.textContent = yearsToVisitAll(MANHATTAN_COFFEE_SHOPS, rawRate / periodDays);
+    }
+
+    coffeeShopsPerDayInput.addEventListener("input", updateCoffeeShops);
+    coffeeShopsPeriodSelect.addEventListener("change", updateCoffeeShops);
+    updateCoffeeShops();
+
+    const restaurantsPerDayInput = document.getElementById("restaurantsPerDayInput");
+    const restaurantsPeriodSelect = document.getElementById("restaurantsPeriodSelect");
+    const restaurantYears = document.getElementById("restaurantYears");
+    const restaurantNoun = document.getElementById("restaurantNoun");
+
+    function updateRestaurants() {
+      const rawRate = Number(restaurantsPerDayInput.value) || 0;
+      restaurantNoun.textContent = pluralize(rawRate, "restaurant", "restaurants");
+      const periodDays = PLACES_PERIOD_DAYS[restaurantsPeriodSelect.value] || 1;
+      restaurantYears.textContent = yearsToVisitAll(MANHATTAN_RESTAURANTS, rawRate / periodDays);
+    }
+
+    restaurantsPerDayInput.addEventListener("input", updateRestaurants);
+    restaurantsPeriodSelect.addEventListener("change", updateRestaurants);
+    updateRestaurants();
+
+    // ---- "if you stand at 1 intersection a day..." ----
+    const NYC_SIGNALIZED_INTERSECTIONS = 13543;
+
+    const intersectionsPerDayInput = document.getElementById("intersectionsPerDayInput");
+    const intersectionsPeriodSelect = document.getElementById("intersectionsPeriodSelect");
+    const intersectionNoun = document.getElementById("intersectionNoun");
+    const intersectionYears = document.getElementById("intersectionYears");
+
+    function updateIntersections() {
+      const rawRate = Number(intersectionsPerDayInput.value) || 0;
+      intersectionNoun.textContent = pluralize(rawRate, "intersection", "intersections");
+      const periodDays = PLACES_PERIOD_DAYS[intersectionsPeriodSelect.value] || 1;
+      intersectionYears.textContent = yearsToVisitAll(NYC_SIGNALIZED_INTERSECTIONS, rawRate / periodDays);
+    }
+
+    intersectionsPerDayInput.addEventListener("input", updateIntersections);
+    intersectionsPeriodSelect.addEventListener("change", updateIntersections);
+    updateIntersections();
+
+    // ---- "if you talk to your mom for 5 minutes a day..." ----
+    const talkRelationshipSelect = document.getElementById("talkRelationshipSelect");
+    const talkAmountInput = document.getElementById("talkAmountInput");
+    const talkTimeUnitSelect = document.getElementById("talkTimeUnitSelect");
+    const talkPeriodSelect = document.getElementById("talkPeriodSelect");
+    const talkYearsSelect = document.getElementById("talkYearsSelect");
+    const talkDuration = document.getElementById("talkDuration");
+
+    const TALK_PERIOD_DAYS = { day: 1, week: 7, month: DAYS_PER_MONTH, year: DAYS_PER_YEAR };
+
+    function updateTalk() {
+      const rawValue = Number(talkAmountInput.value) || 0;
+      const timeUnit = talkTimeUnitSelect.value;
+      const rawHours =
+        timeUnit === "seconds" ? rawValue / 3600 :
+        timeUnit === "minutes" ? rawValue / 60 :
+        rawValue;
+      const periodDays = TALK_PERIOD_DAYS[talkPeriodSelect.value] || 1;
+      const hoursPerDay = rawHours / periodDays;
+
+      const years = Number(talkYearsSelect.value) || 0;
+      const totalHoursValue = hoursPerDay * years * DAYS_PER_YEAR;
+
+      const showMinutes = timeUnit === "minutes" || timeUnit === "seconds";
+      const showSeconds = timeUnit === "seconds";
+
+      talkDuration.textContent = formatDurationBreakdown(totalHoursValue, showMinutes, showSeconds);
+    }
+
+    talkRelationshipSelect.addEventListener("change", updateTalk);
+    talkAmountInput.addEventListener("input", updateTalk);
+    talkTimeUnitSelect.addEventListener("change", updateTalk);
+    talkPeriodSelect.addEventListener("change", updateTalk);
+    talkYearsSelect.addEventListener("change", updateTalk);
+    updateTalk();
+
+    // ---- "if you go to the park 2x a week..." ----
+    const parkActivityInput = document.getElementById("parkActivityInput");
+    const parkActivityMirror = document.getElementById("parkActivityMirror");
+    const parkFrequencyInput = document.getElementById("parkFrequencyInput");
+    const parkPeriodSelect = document.getElementById("parkPeriodSelect");
+    const parkYearsInput = document.getElementById("parkYearsInput");
+    const parkTimes = document.getElementById("parkTimes");
+
+    const PARK_PERIOD_DAYS = { day: 1, week: 7, month: DAYS_PER_MONTH, year: DAYS_PER_YEAR };
+
+    function updatePark() {
+      parkActivityMirror.textContent = parkActivityInput.value.trim() || "go to the park";
+
+      const frequency = Number(parkFrequencyInput.value) || 0;
+      const periodDays = PARK_PERIOD_DAYS[parkPeriodSelect.value] || 1;
+      const perDay = frequency / periodDays;
+      const years = Number(parkYearsInput.value) || 0;
+
+      parkTimes.textContent = Math.round(perDay * DAYS_PER_YEAR * years).toLocaleString();
+    }
+
+    parkActivityInput.addEventListener("input", updatePark);
+    parkFrequencyInput.addEventListener("input", updatePark);
+    parkPeriodSelect.addEventListener("change", updatePark);
+    parkYearsInput.addEventListener("input", updatePark);
+    updatePark();
+
+    // ---- "if you buy 1 small black coffee from Starbucks a day..." ----
+    const FOOD_PRICES = {
+      coffee: 2.45,
+      happymeal: 5.99,
+      taco: 1.99,
+      chickfila: 5.25,
+      dunkin: 1.09,
+      chipotle: 9.79,
+      wendys: 2.49
+    };
+    const SPEND_PERIOD_DAYS = { day: 1, week: 7, month: DAYS_PER_MONTH };
+    const FOOD_INFLATION_RATE = 0.052; // BLS Sectoral Output Price Deflator, NAICS 72251A, 2020–2025 average
+
+    const spendQuantityInput = document.getElementById("spendQuantityInput");
+    const spendFoodSelect = document.getElementById("spendFoodSelect");
+    const spendPeriodSelect = document.getElementById("spendPeriodSelect");
+    const spendYearsInput = document.getElementById("spendYearsInput");
+    const spendTotal = document.getElementById("spendTotal");
+    const spendTotalInflated = document.getElementById("spendTotalInflated");
+
+    function formatDollars(n) {
+      return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function updateSpend() {
+      const quantity = Number(spendQuantityInput.value) || 0;
+      const price = FOOD_PRICES[spendFoodSelect.value] || 0;
+      const periodDays = SPEND_PERIOD_DAYS[spendPeriodSelect.value] || 1;
+      const perDay = quantity / periodDays;
+      const years = Number(spendYearsInput.value) || 0;
+      const annualSpend = perDay * DAYS_PER_YEAR * price;
+
+      const total = annualSpend * years;
+      const inflatedTotal =
+        annualSpend * ((Math.pow(1 + FOOD_INFLATION_RATE, years) - 1) / FOOD_INFLATION_RATE);
+
+      spendTotal.textContent = formatDollars(total);
+      spendTotalInflated.textContent = formatDollars(inflatedTotal);
+    }
+
+    spendQuantityInput.addEventListener("input", updateSpend);
+    spendFoodSelect.addEventListener("change", updateSpend);
+    spendPeriodSelect.addEventListener("change", updateSpend);
+    spendYearsInput.addEventListener("input", updateSpend);
+    updateSpend();
+  </script>
+</body>
+</html>
