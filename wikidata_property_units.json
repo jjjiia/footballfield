@@ -1,0 +1,555 @@
+{
+  "P1082": {
+    "label": "population",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q199",
+        "unit_label": "1",
+        "count": 406
+      }
+    ]
+  },
+  "P2046": {
+    "label": "area",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q712226",
+        "unit_label": "square kilometre",
+        "count": 178
+      },
+      {
+        "unit_qid": "Q35852",
+        "unit_label": "hectare",
+        "count": 116
+      },
+      {
+        "unit_qid": "Q81292",
+        "unit_label": "acre",
+        "count": 4
+      },
+      {
+        "unit_qid": "Q232291",
+        "unit_label": "square mile",
+        "count": 3
+      },
+      {
+        "unit_qid": "Q199",
+        "unit_label": "1",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q25343",
+        "unit_label": "square metre",
+        "count": 1
+      }
+    ]
+  },
+  "P2067": {
+    "label": "mass",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q651336",
+        "unit_label": "Jupiter mass",
+        "count": 170
+      },
+      {
+        "unit_qid": "Q11570",
+        "unit_label": "kilogram",
+        "count": 30
+      },
+      {
+        "unit_qid": "Q681996",
+        "unit_label": "Earth mass",
+        "count": 24
+      },
+      {
+        "unit_qid": "Q108888186",
+        "unit_label": "electronvolt per speed of light squared",
+        "count": 13
+      },
+      {
+        "unit_qid": "Q41803",
+        "unit_label": "gram",
+        "count": 12
+      },
+      {
+        "unit_qid": "Q483261",
+        "unit_label": "dalton",
+        "count": 4
+      },
+      {
+        "unit_qid": "Q108888206",
+        "unit_label": "megaelectronvolt per speed of light squared",
+        "count": 3
+      },
+      {
+        "unit_qid": "Q100995",
+        "unit_label": "pound",
+        "count": 3
+      },
+      {
+        "unit_qid": "Q180892",
+        "unit_label": "solar mass",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q108888224",
+        "unit_label": "gigaelectronvolt per speed of light squared",
+        "count": 1
+      }
+    ]
+  },
+  "P2044": {
+    "label": "elevation above sea level",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q11573",
+        "unit_label": "metre",
+        "count": 202
+      },
+      {
+        "unit_qid": "Q3710",
+        "unit_label": "foot",
+        "count": 31
+      },
+      {
+        "unit_qid": "Q828224",
+        "unit_label": "kilometre",
+        "count": 8
+      }
+    ]
+  },
+  "P2048": {
+    "label": "height",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q3710",
+        "unit_label": "foot",
+        "count": 200
+      }
+    ]
+  },
+  "P2052": {
+    "label": "speed",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q182429",
+        "unit_label": "metre per second",
+        "count": 115
+      },
+      {
+        "unit_qid": "Q160669",
+        "unit_label": "Mach number",
+        "count": 80
+      },
+      {
+        "unit_qid": "Q180154",
+        "unit_label": "kilometre per hour",
+        "count": 64
+      },
+      {
+        "unit_qid": "Q128822",
+        "unit_label": "knot",
+        "count": 35
+      },
+      {
+        "unit_qid": "Q21014455",
+        "unit_label": "metre per minute",
+        "count": 9
+      },
+      {
+        "unit_qid": "Q211256",
+        "unit_label": "mile per hour",
+        "count": 6
+      },
+      {
+        "unit_qid": "Q748716",
+        "unit_label": "foot per second",
+        "count": 4
+      },
+      {
+        "unit_qid": "Q206037",
+        "unit_label": "revolutions per minute",
+        "count": 3
+      },
+      {
+        "unit_qid": "Q6014364",
+        "unit_label": "inch per second",
+        "count": 3
+      },
+      {
+        "unit_qid": "Q3674704",
+        "unit_label": "kilometre per second",
+        "count": 2
+      },
+      {
+        "unit_qid": "Q102130686",
+        "unit_label": "micrometre per second",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q65028392",
+        "unit_label": "millimetre per year",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q17093295",
+        "unit_label": "metre per hour",
+        "count": 1
+      }
+    ]
+  },
+  "P2234": {
+    "label": "volume as quantity",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q5195628",
+        "unit_label": "cubic hectometre",
+        "count": 134
+      },
+      {
+        "unit_qid": "Q4243638",
+        "unit_label": "cubic kilometre",
+        "count": 60
+      },
+      {
+        "unit_qid": "Q25517",
+        "unit_label": "cubic metre",
+        "count": 5
+      },
+      {
+        "unit_qid": "Q11582",
+        "unit_label": "litre",
+        "count": 4
+      },
+      {
+        "unit_qid": "Q1022113",
+        "unit_label": "cubic centimetre",
+        "count": 3
+      },
+      {
+        "unit_qid": "Q1815100",
+        "unit_label": "centilitre",
+        "count": 2
+      },
+      {
+        "unit_qid": "Q2282891",
+        "unit_label": "microlitre",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q2175964",
+        "unit_label": "cubic decimetre",
+        "count": 1
+      }
+    ]
+  },
+  "P2284": {
+    "label": "price",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q199",
+        "unit_label": "1",
+        "count": 112
+      },
+      {
+        "unit_qid": "Q4917",
+        "unit_label": "United States dollar",
+        "count": 37
+      },
+      {
+        "unit_qid": "Q4916",
+        "unit_label": "Q4916",
+        "count": 26
+      },
+      {
+        "unit_qid": "Q127386900",
+        "unit_label": "Funds",
+        "count": 12
+      },
+      {
+        "unit_qid": "Q25224",
+        "unit_label": "pound sterling",
+        "count": 4
+      },
+      {
+        "unit_qid": "Q189097",
+        "unit_label": "peseta",
+        "count": 3
+      },
+      {
+        "unit_qid": "Q122922",
+        "unit_label": "Swedish krona",
+        "count": 3
+      },
+      {
+        "unit_qid": "Q8146",
+        "unit_label": "yen",
+        "count": 3
+      },
+      {
+        "unit_qid": "Q25344",
+        "unit_label": "Swiss franc",
+        "count": 2
+      },
+      {
+        "unit_qid": "Q132643",
+        "unit_label": "Norwegian krone",
+        "count": 2
+      },
+      {
+        "unit_qid": "Q47190",
+        "unit_label": "forint",
+        "count": 2
+      },
+      {
+        "unit_qid": "Q25417",
+        "unit_label": "Danish krone",
+        "count": 2
+      },
+      {
+        "unit_qid": "Q622599",
+        "unit_label": "Czechoslovak koruna",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q125559571",
+        "unit_label": "Colorless",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q58093",
+        "unit_label": "cent",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q155009",
+        "unit_label": "Reichsmark",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q1104069",
+        "unit_label": "Canadian dollar",
+        "count": 1
+      }
+    ]
+  },
+  "P2131": {
+    "label": "nominal GDP",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q199",
+        "unit_label": "1",
+        "count": 105297
+      },
+      {
+        "unit_qid": "Q4917",
+        "unit_label": "United States dollar",
+        "count": 3954
+      },
+      {
+        "unit_qid": "Q4916",
+        "unit_label": "Q4916",
+        "count": 136
+      },
+      {
+        "unit_qid": "Q39099",
+        "unit_label": "renminbi",
+        "count": 3
+      },
+      {
+        "unit_qid": "Q173117",
+        "unit_label": "Brazilian real",
+        "count": 2
+      },
+      {
+        "unit_qid": "Q172540",
+        "unit_label": "Bulgarian lev",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q1104069",
+        "unit_label": "Canadian dollar",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q37440534",
+        "unit_label": "Billion",
+        "count": 1
+      }
+    ]
+  },
+  "P1128": {
+    "label": "employees",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q199",
+        "unit_label": "1",
+        "count": 450
+      }
+    ]
+  },
+  "P2196": {
+    "label": "count of students",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q199",
+        "unit_label": "1",
+        "count": 334
+      }
+    ]
+  },
+  "P2124": {
+    "label": "member count",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q199",
+        "unit_label": "1",
+        "count": 238
+      },
+      {
+        "unit_qid": "Q5",
+        "unit_label": "human",
+        "count": 41
+      },
+      {
+        "unit_qid": "Q467",
+        "unit_label": "woman",
+        "count": 9
+      },
+      {
+        "unit_qid": "Q639669",
+        "unit_label": "musician",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q8441",
+        "unit_label": "man",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q1646605",
+        "unit_label": "member state",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q43229",
+        "unit_label": "organization",
+        "count": 1
+      }
+    ]
+  },
+  "P8687": {
+    "label": "social media followers",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q199",
+        "unit_label": "1",
+        "count": 589
+      },
+      {
+        "unit_qid": "Q11563",
+        "unit_label": "number",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q19346407",
+        "unit_label": "Milhoes",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q866",
+        "unit_label": "YouTube",
+        "count": 1
+      }
+    ]
+  },
+  "P1120": {
+    "label": "number of deaths",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q199",
+        "unit_label": "1",
+        "count": 200
+      }
+    ]
+  },
+  "P1339": {
+    "label": "number of injured",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q199",
+        "unit_label": "1",
+        "count": 202
+      }
+    ]
+  },
+  "P1590": {
+    "label": "number of casualties",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q199",
+        "unit_label": "1",
+        "count": 217
+      },
+      {
+        "unit_qid": "Q5",
+        "unit_label": "human",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q7378",
+        "unit_label": "elephant",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q16514295",
+        "unit_label": "Q16514295",
+        "count": 1
+      },
+      {
+        "unit_qid": "Q56161462",
+        "unit_label": "Persons approximately",
+        "count": 1
+      }
+    ]
+  },
+  "P1113": {
+    "label": "number of episodes",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q199",
+        "unit_label": "1",
+        "count": 208
+      }
+    ]
+  },
+  "P2437": {
+    "label": "number of seasons",
+    "sampled_items": 200,
+    "units": [
+      {
+        "unit_qid": "Q199",
+        "unit_label": "1",
+        "count": 200
+      }
+    ]
+  }
+}

@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Rivers by Length</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .viz-root { max-width: 1200px; margin: 0 auto; padding-inline: 16px; }
+
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--page-plane);
+    padding-block: 16px 8px;
+  }
+  h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 13px; margin: 0; }
+  .axis-note { color: var(--text-muted); font-size: 11px; margin: 4px 0 0; font-style: italic; }
+
+  .strip-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0 16px 16px;
+    margin-top: 8px;
+  }
+  svg { display: block; width: 100%; overflow: visible; }
+  .axis text { fill: var(--text-muted); font-size: 11px; }
+  .axis path, .axis line { stroke: var(--gridline); }
+  .dot { fill: var(--series-1); }
+  .dot-hover { fill: none; stroke: var(--text-primary); stroke-width: 1.5px; pointer-events: none; }
+
+  #tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: var(--text-primary);
+    color: var(--surface-1);
+    font-size: 12px;
+    padding: 6px 9px;
+    border-radius: 6px;
+    max-width: 260px;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    z-index: 10;
+  }
+  #tooltip .tt-value { font-weight: 700; }
+  #tooltip .tt-title { color: var(--text-secondary, #c3c2b7); }
+  #tooltip .tt-hint { color: var(--text-secondary, #c3c2b7); font-size: 10px; margin-top: 3px; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <div class="header">
+    <h1>Rivers by Length</h1>
+    <p class="subtitle" id="subtitle">Loading&hellip;</p>
+    <p class="axis-note">Horizontal position reflects length (log scale, km); circles are nudged from their true position -- mostly vertically, sometimes sideways -- into the nearest open spot so none overlap.</p>
+  </div>
+  <div class="strip-card">
+    <div id="strip"></div>
+  </div>
+</div>
+<div id="tooltip"></div>
+
+<script>
+// Precomputed in Python (see spiral_pack.py) -- a live in-browser force
+// simulation over 61,847 nodes was too slow, and iterative physics-style
+// relaxation (springs/repulsion, or pairwise correction) never fully
+// resolved overlap at this density. Instead each circle reserves one cell
+// in a grid sized to its own footprint, found by spiraling outward from its
+// true log-scale position to the nearest free cell -- this guarantees zero
+// overlap by construction rather than approximating it.
+const PAYLOAD = __DATA_PLACEHOLDER__; // { items: [{t,v,u,x,y,q}, ...], min_km, max_km, inner_width, y_min, y_max }
+const { items, min_km, max_km, inner_width, y_min, y_max } = PAYLOAD;
+
+const MARGIN = { top: 40, right: 20, bottom: 20, left: 20 };
+const WIDTH = inner_width + MARGIN.left + MARGIN.right;
+const HEIGHT = (y_max - y_min) + MARGIN.top + MARGIN.bottom;
+
+document.getElementById("subtitle").textContent =
+  `${items.length.toLocaleString()} rivers, plotted by length (log scale, normalized to kilometres). Hover for details, click to open on Wikidata.`;
+
+function formatValue(v) {
+  if (v >= 1000) return d3.format(",.0f")(v);
+  if (v >= 1) return d3.format(",.2f")(v);
+  return d3.format(",.4f")(v);
+}
+
+// Same domain/range as the Python precompute, no .nice() -- must match
+// exactly so the axis ticks line up with the already-fixed dot positions.
+const x = d3.scaleLog().domain([min_km, max_km]).range([0, inner_width]);
+
+const svg = d3.create("svg")
+  .attr("viewBox", `0 0 ${WIDTH} ${HEIGHT}`)
+  .attr("height", HEIGHT);
+
+const g = svg.append("g").attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
+
+g.append("g")
+  .attr("class", "axis")
+  .call(d3.axisTop(x).ticks(12, "~s").tickFormat(d => d3.format("~s")(d) + " km"));
+
+const toSvgY = (y) => y - y_min + MARGIN.top;
+
+g.append("g")
+  .selectAll("circle")
+  .data(items)
+  .join("circle")
+  .attr("class", "dot")
+  .attr("cx", d => d.x)
+  .attr("cy", d => toSvgY(d.y))
+  .attr("r", 2.2);
+
+const hoverRing = g.append("circle")
+  .attr("class", "dot-hover")
+  .attr("r", 7)
+  .style("opacity", 0);
+
+const tooltip = document.getElementById("tooltip");
+const sortedByX = items.map((d, i) => ({ ...d, i })).sort((a, b) => a.x - b.x);
+const bisect = d3.bisector(d => d.x).left;
+
+let hovered = null;
+function showNearest(clientX, clientY, svgX, svgY) {
+  // nearest by combined x/y distance among items close in x (cheap window)
+  let idx = bisect(sortedByX, svgX);
+  const lo = Math.max(0, idx - 40);
+  const hi = Math.min(sortedByX.length, idx + 40);
+  let best = null, bestDist = Infinity;
+  for (let k = lo; k < hi; k++) {
+    const d = sortedByX[k];
+    const dy = toSvgY(d.y) - svgY;
+    const dx = d.x - svgX;
+    const dist = dx * dx + dy * dy;
+    if (dist < bestDist) { bestDist = dist; best = d; }
+  }
+  if (!best) return;
+  hovered = best;
+
+  hoverRing.attr("cx", best.x).attr("cy", toSvgY(best.y)).style("opacity", 1);
+
+  tooltip.innerHTML = "";
+  const titleEl = document.createElement("div");
+  titleEl.className = "tt-title";
+  titleEl.textContent = best.t;
+  const valueEl = document.createElement("div");
+  valueEl.className = "tt-value";
+  valueEl.textContent = `${formatValue(best.v)} ${best.u}`;
+  tooltip.appendChild(titleEl);
+  tooltip.appendChild(valueEl);
+  if (best.q) {
+    const hintEl = document.createElement("div");
+    hintEl.className = "tt-hint";
+    hintEl.textContent = "click to open on Wikidata";
+    tooltip.appendChild(hintEl);
+  }
+
+  tooltip.style.opacity = 1;
+  tooltip.style.left = (clientX + 14) + "px";
+  tooltip.style.top = (clientY + 14) + "px";
+}
+
+svg.style("cursor", "pointer");
+svg.on("pointermove", (event) => {
+  const [mx, my] = d3.pointer(event, g.node());
+  showNearest(event.clientX, event.clientY, mx, my);
+});
+svg.on("pointerleave", () => {
+  hoverRing.style("opacity", 0);
+  tooltip.style.opacity = 0;
+  hovered = null;
+});
+svg.on("click", () => {
+  if (hovered && hovered.q) {
+    window.open(`https://www.wikidata.org/wiki/${hovered.q}`, "_blank", "noopener");
+  }
+});
+
+document.getElementById("strip").appendChild(svg.node());
+</script>
+</body>
+</html>

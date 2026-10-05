@@ -1,0 +1,872 @@
+{
+  "P3872": {
+    "label": "patronage",
+    "classes": [
+      {
+        "class_qid": "Q1248784",
+        "class_label": "airport",
+        "count": 74
+      },
+      {
+        "class_qid": "Q94993988",
+        "class_label": "commercial traffic aerodrome",
+        "count": 58
+      },
+      {
+        "class_qid": "Q55488",
+        "class_label": "railway station",
+        "count": 53
+      },
+      {
+        "class_qid": "Q644371",
+        "class_label": "international airport",
+        "count": 10
+      },
+      {
+        "class_qid": "Q62447",
+        "class_label": "aerodrome",
+        "count": 8
+      },
+      {
+        "class_qid": "Q22808404",
+        "class_label": "station located on surface",
+        "count": 8
+      }
+    ]
+  },
+  "P1174": {
+    "label": "visitors per year",
+    "classes": [
+      {
+        "class_qid": "Q26271642",
+        "class_label": "library network",
+        "count": 53
+      },
+      {
+        "class_qid": "Q124750618",
+        "class_label": "library of an Italian territorial body",
+        "count": 28
+      },
+      {
+        "class_qid": "Q28564",
+        "class_label": "public library",
+        "count": 26
+      },
+      {
+        "class_qid": "Q33506",
+        "class_label": "museum",
+        "count": 20
+      },
+      {
+        "class_qid": "Q124830213",
+        "class_label": "museum of a public entity",
+        "count": 13
+      },
+      {
+        "class_qid": "Q614316",
+        "class_label": "private museum",
+        "count": 13
+      }
+    ]
+  },
+  "P1971": {
+    "label": "number of children",
+    "classes": [
+      {
+        "class_qid": "Q5",
+        "class_label": "human",
+        "count": 147
+      },
+      {
+        "class_qid": "Q15632617",
+        "class_label": "fictional human",
+        "count": 3
+      },
+      {
+        "class_qid": "Q3658341",
+        "class_label": "literary character",
+        "count": 1
+      },
+      {
+        "class_qid": "Q15773317",
+        "class_label": "television character",
+        "count": 1
+      },
+      {
+        "class_qid": "Q108065012",
+        "class_label": "radio character",
+        "count": 1
+      },
+      {
+        "class_qid": "Q15711870",
+        "class_label": "animated character",
+        "count": 1
+      }
+    ]
+  },
+  "P5436": {
+    "label": "number of viewers/listeners",
+    "classes": [
+      {
+        "class_qid": "Q5",
+        "class_label": "human",
+        "count": 55
+      },
+      {
+        "class_qid": "Q4830453",
+        "class_label": "business",
+        "count": 11
+      },
+      {
+        "class_qid": "Q163740",
+        "class_label": "nonprofit organization",
+        "count": 10
+      },
+      {
+        "class_qid": "Q215380",
+        "class_label": "musical group",
+        "count": 4
+      },
+      {
+        "class_qid": "Q17558136",
+        "class_label": "YouTube channel",
+        "count": 4
+      },
+      {
+        "class_qid": "Q43229",
+        "class_label": "organization",
+        "count": 3
+      }
+    ]
+  },
+  "P1083": {
+    "label": "maximum capacity",
+    "classes": [
+      {
+        "class_qid": "Q483110",
+        "class_label": "stadium",
+        "count": 20
+      },
+      {
+        "class_qid": "Q41253",
+        "class_label": "movie theater",
+        "count": 20
+      },
+      {
+        "class_qid": "Q1154710",
+        "class_label": "association football venue",
+        "count": 19
+      },
+      {
+        "class_qid": "Q1076486",
+        "class_label": "sports venue",
+        "count": 17
+      },
+      {
+        "class_qid": "Q61663696",
+        "class_label": "bicycle-sharing station",
+        "count": 15
+      },
+      {
+        "class_qid": "Q16970",
+        "class_label": "church building",
+        "count": 5
+      }
+    ]
+  },
+  "P1342": {
+    "label": "number of seats",
+    "classes": [
+      {
+        "class_qid": "Q4414033",
+        "class_label": "rural council of Ukraine",
+        "count": 78
+      },
+      {
+        "class_qid": "Q37002670",
+        "class_label": "unicameral legislature",
+        "count": 12
+      },
+      {
+        "class_qid": "Q27002",
+        "class_label": "selsoviet",
+        "count": 10
+      },
+      {
+        "class_qid": "Q191893",
+        "class_label": "municipal council in Finland",
+        "count": 9
+      },
+      {
+        "class_qid": "Q701632",
+        "class_label": "municipal council",
+        "count": 8
+      },
+      {
+        "class_qid": "Q19953632",
+        "class_label": "former administrative territorial entity",
+        "count": 6
+      }
+    ]
+  },
+  "P1098": {
+    "label": "number of speakers, writers, or signers",
+    "classes": [
+      {
+        "class_qid": "Q1288568",
+        "class_label": "modern language",
+        "count": 112
+      },
+      {
+        "class_qid": "Q34770",
+        "class_label": "language",
+        "count": 84
+      },
+      {
+        "class_qid": "Q33742",
+        "class_label": "natural language",
+        "count": 45
+      },
+      {
+        "class_qid": "Q33384",
+        "class_label": "dialect",
+        "count": 17
+      },
+      {
+        "class_qid": "Q152559",
+        "class_label": "macrolanguage",
+        "count": 8
+      },
+      {
+        "class_qid": "Q25295",
+        "class_label": "language family",
+        "count": 7
+      }
+    ]
+  },
+  "P2573": {
+    "label": "number of out-of-school children",
+    "classes": [
+      {
+        "class_qid": "Q6256",
+        "class_label": "country",
+        "count": 130
+      },
+      {
+        "class_qid": "Q3624078",
+        "class_label": "sovereign state",
+        "count": 126
+      },
+      {
+        "class_qid": "Q112099",
+        "class_label": "island country",
+        "count": 29
+      },
+      {
+        "class_qid": "Q123480",
+        "class_label": "landlocked country",
+        "count": 23
+      },
+      {
+        "class_qid": "Q7270",
+        "class_label": "republic",
+        "count": 19
+      },
+      {
+        "class_qid": "Q11815167",
+        "class_label": "archipelagic state",
+        "count": 14
+      }
+    ]
+  },
+  "P1561": {
+    "label": "number of survivors",
+    "classes": [
+      {
+        "class_qid": "Q744913",
+        "class_label": "aviation accident",
+        "count": 113
+      },
+      {
+        "class_qid": "Q3002150",
+        "class_label": "aircraft crash",
+        "count": 7
+      },
+      {
+        "class_qid": "Q1863435",
+        "class_label": "mid-air collision",
+        "count": 5
+      },
+      {
+        "class_qid": "Q898712",
+        "class_label": "aircraft hijacking",
+        "count": 4
+      },
+      {
+        "class_qid": "Q171558",
+        "class_label": "accident",
+        "count": 3
+      },
+      {
+        "class_qid": "Q16334295",
+        "class_label": "group of humans",
+        "count": 2
+      }
+    ]
+  },
+  "P4909": {
+    "label": "number of players in region",
+    "classes": [
+      {
+        "class_qid": "Q43229",
+        "class_label": "organization",
+        "count": 116
+      },
+      {
+        "class_qid": "Q58952621",
+        "class_label": "Sokol Subdivision",
+        "count": 76
+      },
+      {
+        "class_qid": "Q163740",
+        "class_label": "nonprofit organization",
+        "count": 18
+      },
+      {
+        "class_qid": "Q2485448",
+        "class_label": "sports governing body",
+        "count": 8
+      },
+      {
+        "class_qid": "Q58952499",
+        "class_label": "Sokol County",
+        "count": 8
+      },
+      {
+        "class_qid": "Q29791211",
+        "class_label": "sport in a geographic region",
+        "count": 8
+      }
+    ]
+  },
+  "P12712": {
+    "label": "population by native language",
+    "classes": [
+      {
+        "class_qid": "Q659103",
+        "class_label": "commune of Romania",
+        "count": 122
+      },
+      {
+        "class_qid": "Q16858213",
+        "class_label": "town in Romania",
+        "count": 20
+      },
+      {
+        "class_qid": "Q640364",
+        "class_label": "municipality of Romania",
+        "count": 7
+      },
+      {
+        "class_qid": "Q902814",
+        "class_label": "border city",
+        "count": 3
+      },
+      {
+        "class_qid": "Q34843301",
+        "class_label": "county seat in Romania",
+        "count": 2
+      },
+      {
+        "class_qid": "Q188604",
+        "class_label": "county of Hungary",
+        "count": 1
+      }
+    ]
+  },
+  "P9107": {
+    "label": "number of vaccinations",
+    "classes": [
+      {
+        "class_qid": "Q3241045",
+        "class_label": "disease outbreak",
+        "count": 24
+      },
+      {
+        "class_qid": "Q83741704",
+        "class_label": "COVID-19 pandemic by country and territory",
+        "count": 1
+      }
+    ]
+  },
+  "P3744": {
+    "label": "number of subscribers",
+    "classes": [
+      {
+        "class_qid": "Q4830453",
+        "class_label": "business",
+        "count": 67
+      },
+      {
+        "class_qid": "Q472093",
+        "class_label": "distribution network operator for electricity",
+        "count": 39
+      },
+      {
+        "class_qid": "Q6881511",
+        "class_label": "enterprise",
+        "count": 17
+      },
+      {
+        "class_qid": "Q891723",
+        "class_label": "public company",
+        "count": 8
+      },
+      {
+        "class_qid": "Q17558136",
+        "class_label": "YouTube channel",
+        "count": 7
+      },
+      {
+        "class_qid": "Q28464970",
+        "class_label": "subreddit",
+        "count": 6
+      }
+    ]
+  },
+  "P1345": {
+    "label": "number of victims of killer",
+    "classes": [
+      {
+        "class_qid": "Q5",
+        "class_label": "human",
+        "count": 107
+      },
+      {
+        "class_qid": "Q3199915",
+        "class_label": "massacre",
+        "count": 17
+      },
+      {
+        "class_qid": "Q15632617",
+        "class_label": "fictional human",
+        "count": 9
+      },
+      {
+        "class_qid": "Q1569167",
+        "class_label": "video game character",
+        "count": 6
+      },
+      {
+        "class_qid": "Q3658341",
+        "class_label": "literary character",
+        "count": 3
+      },
+      {
+        "class_qid": "Q132821",
+        "class_label": "murder",
+        "count": 3
+      }
+    ]
+  },
+  "P8682": {
+    "label": "number of negative votes",
+    "classes": [
+      {
+        "class_qid": "Q15078695",
+        "class_label": "Swiss federal popular initiative",
+        "count": 50
+      },
+      {
+        "class_qid": "Q43109",
+        "class_label": "referendum",
+        "count": 31
+      },
+      {
+        "class_qid": "Q54086790",
+        "class_label": "referendums in Ireland",
+        "count": 15
+      },
+      {
+        "class_qid": "Q2515494",
+        "class_label": "constitutional referendum",
+        "count": 12
+      },
+      {
+        "class_qid": "Q467578",
+        "class_label": "amendments to the Constitution of Ireland",
+        "count": 10
+      },
+      {
+        "class_qid": "Q858439",
+        "class_label": "presidential election",
+        "count": 10
+      }
+    ]
+  },
+  "P8683": {
+    "label": "number of support votes",
+    "classes": [
+      {
+        "class_qid": "Q15078695",
+        "class_label": "Swiss federal popular initiative",
+        "count": 64
+      },
+      {
+        "class_qid": "Q43109",
+        "class_label": "referendum",
+        "count": 31
+      },
+      {
+        "class_qid": "Q2515494",
+        "class_label": "constitutional referendum",
+        "count": 15
+      },
+      {
+        "class_qid": "Q54086790",
+        "class_label": "referendums in Ireland",
+        "count": 8
+      },
+      {
+        "class_qid": "Q1219394",
+        "class_label": "independence referendum",
+        "count": 6
+      },
+      {
+        "class_qid": "Q858439",
+        "class_label": "presidential election",
+        "count": 6
+      }
+    ]
+  },
+  "P1833": {
+    "label": "number of registered users/contributors",
+    "classes": [
+      {
+        "class_qid": "Q72705885",
+        "class_label": "Mastodon instance",
+        "count": 25
+      },
+      {
+        "class_qid": "Q35127",
+        "class_label": "website",
+        "count": 21
+      },
+      {
+        "class_qid": "Q15633582",
+        "class_label": "MediaWiki wiki",
+        "count": 19
+      },
+      {
+        "class_qid": "Q3220391",
+        "class_label": "social networking service",
+        "count": 12
+      },
+      {
+        "class_qid": "Q10876391",
+        "class_label": "Wikipedia language edition",
+        "count": 8
+      },
+      {
+        "class_qid": "Q6576792",
+        "class_label": "online community",
+        "count": 8
+      }
+    ]
+  },
+  "P1446": {
+    "label": "number of missing",
+    "classes": [
+      {
+        "class_qid": "Q3030513",
+        "class_label": "disappearance",
+        "count": 25
+      },
+      {
+        "class_qid": "Q8068",
+        "class_label": "flood",
+        "count": 22
+      },
+      {
+        "class_qid": "Q8065",
+        "class_label": "natural disaster",
+        "count": 11
+      },
+      {
+        "class_qid": "Q744913",
+        "class_label": "aviation accident",
+        "count": 10
+      },
+      {
+        "class_qid": "Q3839081",
+        "class_label": "disaster",
+        "count": 9
+      },
+      {
+        "class_qid": "Q7944",
+        "class_label": "earthquake",
+        "count": 8
+      }
+    ]
+  },
+  "P8876": {
+    "label": "number of taxpayers",
+    "classes": [
+      {
+        "class_qid": "Q8161",
+        "class_label": "tax",
+        "count": 48
+      },
+      {
+        "class_qid": "Q98539801",
+        "class_label": "Q98539801",
+        "count": 37
+      },
+      {
+        "class_qid": "Q3149562",
+        "class_label": "local tax in France",
+        "count": 15
+      },
+      {
+        "class_qid": "Q926871",
+        "class_label": "direct tax",
+        "count": 10
+      },
+      {
+        "class_qid": "Q3363424",
+        "class_label": "Parafiscal tax in France",
+        "count": 9
+      },
+      {
+        "class_qid": "Q98784527",
+        "class_label": "Q98784527",
+        "count": 7
+      }
+    ]
+  },
+  "P9740": {
+    "label": "number of request signatories",
+    "classes": [
+      {
+        "class_qid": "Q46337",
+        "class_label": "manifesto",
+        "count": 47
+      },
+      {
+        "class_qid": "Q697279",
+        "class_label": "petition",
+        "count": 7
+      },
+      {
+        "class_qid": "Q660064",
+        "class_label": "citizens' initiative",
+        "count": 4
+      },
+      {
+        "class_qid": "Q43109",
+        "class_label": "referendum",
+        "count": 2
+      },
+      {
+        "class_qid": "Q15078695",
+        "class_label": "Swiss federal popular initiative",
+        "count": 2
+      },
+      {
+        "class_qid": "Q1411466",
+        "class_label": "petition campaign",
+        "count": 2
+      }
+    ]
+  },
+  "P9924": {
+    "label": "number of evacuated",
+    "classes": [
+      {
+        "class_qid": "Q169950",
+        "class_label": "wildfire",
+        "count": 8
+      },
+      {
+        "class_qid": "Q8068",
+        "class_label": "flood",
+        "count": 5
+      },
+      {
+        "class_qid": "Q606332",
+        "class_label": "evacuation",
+        "count": 3
+      },
+      {
+        "class_qid": "Q256905",
+        "class_label": "airlift",
+        "count": 2
+      },
+      {
+        "class_qid": "Q8070",
+        "class_label": "tsunami",
+        "count": 1
+      },
+      {
+        "class_qid": "Q727990",
+        "class_label": "megathrust earthquake",
+        "count": 1
+      }
+    ]
+  },
+  "P13564": {
+    "label": "third-gender population",
+    "classes": [
+      {
+        "class_qid": "Q620471",
+        "class_label": "upazila of Bangladesh",
+        "count": 3
+      },
+      {
+        "class_qid": "Q6256",
+        "class_label": "country",
+        "count": 1
+      },
+      {
+        "class_qid": "Q3624078",
+        "class_label": "sovereign state",
+        "count": 1
+      }
+    ]
+  },
+  "P9077": {
+    "label": "number of aid beneficiaries",
+    "classes": [
+      {
+        "class_qid": "Q1968122",
+        "class_label": "National Red Cross and Red Crescent society",
+        "count": 1
+      },
+      {
+        "class_qid": "Q1411457",
+        "class_label": "transfer payment",
+        "count": 1
+      },
+      {
+        "class_qid": "Q193219",
+        "class_label": "subsidy",
+        "count": 1
+      },
+      {
+        "class_qid": "Q934744",
+        "class_label": "political scandal",
+        "count": 1
+      },
+      {
+        "class_qid": "Q4551254",
+        "class_label": "fund",
+        "count": 1
+      }
+    ]
+  },
+  "P1120": {
+    "label": "number of deaths",
+    "classes": [
+      {
+        "class_qid": "Q3241045",
+        "class_label": "disease outbreak",
+        "count": 26
+      },
+      {
+        "class_qid": "Q744913",
+        "class_label": "aviation accident",
+        "count": 19
+      },
+      {
+        "class_qid": "Q3199915",
+        "class_label": "massacre",
+        "count": 19
+      },
+      {
+        "class_qid": "Q734271",
+        "class_label": "mass grave",
+        "count": 11
+      },
+      {
+        "class_qid": "Q1078765",
+        "class_label": "railway accident",
+        "count": 5
+      },
+      {
+        "class_qid": "Q891854",
+        "class_label": "bomb attack",
+        "count": 5
+      }
+    ]
+  },
+  "P1339": {
+    "label": "number of injured",
+    "classes": [
+      {
+        "class_qid": "Q1078765",
+        "class_label": "railway accident",
+        "count": 15
+      },
+      {
+        "class_qid": "Q744913",
+        "class_label": "aviation accident",
+        "count": 13
+      },
+      {
+        "class_qid": "Q21480300",
+        "class_label": "mass shooting",
+        "count": 13
+      },
+      {
+        "class_qid": "Q2223653",
+        "class_label": "terrorist attack",
+        "count": 11
+      },
+      {
+        "class_qid": "Q891854",
+        "class_label": "bomb attack",
+        "count": 7
+      },
+      {
+        "class_qid": "Q171558",
+        "class_label": "accident",
+        "count": 5
+      }
+    ]
+  },
+  "P1590": {
+    "label": "number of casualties",
+    "classes": [
+      {
+        "class_qid": "Q1078765",
+        "class_label": "railway accident",
+        "count": 17
+      },
+      {
+        "class_qid": "Q168983",
+        "class_label": "conflagration",
+        "count": 11
+      },
+      {
+        "class_qid": "Q6983405",
+        "class_label": "Nazi crime",
+        "count": 9
+      },
+      {
+        "class_qid": "Q3199915",
+        "class_label": "massacre",
+        "count": 7
+      },
+      {
+        "class_qid": "Q179057",
+        "class_label": "explosion",
+        "count": 6
+      },
+      {
+        "class_qid": "Q178561",
+        "class_label": "battle",
+        "count": 5
+      }
+    ]
+  }
+}

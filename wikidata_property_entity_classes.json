@@ -1,0 +1,3637 @@
+{
+  "P1082": {
+    "label": "population",
+    "classes": [
+      {
+        "class_qid": "Q1529096",
+        "class_label": "village of Turkey",
+        "count": 22
+      },
+      {
+        "class_qid": "Q532",
+        "class_label": "village",
+        "count": 19
+      },
+      {
+        "class_qid": "Q5084",
+        "class_label": "hamlet",
+        "count": 18
+      },
+      {
+        "class_qid": "Q253019",
+        "class_label": "Ortsteil",
+        "count": 14
+      },
+      {
+        "class_qid": "Q486972",
+        "class_label": "human settlement",
+        "count": 10
+      },
+      {
+        "class_qid": "Q634099",
+        "class_label": "rural settlement in Russia",
+        "count": 10
+      },
+      {
+        "class_qid": "Q56436498",
+        "class_label": "village in India",
+        "count": 10
+      },
+      {
+        "class_qid": "Q17051044",
+        "class_label": "mahalle",
+        "count": 6
+      }
+    ]
+  },
+  "P2583": {
+    "label": "distance from Earth",
+    "classes": [
+      {
+        "class_qid": "Q523",
+        "class_label": "star",
+        "count": 123
+      },
+      {
+        "class_qid": "Q2247863",
+        "class_label": "high proper-motion star",
+        "count": 15
+      },
+      {
+        "class_qid": "Q726242",
+        "class_label": "RR Lyrae variable",
+        "count": 3
+      },
+      {
+        "class_qid": "Q66619666",
+        "class_label": "red giant branch star",
+        "count": 2
+      },
+      {
+        "class_qid": "Q1457376",
+        "class_label": "eclipsing binary",
+        "count": 1
+      },
+      {
+        "class_qid": "Q1491746",
+        "class_label": "galaxy group",
+        "count": 1
+      },
+      {
+        "class_qid": "Q5871",
+        "class_label": "white dwarf",
+        "count": 1
+      },
+      {
+        "class_qid": "Q2168098",
+        "class_label": "rotating variable star",
+        "count": 1
+      }
+    ]
+  },
+  "P1104": {
+    "label": "number of pages",
+    "classes": [
+      {
+        "class_qid": "Q3331189",
+        "class_label": "version, edition or translation",
+        "count": 105
+      },
+      {
+        "class_qid": "Q87167",
+        "class_label": "manuscript",
+        "count": 21
+      },
+      {
+        "class_qid": "Q47461344",
+        "class_label": "written work",
+        "count": 6
+      },
+      {
+        "class_qid": "Q571",
+        "class_label": "book",
+        "count": 2
+      },
+      {
+        "class_qid": "Q57933693",
+        "class_label": "book edition",
+        "count": 2
+      },
+      {
+        "class_qid": "Q212971",
+        "class_label": "Request for Comments",
+        "count": 2
+      },
+      {
+        "class_qid": "Q55089312",
+        "class_label": "edition of commercial catalogue",
+        "count": 2
+      },
+      {
+        "class_qid": "Q637866",
+        "class_label": "book review",
+        "count": 2
+      }
+    ]
+  },
+  "P2067": {
+    "label": "mass",
+    "classes": [
+      {
+        "class_qid": "Q113145171",
+        "class_label": "type of chemical entity",
+        "count": 117
+      },
+      {
+        "class_qid": "Q5",
+        "class_label": "human",
+        "count": 10
+      },
+      {
+        "class_qid": "Q113813711",
+        "class_label": "coin type",
+        "count": 10
+      },
+      {
+        "class_qid": "Q59199015",
+        "class_label": "group of stereoisomers",
+        "count": 8
+      },
+      {
+        "class_qid": "Q16521",
+        "class_label": "taxon",
+        "count": 2
+      },
+      {
+        "class_qid": "Q523",
+        "class_label": "star",
+        "count": 2
+      },
+      {
+        "class_qid": "Q67206785",
+        "class_label": "near-infrared source",
+        "count": 2
+      },
+      {
+        "class_qid": "Q60186",
+        "class_label": "meteorite",
+        "count": 1
+      }
+    ]
+  },
+  "P2044": {
+    "label": "elevation above sea level",
+    "classes": [
+      {
+        "class_qid": "Q484170",
+        "class_label": "commune of France",
+        "count": 18
+      },
+      {
+        "class_qid": "Q486972",
+        "class_label": "human settlement",
+        "count": 18
+      },
+      {
+        "class_qid": "Q23397",
+        "class_label": "lake",
+        "count": 13
+      },
+      {
+        "class_qid": "Q4022",
+        "class_label": "river",
+        "count": 13
+      },
+      {
+        "class_qid": "Q8502",
+        "class_label": "mountain",
+        "count": 12
+      },
+      {
+        "class_qid": "Q532",
+        "class_label": "village",
+        "count": 6
+      },
+      {
+        "class_qid": "Q253019",
+        "class_label": "Ortsteil",
+        "count": 5
+      },
+      {
+        "class_qid": "Q17343829",
+        "class_label": "unincorporated community",
+        "count": 4
+      }
+    ]
+  },
+  "P2048": {
+    "label": "height",
+    "classes": [
+      {
+        "class_qid": "Q3305213",
+        "class_label": "painting",
+        "count": 72
+      },
+      {
+        "class_qid": "Q5",
+        "class_label": "human",
+        "count": 32
+      },
+      {
+        "class_qid": "Q11060274",
+        "class_label": "print",
+        "count": 13
+      },
+      {
+        "class_qid": "Q93184",
+        "class_label": "drawing",
+        "count": 8
+      },
+      {
+        "class_qid": "Q125191",
+        "class_label": "photograph",
+        "count": 4
+      },
+      {
+        "class_qid": "Q76504821",
+        "class_label": "scenography sketch",
+        "count": 2
+      },
+      {
+        "class_qid": "Q860861",
+        "class_label": "sculpture",
+        "count": 2
+      },
+      {
+        "class_qid": "Q87167",
+        "class_label": "manuscript",
+        "count": 1
+      }
+    ]
+  },
+  "P2049": {
+    "label": "width",
+    "classes": [
+      {
+        "class_qid": "Q3305213",
+        "class_label": "painting",
+        "count": 83
+      },
+      {
+        "class_qid": "Q93184",
+        "class_label": "drawing",
+        "count": 13
+      },
+      {
+        "class_qid": "Q11060274",
+        "class_label": "print",
+        "count": 8
+      },
+      {
+        "class_qid": "Q113813711",
+        "class_label": "coin type",
+        "count": 8
+      },
+      {
+        "class_qid": "Q11446",
+        "class_label": "ship",
+        "count": 6
+      },
+      {
+        "class_qid": "Q125191",
+        "class_label": "photograph",
+        "count": 4
+      },
+      {
+        "class_qid": "Q188040",
+        "class_label": "quarry",
+        "count": 2
+      },
+      {
+        "class_qid": "Q372363",
+        "class_label": "geotope",
+        "count": 2
+      }
+    ]
+  },
+  "P2046": {
+    "label": "area",
+    "classes": [
+      {
+        "class_qid": "Q23397",
+        "class_label": "lake",
+        "count": 15
+      },
+      {
+        "class_qid": "Q473972",
+        "class_label": "protected area",
+        "count": 10
+      },
+      {
+        "class_qid": "Q179049",
+        "class_label": "nature reserve",
+        "count": 9
+      },
+      {
+        "class_qid": "Q56436498",
+        "class_label": "village in India",
+        "count": 7
+      },
+      {
+        "class_qid": "Q21672098",
+        "class_label": "village of Ukraine",
+        "count": 7
+      },
+      {
+        "class_qid": "Q1093829",
+        "class_label": "city in the United States",
+        "count": 5
+      },
+      {
+        "class_qid": "Q484170",
+        "class_label": "commune of France",
+        "count": 5
+      },
+      {
+        "class_qid": "Q23442",
+        "class_label": "island",
+        "count": 5
+      }
+    ]
+  },
+  "P8687": {
+    "label": "social media followers",
+    "classes": [
+      {
+        "class_qid": "Q5",
+        "class_label": "human",
+        "count": 86
+      },
+      {
+        "class_qid": "Q215380",
+        "class_label": "musical group",
+        "count": 9
+      },
+      {
+        "class_qid": "Q4830453",
+        "class_label": "business",
+        "count": 5
+      },
+      {
+        "class_qid": "Q2085381",
+        "class_label": "publishing house",
+        "count": 3
+      },
+      {
+        "class_qid": "Q163740",
+        "class_label": "nonprofit organization",
+        "count": 3
+      },
+      {
+        "class_qid": "Q1320047",
+        "class_label": "book publisher",
+        "count": 2
+      },
+      {
+        "class_qid": "Q5398426",
+        "class_label": "television series",
+        "count": 2
+      },
+      {
+        "class_qid": "Q14350",
+        "class_label": "radio station",
+        "count": 2
+      }
+    ]
+  },
+  "P7015": {
+    "label": "surface gravity",
+    "classes": [
+      {
+        "class_qid": "Q523",
+        "class_label": "star",
+        "count": 107
+      },
+      {
+        "class_qid": "Q66619666",
+        "class_label": "red giant branch star",
+        "count": 22
+      },
+      {
+        "class_qid": "Q2247863",
+        "class_label": "high proper-motion star",
+        "count": 10
+      },
+      {
+        "class_qid": "Q2168098",
+        "class_label": "rotating variable star",
+        "count": 4
+      },
+      {
+        "class_qid": "Q5871",
+        "class_label": "white dwarf",
+        "count": 3
+      },
+      {
+        "class_qid": "Q497654",
+        "class_label": "young stellar object",
+        "count": 2
+      },
+      {
+        "class_qid": "Q67206785",
+        "class_label": "near-infrared source",
+        "count": 1
+      },
+      {
+        "class_qid": "Q71798788",
+        "class_label": "ultraviolet source",
+        "count": 1
+      }
+    ]
+  },
+  "P1436": {
+    "label": "collection or exhibition size",
+    "classes": [
+      {
+        "class_qid": "Q2668072",
+        "class_label": "collection",
+        "count": 114
+      },
+      {
+        "class_qid": "Q124750618",
+        "class_label": "library of an Italian territorial body",
+        "count": 13
+      },
+      {
+        "class_qid": "Q28564",
+        "class_label": "public library",
+        "count": 12
+      },
+      {
+        "class_qid": "Q3052382",
+        "class_label": "fonds",
+        "count": 10
+      },
+      {
+        "class_qid": "Q385994",
+        "class_label": "special library",
+        "count": 3
+      },
+      {
+        "class_qid": "Q9388534",
+        "class_label": "archival collection",
+        "count": 2
+      },
+      {
+        "class_qid": "Q124750593",
+        "class_label": "Q124750593",
+        "count": 2
+      },
+      {
+        "class_qid": "Q2860456",
+        "class_label": "departmental archives",
+        "count": 1
+      }
+    ]
+  },
+  "P1132": {
+    "label": "number of participants",
+    "classes": [
+      {
+        "class_qid": "Q30612",
+        "class_label": "clinical trial",
+        "count": 124
+      },
+      {
+        "class_qid": "Q27020041",
+        "class_label": "sports season",
+        "count": 13
+      },
+      {
+        "class_qid": "Q17317604",
+        "class_label": "professional wrestling event",
+        "count": 1
+      },
+      {
+        "class_qid": "Q51031626",
+        "class_label": "sport competition at a multi-sport event",
+        "count": 1
+      },
+      {
+        "class_qid": "Q273120",
+        "class_label": "protest",
+        "count": 1
+      },
+      {
+        "class_qid": "Q137592217",
+        "class_label": "Winter Olympic Games edition",
+        "count": 1
+      },
+      {
+        "class_qid": "Q1478437",
+        "class_label": "association football competition",
+        "count": 1
+      },
+      {
+        "class_qid": "Q3002150",
+        "class_label": "aircraft crash",
+        "count": 1
+      }
+    ]
+  },
+  "P2139": {
+    "label": "total revenue",
+    "classes": [
+      {
+        "class_qid": "Q163740",
+        "class_label": "nonprofit organization",
+        "count": 120
+      },
+      {
+        "class_qid": "Q708676",
+        "class_label": "charitable organization",
+        "count": 12
+      },
+      {
+        "class_qid": "Q26271642",
+        "class_label": "library network",
+        "count": 5
+      },
+      {
+        "class_qid": "Q43229",
+        "class_label": "organization",
+        "count": 4
+      },
+      {
+        "class_qid": "Q4830453",
+        "class_label": "business",
+        "count": 4
+      },
+      {
+        "class_qid": "Q157031",
+        "class_label": "foundation",
+        "count": 3
+      },
+      {
+        "class_qid": "Q33506",
+        "class_label": "museum",
+        "count": 3
+      },
+      {
+        "class_qid": "Q42998",
+        "class_label": "orchestra",
+        "count": 2
+      }
+    ]
+  },
+  "P2043": {
+    "label": "length",
+    "classes": [
+      {
+        "class_qid": "Q4022",
+        "class_label": "river",
+        "count": 28
+      },
+      {
+        "class_qid": "Q11446",
+        "class_label": "ship",
+        "count": 23
+      },
+      {
+        "class_qid": "Q34442",
+        "class_label": "road",
+        "count": 11
+      },
+      {
+        "class_qid": "Q728937",
+        "class_label": "railway line/metro line",
+        "count": 7
+      },
+      {
+        "class_qid": "Q459297",
+        "class_label": "qanat",
+        "count": 5
+      },
+      {
+        "class_qid": "Q15276",
+        "class_label": "bulk carrier",
+        "count": 5
+      },
+      {
+        "class_qid": "Q47521",
+        "class_label": "stream",
+        "count": 5
+      },
+      {
+        "class_qid": "Q3231690",
+        "class_label": "car model",
+        "count": 4
+      }
+    ]
+  },
+  "P1540": {
+    "label": "male population",
+    "classes": [
+      {
+        "class_qid": "Q56436498",
+        "class_label": "village in India",
+        "count": 43
+      },
+      {
+        "class_qid": "Q3558970",
+        "class_label": "village of Poland",
+        "count": 24
+      },
+      {
+        "class_qid": "Q17051044",
+        "class_label": "mahalle",
+        "count": 21
+      },
+      {
+        "class_qid": "Q484170",
+        "class_label": "commune of France",
+        "count": 17
+      },
+      {
+        "class_qid": "Q7930614",
+        "class_label": "village of Taiwan",
+        "count": 13
+      },
+      {
+        "class_qid": "Q486972",
+        "class_label": "human settlement",
+        "count": 7
+      },
+      {
+        "class_qid": "Q28371991",
+        "class_label": "village of Yemen",
+        "count": 6
+      },
+      {
+        "class_qid": "Q188509",
+        "class_label": "suburb",
+        "count": 4
+      }
+    ]
+  },
+  "P1539": {
+    "label": "female population",
+    "classes": [
+      {
+        "class_qid": "Q56436498",
+        "class_label": "village in India",
+        "count": 51
+      },
+      {
+        "class_qid": "Q484170",
+        "class_label": "commune of France",
+        "count": 21
+      },
+      {
+        "class_qid": "Q17051044",
+        "class_label": "mahalle",
+        "count": 12
+      },
+      {
+        "class_qid": "Q3558970",
+        "class_label": "village of Poland",
+        "count": 12
+      },
+      {
+        "class_qid": "Q2074737",
+        "class_label": "municipality of Spain",
+        "count": 10
+      },
+      {
+        "class_qid": "Q486972",
+        "class_label": "human settlement",
+        "count": 9
+      },
+      {
+        "class_qid": "Q7930614",
+        "class_label": "village of Taiwan",
+        "count": 8
+      },
+      {
+        "class_qid": "Q1529096",
+        "class_label": "village of Turkey",
+        "count": 5
+      }
+    ]
+  },
+  "P2047": {
+    "label": "duration",
+    "classes": [
+      {
+        "class_qid": "Q11424",
+        "class_label": "film",
+        "count": 62
+      },
+      {
+        "class_qid": "Q18431960",
+        "class_label": "basketball game",
+        "count": 20
+      },
+      {
+        "class_qid": "Q506240",
+        "class_label": "television film",
+        "count": 9
+      },
+      {
+        "class_qid": "Q125390868",
+        "class_label": "hijri month of a given year",
+        "count": 9
+      },
+      {
+        "class_qid": "Q55850593",
+        "class_label": "music track with vocals",
+        "count": 7
+      },
+      {
+        "class_qid": "Q7302866",
+        "class_label": "audio track",
+        "count": 6
+      },
+      {
+        "class_qid": "Q482994",
+        "class_label": "album",
+        "count": 5
+      },
+      {
+        "class_qid": "Q105543609",
+        "class_label": "musical work/composition",
+        "count": 5
+      }
+    ]
+  },
+  "P2403": {
+    "label": "total assets",
+    "classes": [
+      {
+        "class_qid": "Q163740",
+        "class_label": "nonprofit organization",
+        "count": 141
+      },
+      {
+        "class_qid": "Q708676",
+        "class_label": "charitable organization",
+        "count": 7
+      },
+      {
+        "class_qid": "Q16917",
+        "class_label": "hospital",
+        "count": 4
+      },
+      {
+        "class_qid": "Q79913",
+        "class_label": "non-governmental organization",
+        "count": 4
+      },
+      {
+        "class_qid": "Q43229",
+        "class_label": "organization",
+        "count": 4
+      },
+      {
+        "class_qid": "Q3778211",
+        "class_label": "legal person",
+        "count": 3
+      },
+      {
+        "class_qid": "Q4830453",
+        "class_label": "business",
+        "count": 3
+      },
+      {
+        "class_qid": "Q4287745",
+        "class_label": "medical organization",
+        "count": 2
+      }
+    ]
+  },
+  "P2899": {
+    "label": "minimum age",
+    "classes": [
+      {
+        "class_qid": "Q30612",
+        "class_label": "clinical trial",
+        "count": 149
+      },
+      {
+        "class_qid": "Q110910264",
+        "class_label": "Apple App Store rating category",
+        "count": 1
+      }
+    ]
+  },
+  "P8093": {
+    "label": "donations",
+    "classes": [
+      {
+        "class_qid": "Q163740",
+        "class_label": "nonprofit organization",
+        "count": 131
+      },
+      {
+        "class_qid": "Q708676",
+        "class_label": "charitable organization",
+        "count": 14
+      },
+      {
+        "class_qid": "Q5774403",
+        "class_label": "historical society",
+        "count": 5
+      },
+      {
+        "class_qid": "Q28564",
+        "class_label": "public library",
+        "count": 2
+      },
+      {
+        "class_qid": "Q43229",
+        "class_label": "organization",
+        "count": 2
+      },
+      {
+        "class_qid": "Q79913",
+        "class_label": "non-governmental organization",
+        "count": 2
+      },
+      {
+        "class_qid": "Q742421",
+        "class_label": "theatre company",
+        "count": 2
+      },
+      {
+        "class_qid": "Q33506",
+        "class_label": "museum",
+        "count": 2
+      }
+    ]
+  },
+  "P4080": {
+    "label": "number of houses",
+    "classes": [
+      {
+        "class_qid": "Q61089180",
+        "class_label": "municipal part of the Czech Republic",
+        "count": 40
+      },
+      {
+        "class_qid": "Q39825",
+        "class_label": "census",
+        "count": 40
+      },
+      {
+        "class_qid": "Q20871353",
+        "class_label": "cadastral area in the Czech Republic",
+        "count": 26
+      },
+      {
+        "class_qid": "Q5153359",
+        "class_label": "municipality of the Czech Republic",
+        "count": 22
+      },
+      {
+        "class_qid": "Q11183787",
+        "class_label": "Ortschaft",
+        "count": 12
+      },
+      {
+        "class_qid": "Q253019",
+        "class_label": "Ortsteil",
+        "count": 12
+      },
+      {
+        "class_qid": "Q532",
+        "class_label": "village",
+        "count": 7
+      },
+      {
+        "class_qid": "Q5084",
+        "class_label": "hamlet",
+        "count": 7
+      }
+    ]
+  },
+  "P2196": {
+    "label": "count of students",
+    "classes": [
+      {
+        "class_qid": "Q20860083",
+        "class_label": "educational facility",
+        "count": 89
+      },
+      {
+        "class_qid": "Q67015940",
+        "class_label": "Government Boys' Primary School",
+        "count": 13
+      },
+      {
+        "class_qid": "Q3914",
+        "class_label": "school",
+        "count": 11
+      },
+      {
+        "class_qid": "Q67015944",
+        "class_label": "Government Girls Primary School",
+        "count": 4
+      },
+      {
+        "class_qid": "Q19855165",
+        "class_label": "rural school",
+        "count": 4
+      },
+      {
+        "class_qid": "Q875538",
+        "class_label": "public university",
+        "count": 3
+      },
+      {
+        "class_qid": "Q23002039",
+        "class_label": "public educational institution of the United States",
+        "count": 3
+      },
+      {
+        "class_qid": "Q9826",
+        "class_label": "high school",
+        "count": 3
+      }
+    ]
+  },
+  "P1181": {
+    "label": "numeric value",
+    "classes": [
+      {
+        "class_qid": "Q16317911",
+        "class_label": "positive integer",
+        "count": 148
+      },
+      {
+        "class_qid": "Q50707",
+        "class_label": "composite number",
+        "count": 124
+      },
+      {
+        "class_qid": "Q467511",
+        "class_label": "deficient number",
+        "count": 98
+      },
+      {
+        "class_qid": "Q13366129",
+        "class_label": "odd number",
+        "count": 75
+      },
+      {
+        "class_qid": "Q13366104",
+        "class_label": "even number",
+        "count": 73
+      },
+      {
+        "class_qid": "Q223722",
+        "class_label": "abundant number",
+        "count": 32
+      },
+      {
+        "class_qid": "Q765289",
+        "class_label": "semiprime",
+        "count": 27
+      },
+      {
+        "class_qid": "Q49008",
+        "class_label": "prime number",
+        "count": 7
+      }
+    ]
+  },
+  "P7316": {
+    "label": "number of decimal digits",
+    "classes": [
+      {
+        "class_qid": "Q16317911",
+        "class_label": "positive integer",
+        "count": 84
+      },
+      {
+        "class_qid": "Q49008",
+        "class_label": "prime number",
+        "count": 73
+      },
+      {
+        "class_qid": "Q50707",
+        "class_label": "composite number",
+        "count": 68
+      },
+      {
+        "class_qid": "Q467511",
+        "class_label": "deficient number",
+        "count": 57
+      },
+      {
+        "class_qid": "Q13366104",
+        "class_label": "even number",
+        "count": 43
+      },
+      {
+        "class_qid": "Q13366129",
+        "class_label": "odd number",
+        "count": 41
+      },
+      {
+        "class_qid": "Q765289",
+        "class_label": "semiprime",
+        "count": 20
+      },
+      {
+        "class_qid": "Q223722",
+        "class_label": "abundant number",
+        "count": 20
+      }
+    ]
+  },
+  "P1128": {
+    "label": "employees",
+    "classes": [
+      {
+        "class_qid": "Q163740",
+        "class_label": "nonprofit organization",
+        "count": 83
+      },
+      {
+        "class_qid": "Q708676",
+        "class_label": "charitable organization",
+        "count": 17
+      },
+      {
+        "class_qid": "Q4830453",
+        "class_label": "business",
+        "count": 12
+      },
+      {
+        "class_qid": "Q6881511",
+        "class_label": "enterprise",
+        "count": 6
+      },
+      {
+        "class_qid": "Q207694",
+        "class_label": "art museum",
+        "count": 5
+      },
+      {
+        "class_qid": "Q614316",
+        "class_label": "private museum",
+        "count": 5
+      },
+      {
+        "class_qid": "Q9826",
+        "class_label": "high school",
+        "count": 5
+      },
+      {
+        "class_qid": "Q3914",
+        "class_label": "school",
+        "count": 5
+      }
+    ]
+  },
+  "P2386": {
+    "label": "diameter",
+    "classes": [
+      {
+        "class_qid": "Q113813711",
+        "class_label": "coin type",
+        "count": 80
+      },
+      {
+        "class_qid": "Q3863",
+        "class_label": "asteroid",
+        "count": 42
+      },
+      {
+        "class_qid": "Q860861",
+        "class_label": "sculpture",
+        "count": 5
+      },
+      {
+        "class_qid": "Q220659",
+        "class_label": "archaeological artefact",
+        "count": 5
+      },
+      {
+        "class_qid": "Q41207",
+        "class_label": "coin",
+        "count": 4
+      },
+      {
+        "class_qid": "Q838948",
+        "class_label": "work of art",
+        "count": 4
+      },
+      {
+        "class_qid": "Q811534",
+        "class_label": "remarkable tree",
+        "count": 2
+      },
+      {
+        "class_qid": "Q131647",
+        "class_label": "medal",
+        "count": 2
+      }
+    ]
+  },
+  "P4135": {
+    "label": "maximum age",
+    "classes": [
+      {
+        "class_qid": "Q30612",
+        "class_label": "clinical trial",
+        "count": 150
+      }
+    ]
+  },
+  "P3872": {
+    "label": "patronage",
+    "classes": [
+      {
+        "class_qid": "Q1248784",
+        "class_label": "airport",
+        "count": 77
+      },
+      {
+        "class_qid": "Q94993988",
+        "class_label": "commercial traffic aerodrome",
+        "count": 64
+      },
+      {
+        "class_qid": "Q55488",
+        "class_label": "railway station",
+        "count": 50
+      },
+      {
+        "class_qid": "Q644371",
+        "class_label": "international airport",
+        "count": 13
+      },
+      {
+        "class_qid": "Q62447",
+        "class_label": "aerodrome",
+        "count": 10
+      },
+      {
+        "class_qid": "Q22808404",
+        "class_label": "station located on surface",
+        "count": 8
+      },
+      {
+        "class_qid": "Q22808403",
+        "class_label": "underground station",
+        "count": 4
+      },
+      {
+        "class_qid": "Q11670533",
+        "class_label": "elevated station",
+        "count": 3
+      }
+    ]
+  },
+  "P2284": {
+    "label": "price",
+    "classes": [
+      {
+        "class_qid": "Q113813711",
+        "class_label": "coin type",
+        "count": 144
+      },
+      {
+        "class_qid": "Q10929058",
+        "class_label": "product model",
+        "count": 1
+      },
+      {
+        "class_qid": "Q482994",
+        "class_label": "album",
+        "count": 1
+      },
+      {
+        "class_qid": "Q7725634",
+        "class_label": "literary work",
+        "count": 1
+      },
+      {
+        "class_qid": "Q136260412",
+        "class_label": "computer monitor model",
+        "count": 1
+      },
+      {
+        "class_qid": "Q7889",
+        "class_label": "video game",
+        "count": 1
+      },
+      {
+        "class_qid": "Q3331189",
+        "class_label": "version, edition or translation",
+        "count": 1
+      }
+    ]
+  },
+  "P3934": {
+    "label": "face value",
+    "classes": [
+      {
+        "class_qid": "Q113813711",
+        "class_label": "coin type",
+        "count": 148
+      },
+      {
+        "class_qid": "Q3331189",
+        "class_label": "version, edition or translation",
+        "count": 1
+      },
+      {
+        "class_qid": "Q1926935",
+        "class_label": "stamp edition",
+        "count": 1
+      }
+    ]
+  },
+  "P2635": {
+    "label": "number of parts of this work",
+    "classes": [
+      {
+        "class_qid": "Q482994",
+        "class_label": "album",
+        "count": 96
+      },
+      {
+        "class_qid": "Q134556",
+        "class_label": "single",
+        "count": 10
+      },
+      {
+        "class_qid": "Q3331189",
+        "class_label": "version, edition or translation",
+        "count": 7
+      },
+      {
+        "class_qid": "Q105543609",
+        "class_label": "musical work/composition",
+        "count": 4
+      },
+      {
+        "class_qid": "Q169930",
+        "class_label": "extended play",
+        "count": 4
+      },
+      {
+        "class_qid": "Q7725634",
+        "class_label": "literary work",
+        "count": 4
+      },
+      {
+        "class_qid": "Q21198342",
+        "class_label": "manga series",
+        "count": 3
+      },
+      {
+        "class_qid": "Q104213567",
+        "class_label": "light novel series",
+        "count": 3
+      }
+    ]
+  },
+  "P4895": {
+    "label": "time index",
+    "classes": [
+      {
+        "class_qid": "Q1260524",
+        "class_label": "time of day",
+        "count": 116
+      },
+      {
+        "class_qid": "Q125390868",
+        "class_label": "hijri month of a given year",
+        "count": 30
+      },
+      {
+        "class_qid": "Q14795564",
+        "class_label": "point in time with respect to recurrent timeframe",
+        "count": 4
+      },
+      {
+        "class_qid": "Q5019497",
+        "class_label": "calendar day",
+        "count": 2
+      }
+    ]
+  },
+  "P1174": {
+    "label": "visitors per year",
+    "classes": [
+      {
+        "class_qid": "Q26271642",
+        "class_label": "library network",
+        "count": 47
+      },
+      {
+        "class_qid": "Q33506",
+        "class_label": "museum",
+        "count": 22
+      },
+      {
+        "class_qid": "Q28564",
+        "class_label": "public library",
+        "count": 19
+      },
+      {
+        "class_qid": "Q124750618",
+        "class_label": "library of an Italian territorial body",
+        "count": 19
+      },
+      {
+        "class_qid": "Q124830213",
+        "class_label": "museum of a public entity",
+        "count": 13
+      },
+      {
+        "class_qid": "Q207694",
+        "class_label": "art museum",
+        "count": 13
+      },
+      {
+        "class_qid": "Q614316",
+        "class_label": "private museum",
+        "count": 10
+      },
+      {
+        "class_qid": "Q92755865",
+        "class_label": "religious museum",
+        "count": 8
+      }
+    ]
+  },
+  "P5205": {
+    "label": "stroke count",
+    "classes": [
+      {
+        "class_qid": "Q29654788",
+        "class_label": "Unicode character",
+        "count": 150
+      },
+      {
+        "class_qid": "Q17300291",
+        "class_label": "sinogram",
+        "count": 148
+      },
+      {
+        "class_qid": "Q53764732",
+        "class_label": "CJKV character",
+        "count": 127
+      },
+      {
+        "class_qid": "Q53764782",
+        "class_label": "kanji character",
+        "count": 15
+      },
+      {
+        "class_qid": "Q41798684",
+        "class_label": "hiragana character",
+        "count": 1
+      },
+      {
+        "class_qid": "Q55712979",
+        "class_label": "hanja character",
+        "count": 1
+      },
+      {
+        "class_qid": "Q15100640",
+        "class_label": "N\u00f4m character",
+        "count": 1
+      },
+      {
+        "class_qid": "Q136440129",
+        "class_label": "Tangut component",
+        "count": 1
+      }
+    ]
+  },
+  "P6498": {
+    "label": "illiterate population",
+    "classes": [
+      {
+        "class_qid": "Q56436498",
+        "class_label": "village in India",
+        "count": 136
+      },
+      {
+        "class_qid": "Q1195098",
+        "class_label": "ward",
+        "count": 8
+      },
+      {
+        "class_qid": "Q16830604",
+        "class_label": "census town of India",
+        "count": 4
+      },
+      {
+        "class_qid": "Q122987743",
+        "class_label": "community development block in West Bengal",
+        "count": 2
+      },
+      {
+        "class_qid": "Q902814",
+        "class_label": "border city",
+        "count": 1
+      }
+    ]
+  },
+  "P1113": {
+    "label": "number of episodes",
+    "classes": [
+      {
+        "class_qid": "Q5398426",
+        "class_label": "television series",
+        "count": 83
+      },
+      {
+        "class_qid": "Q15416",
+        "class_label": "television program",
+        "count": 20
+      },
+      {
+        "class_qid": "Q3464665",
+        "class_label": "television series season",
+        "count": 14
+      },
+      {
+        "class_qid": "Q117467246",
+        "class_label": "animated television series",
+        "count": 7
+      },
+      {
+        "class_qid": "Q24634210",
+        "class_label": "podcast show",
+        "count": 6
+      },
+      {
+        "class_qid": "Q63952888",
+        "class_label": "anime television series",
+        "count": 6
+      },
+      {
+        "class_qid": "Q1259759",
+        "class_label": "miniseries",
+        "count": 3
+      },
+      {
+        "class_qid": "Q100269041",
+        "class_label": "anime television series season",
+        "count": 3
+      }
+    ]
+  },
+  "P1093": {
+    "label": "gross tonnage",
+    "classes": [
+      {
+        "class_qid": "Q11446",
+        "class_label": "ship",
+        "count": 88
+      },
+      {
+        "class_qid": "Q17210",
+        "class_label": "container ship",
+        "count": 12
+      },
+      {
+        "class_qid": "Q15276",
+        "class_label": "bulk carrier",
+        "count": 11
+      },
+      {
+        "class_qid": "Q14970",
+        "class_label": "tanker",
+        "count": 7
+      },
+      {
+        "class_qid": "Q105999",
+        "class_label": "cargo ship",
+        "count": 6
+      },
+      {
+        "class_qid": "Q473932",
+        "class_label": "roll-on/roll-off ship",
+        "count": 4
+      },
+      {
+        "class_qid": "Q14928",
+        "class_label": "oil tanker",
+        "count": 2
+      },
+      {
+        "class_qid": "Q1917626",
+        "class_label": "multi-purpose vessel",
+        "count": 2
+      }
+    ]
+  },
+  "P1352": {
+    "label": "ranking",
+    "classes": [
+      {
+        "class_qid": "Q135408445",
+        "class_label": "men's national association football team",
+        "count": 53
+      },
+      {
+        "class_qid": "Q5",
+        "class_label": "human",
+        "count": 24
+      },
+      {
+        "class_qid": "Q121117",
+        "class_label": "supercomputer",
+        "count": 16
+      },
+      {
+        "class_qid": "Q45400320",
+        "class_label": "open-access publisher",
+        "count": 15
+      },
+      {
+        "class_qid": "Q3918",
+        "class_label": "university",
+        "count": 12
+      },
+      {
+        "class_qid": "Q875538",
+        "class_label": "public university",
+        "count": 11
+      },
+      {
+        "class_qid": "Q62078547",
+        "class_label": "public research university",
+        "count": 9
+      },
+      {
+        "class_qid": "Q902104",
+        "class_label": "private university",
+        "count": 6
+      }
+    ]
+  },
+  "P2124": {
+    "label": "member count",
+    "classes": [
+      {
+        "class_qid": "Q163740",
+        "class_label": "nonprofit organization",
+        "count": 45
+      },
+      {
+        "class_qid": "Q43229",
+        "class_label": "organization",
+        "count": 20
+      },
+      {
+        "class_qid": "Q3146899",
+        "class_label": "diocese of the Catholic Church",
+        "count": 13
+      },
+      {
+        "class_qid": "Q7278",
+        "class_label": "political party",
+        "count": 7
+      },
+      {
+        "class_qid": "Q615980",
+        "class_label": "parish of the Church of Sweden",
+        "count": 7
+      },
+      {
+        "class_qid": "Q48204",
+        "class_label": "voluntary association",
+        "count": 5
+      },
+      {
+        "class_qid": "Q15911314",
+        "class_label": "association",
+        "count": 4
+      },
+      {
+        "class_qid": "Q18706073",
+        "class_label": "public institution of intermunicipal cooperation with own taxation",
+        "count": 4
+      }
+    ]
+  },
+  "P11200": {
+    "label": "tiratge",
+    "classes": [
+      {
+        "class_qid": "Q105543609",
+        "class_label": "musical work/composition",
+        "count": 149
+      }
+    ]
+  },
+  "P1971": {
+    "label": "number of children",
+    "classes": [
+      {
+        "class_qid": "Q5",
+        "class_label": "human",
+        "count": 148
+      },
+      {
+        "class_qid": "Q15632617",
+        "class_label": "fictional human",
+        "count": 2
+      },
+      {
+        "class_qid": "Q3658341",
+        "class_label": "literary character",
+        "count": 1
+      },
+      {
+        "class_qid": "Q15773347",
+        "class_label": "film character",
+        "count": 1
+      },
+      {
+        "class_qid": "Q15773317",
+        "class_label": "television character",
+        "count": 1
+      }
+    ]
+  },
+  "P2547": {
+    "label": "perimeter",
+    "classes": [
+      {
+        "class_qid": "Q23397",
+        "class_label": "lake",
+        "count": 109
+      },
+      {
+        "class_qid": "Q811534",
+        "class_label": "remarkable tree",
+        "count": 28
+      },
+      {
+        "class_qid": "Q2438638",
+        "class_label": "solitary",
+        "count": 17
+      },
+      {
+        "class_qid": "Q104093746",
+        "class_label": "lake or pond",
+        "count": 17
+      },
+      {
+        "class_qid": "Q30092776",
+        "class_label": "lake water body",
+        "count": 13
+      },
+      {
+        "class_qid": "Q2732840",
+        "class_label": "gram panchayat",
+        "count": 4
+      },
+      {
+        "class_qid": "Q52062847",
+        "class_label": "Tree of Public Interest",
+        "count": 2
+      },
+      {
+        "class_qid": "Q1265665",
+        "class_label": "fish pond",
+        "count": 1
+      }
+    ]
+  },
+  "P10622": {
+    "label": "per capita income",
+    "classes": [
+      {
+        "class_qid": "Q498162",
+        "class_label": "census-designated place in the United States",
+        "count": 35
+      },
+      {
+        "class_qid": "Q1093829",
+        "class_label": "city in the United States",
+        "count": 18
+      },
+      {
+        "class_qid": "Q15127012",
+        "class_label": "town in the United States",
+        "count": 11
+      },
+      {
+        "class_qid": "Q17343829",
+        "class_label": "unincorporated community",
+        "count": 10
+      },
+      {
+        "class_qid": "Q17201685",
+        "class_label": "township of Indiana",
+        "count": 7
+      },
+      {
+        "class_qid": "Q17205621",
+        "class_label": "township of Iowa",
+        "count": 7
+      },
+      {
+        "class_qid": "Q17198620",
+        "class_label": "township of Ohio",
+        "count": 6
+      },
+      {
+        "class_qid": "Q28111",
+        "class_label": "township in the United States",
+        "count": 6
+      }
+    ]
+  },
+  "P1831": {
+    "label": "electorate",
+    "classes": [
+      {
+        "class_qid": "Q152450",
+        "class_label": "municipal election",
+        "count": 39
+      },
+      {
+        "class_qid": "Q3184121",
+        "class_label": "municipality of Brazil",
+        "count": 26
+      },
+      {
+        "class_qid": "Q40231",
+        "class_label": "public election",
+        "count": 17
+      },
+      {
+        "class_qid": "Q19571328",
+        "class_label": "electoral result",
+        "count": 17
+      },
+      {
+        "class_qid": "Q27971968",
+        "class_label": "constituency of the House of Commons",
+        "count": 16
+      },
+      {
+        "class_qid": "Q14509381",
+        "class_label": "Dutch general election",
+        "count": 11
+      },
+      {
+        "class_qid": "Q24764",
+        "class_label": "municipality of the Philippines",
+        "count": 9
+      },
+      {
+        "class_qid": "Q63084210",
+        "class_label": "electoral district of Ukraine",
+        "count": 3
+      }
+    ]
+  },
+  "P2437": {
+    "label": "number of seasons",
+    "classes": [
+      {
+        "class_qid": "Q5398426",
+        "class_label": "television series",
+        "count": 106
+      },
+      {
+        "class_qid": "Q15416",
+        "class_label": "television program",
+        "count": 28
+      },
+      {
+        "class_qid": "Q117467246",
+        "class_label": "animated television series",
+        "count": 8
+      },
+      {
+        "class_qid": "Q1259759",
+        "class_label": "miniseries",
+        "count": 5
+      },
+      {
+        "class_qid": "Q63952888",
+        "class_label": "anime television series",
+        "count": 5
+      },
+      {
+        "class_qid": "Q526877",
+        "class_label": "web series",
+        "count": 2
+      },
+      {
+        "class_qid": "Q1484397",
+        "class_label": "talent show",
+        "count": 1
+      },
+      {
+        "class_qid": "Q202866",
+        "class_label": "animated film",
+        "count": 1
+      }
+    ]
+  },
+  "P1350": {
+    "label": "number of matches played/races/starts",
+    "classes": [
+      {
+        "class_qid": "Q27020041",
+        "class_label": "sports season",
+        "count": 92
+      },
+      {
+        "class_qid": "Q5",
+        "class_label": "human",
+        "count": 41
+      },
+      {
+        "class_qid": "Q10497835",
+        "class_label": "Formula One team",
+        "count": 3
+      },
+      {
+        "class_qid": "Q1478437",
+        "class_label": "association football competition",
+        "count": 2
+      },
+      {
+        "class_qid": "Q51031626",
+        "class_label": "sport competition at a multi-sport event",
+        "count": 2
+      },
+      {
+        "class_qid": "Q16848281",
+        "class_label": "UEFA European Championship qualifying",
+        "count": 1
+      },
+      {
+        "class_qid": "Q931386",
+        "class_label": "Campeonato Goiano",
+        "count": 1
+      },
+      {
+        "class_qid": "Q108861375",
+        "class_label": "Formula One season",
+        "count": 1
+      }
+    ]
+  },
+  "P2053": {
+    "label": "watershed area",
+    "classes": [
+      {
+        "class_qid": "Q4022",
+        "class_label": "river",
+        "count": 91
+      },
+      {
+        "class_qid": "Q131681",
+        "class_label": "reservoir",
+        "count": 35
+      },
+      {
+        "class_qid": "Q47521",
+        "class_label": "stream",
+        "count": 9
+      },
+      {
+        "class_qid": "Q23397",
+        "class_label": "lake",
+        "count": 6
+      },
+      {
+        "class_qid": "Q355304",
+        "class_label": "watercourse",
+        "count": 5
+      },
+      {
+        "class_qid": "Q63565252",
+        "class_label": "brook",
+        "count": 3
+      },
+      {
+        "class_qid": "Q166620",
+        "class_label": "drainage basin",
+        "count": 2
+      },
+      {
+        "class_qid": "Q285451",
+        "class_label": "drainage system",
+        "count": 2
+      }
+    ]
+  },
+  "P3157": {
+    "label": "event distance",
+    "classes": [
+      {
+        "class_qid": "Q18131152",
+        "class_label": "round",
+        "count": 20
+      },
+      {
+        "class_qid": "Q20646667",
+        "class_label": "plain stage",
+        "count": 16
+      },
+      {
+        "class_qid": "Q21246076",
+        "class_label": "rowing event",
+        "count": 13
+      },
+      {
+        "class_qid": "Q20646670",
+        "class_label": "hilly stage",
+        "count": 10
+      },
+      {
+        "class_qid": "Q20680270",
+        "class_label": "medium mountain stage",
+        "count": 9
+      },
+      {
+        "class_qid": "Q20646668",
+        "class_label": "mountain stage",
+        "count": 7
+      },
+      {
+        "class_qid": "Q114609228",
+        "class_label": "recurring sporting event edition",
+        "count": 6
+      },
+      {
+        "class_qid": "Q27020041",
+        "class_label": "sports season",
+        "count": 4
+      }
+    ]
+  },
+  "P1868": {
+    "label": "ballots cast",
+    "classes": [
+      {
+        "class_qid": "Q40231",
+        "class_label": "public election",
+        "count": 43
+      },
+      {
+        "class_qid": "Q152450",
+        "class_label": "municipal election",
+        "count": 25
+      },
+      {
+        "class_qid": "Q51591359",
+        "class_label": "voting result",
+        "count": 22
+      },
+      {
+        "class_qid": "Q19571328",
+        "class_label": "electoral result",
+        "count": 21
+      },
+      {
+        "class_qid": "Q14509381",
+        "class_label": "Dutch general election",
+        "count": 11
+      },
+      {
+        "class_qid": "Q1057954",
+        "class_label": "by-election",
+        "count": 4
+      },
+      {
+        "class_qid": "Q7353823",
+        "class_label": "Rochdale Metropolitan Borough Council election",
+        "count": 4
+      },
+      {
+        "class_qid": "Q24097670",
+        "class_label": "voting round",
+        "count": 4
+      }
+    ]
+  },
+  "P5436": {
+    "label": "number of viewers/listeners",
+    "classes": [
+      {
+        "class_qid": "Q5",
+        "class_label": "human",
+        "count": 58
+      },
+      {
+        "class_qid": "Q4830453",
+        "class_label": "business",
+        "count": 8
+      },
+      {
+        "class_qid": "Q163740",
+        "class_label": "nonprofit organization",
+        "count": 6
+      },
+      {
+        "class_qid": "Q43229",
+        "class_label": "organization",
+        "count": 5
+      },
+      {
+        "class_qid": "Q708676",
+        "class_label": "charitable organization",
+        "count": 5
+      },
+      {
+        "class_qid": "Q215380",
+        "class_label": "musical group",
+        "count": 5
+      },
+      {
+        "class_qid": "Q17558136",
+        "class_label": "YouTube channel",
+        "count": 4
+      },
+      {
+        "class_qid": "Q783794",
+        "class_label": "company",
+        "count": 3
+      }
+    ]
+  },
+  "P1697": {
+    "label": "total valid votes",
+    "classes": [
+      {
+        "class_qid": "Q152450",
+        "class_label": "municipal election",
+        "count": 33
+      },
+      {
+        "class_qid": "Q40231",
+        "class_label": "public election",
+        "count": 27
+      },
+      {
+        "class_qid": "Q51591359",
+        "class_label": "voting result",
+        "count": 26
+      },
+      {
+        "class_qid": "Q19571328",
+        "class_label": "electoral result",
+        "count": 19
+      },
+      {
+        "class_qid": "Q14509381",
+        "class_label": "Dutch general election",
+        "count": 14
+      },
+      {
+        "class_qid": "Q5116010",
+        "class_label": "election to the Parliament of Catalonia",
+        "count": 4
+      },
+      {
+        "class_qid": "Q15154951",
+        "class_label": "municipal elections in Finland",
+        "count": 3
+      },
+      {
+        "class_qid": "Q24097670",
+        "class_label": "voting round",
+        "count": 3
+      }
+    ]
+  },
+  "P1103": {
+    "label": "number of platform tracks",
+    "classes": [
+      {
+        "class_qid": "Q55488",
+        "class_label": "railway station",
+        "count": 100
+      },
+      {
+        "class_qid": "Q928830",
+        "class_label": "metro station",
+        "count": 22
+      },
+      {
+        "class_qid": "Q4312270",
+        "class_label": "railway station above ground",
+        "count": 21
+      },
+      {
+        "class_qid": "Q22808403",
+        "class_label": "underground station",
+        "count": 20
+      },
+      {
+        "class_qid": "Q85882206",
+        "class_label": "unmanned station",
+        "count": 12
+      },
+      {
+        "class_qid": "Q22808404",
+        "class_label": "station located on surface",
+        "count": 10
+      },
+      {
+        "class_qid": "Q55678",
+        "class_label": "railway stop",
+        "count": 9
+      },
+      {
+        "class_qid": "Q122397434",
+        "class_label": "Q122397434",
+        "count": 8
+      }
+    ]
+  },
+  "P2402": {
+    "label": "total expenditure",
+    "classes": [
+      {
+        "class_qid": "Q26271642",
+        "class_label": "library network",
+        "count": 114
+      },
+      {
+        "class_qid": "Q24764",
+        "class_label": "municipality of the Philippines",
+        "count": 15
+      },
+      {
+        "class_qid": "Q891723",
+        "class_label": "public company",
+        "count": 8
+      },
+      {
+        "class_qid": "Q28564",
+        "class_label": "public library",
+        "count": 6
+      },
+      {
+        "class_qid": "Q783794",
+        "class_label": "company",
+        "count": 5
+      },
+      {
+        "class_qid": "Q163740",
+        "class_label": "nonprofit organization",
+        "count": 4
+      },
+      {
+        "class_qid": "Q667509",
+        "class_label": "municipality of Austria",
+        "count": 4
+      },
+      {
+        "class_qid": "Q4830453",
+        "class_label": "business",
+        "count": 3
+      }
+    ]
+  },
+  "P1083": {
+    "label": "maximum capacity",
+    "classes": [
+      {
+        "class_qid": "Q483110",
+        "class_label": "stadium",
+        "count": 27
+      },
+      {
+        "class_qid": "Q41253",
+        "class_label": "movie theater",
+        "count": 16
+      },
+      {
+        "class_qid": "Q1076486",
+        "class_label": "sports venue",
+        "count": 14
+      },
+      {
+        "class_qid": "Q24354",
+        "class_label": "theatre building",
+        "count": 10
+      },
+      {
+        "class_qid": "Q641226",
+        "class_label": "arena",
+        "count": 9
+      },
+      {
+        "class_qid": "Q1154710",
+        "class_label": "association football venue",
+        "count": 8
+      },
+      {
+        "class_qid": "Q61663696",
+        "class_label": "bicycle-sharing station",
+        "count": 7
+      },
+      {
+        "class_qid": "Q11446",
+        "class_label": "ship",
+        "count": 5
+      }
+    ]
+  },
+  "P2101": {
+    "label": "melting point",
+    "classes": [],
+    "error": "HTTP Error 502: Bad Gateway"
+  },
+  "P6589": {
+    "label": "endowment",
+    "classes": [
+      {
+        "class_qid": "Q163740",
+        "class_label": "nonprofit organization",
+        "count": 124
+      },
+      {
+        "class_qid": "Q23002054",
+        "class_label": "private not-for-profit educational institution",
+        "count": 14
+      },
+      {
+        "class_qid": "Q157031",
+        "class_label": "foundation",
+        "count": 7
+      },
+      {
+        "class_qid": "Q3918",
+        "class_label": "university",
+        "count": 6
+      },
+      {
+        "class_qid": "Q33506",
+        "class_label": "museum",
+        "count": 4
+      },
+      {
+        "class_qid": "Q615150",
+        "class_label": "land-grant university",
+        "count": 3
+      },
+      {
+        "class_qid": "Q62078547",
+        "class_label": "public research university",
+        "count": 3
+      },
+      {
+        "class_qid": "Q207694",
+        "class_label": "art museum",
+        "count": 3
+      }
+    ]
+  },
+  "P2927": {
+    "label": "water as percent of area",
+    "classes": [
+      {
+        "class_qid": "Q498162",
+        "class_label": "census-designated place in the United States",
+        "count": 44
+      },
+      {
+        "class_qid": "Q1093829",
+        "class_label": "city in the United States",
+        "count": 43
+      },
+      {
+        "class_qid": "Q15127012",
+        "class_label": "town in the United States",
+        "count": 19
+      },
+      {
+        "class_qid": "Q17343829",
+        "class_label": "unincorporated community",
+        "count": 14
+      },
+      {
+        "class_qid": "Q62049",
+        "class_label": "county seat",
+        "count": 12
+      },
+      {
+        "class_qid": "Q751708",
+        "class_label": "village in the United States",
+        "count": 7
+      },
+      {
+        "class_qid": "Q777120",
+        "class_label": "borough of Pennsylvania",
+        "count": 5
+      },
+      {
+        "class_qid": "Q132680629",
+        "class_label": "city of North Carolina",
+        "count": 4
+      }
+    ]
+  },
+  "P2610": {
+    "label": "thickness",
+    "classes": [
+      {
+        "class_qid": "Q3305213",
+        "class_label": "painting",
+        "count": 46
+      },
+      {
+        "class_qid": "Q3026325",
+        "class_label": "slide",
+        "count": 16
+      },
+      {
+        "class_qid": "Q10855061",
+        "class_label": "archaeological find",
+        "count": 15
+      },
+      {
+        "class_qid": "Q220659",
+        "class_label": "archaeological artefact",
+        "count": 14
+      },
+      {
+        "class_qid": "Q860861",
+        "class_label": "sculpture",
+        "count": 13
+      },
+      {
+        "class_qid": "Q11723795",
+        "class_label": "item",
+        "count": 12
+      },
+      {
+        "class_qid": "Q131557",
+        "class_label": "amulet",
+        "count": 8
+      },
+      {
+        "class_qid": "Q1066288",
+        "class_label": "figurine",
+        "count": 3
+      }
+    ]
+  },
+  "P2120": {
+    "label": "radius",
+    "classes": [
+      {
+        "class_qid": "Q67206785",
+        "class_label": "near-infrared source",
+        "count": 83
+      },
+      {
+        "class_qid": "Q523",
+        "class_label": "star",
+        "count": 61
+      },
+      {
+        "class_qid": "Q44559",
+        "class_label": "exoplanet",
+        "count": 34
+      },
+      {
+        "class_qid": "Q18611609",
+        "class_label": "unconfirmed exoplanet",
+        "count": 22
+      },
+      {
+        "class_qid": "Q2168098",
+        "class_label": "rotating variable star",
+        "count": 22
+      },
+      {
+        "class_qid": "Q2247863",
+        "class_label": "high proper-motion star",
+        "count": 17
+      },
+      {
+        "class_qid": "Q71798788",
+        "class_label": "ultraviolet source",
+        "count": 11
+      },
+      {
+        "class_qid": "Q1457376",
+        "class_label": "eclipsing binary",
+        "count": 9
+      }
+    ]
+  },
+  "P2109": {
+    "label": "nominal power output",
+    "classes": [
+      {
+        "class_qid": "Q15911738",
+        "class_label": "hydroelectric power station",
+        "count": 46
+      },
+      {
+        "class_qid": "Q1003207",
+        "class_label": "photovoltaic power station",
+        "count": 30
+      },
+      {
+        "class_qid": "Q3498533",
+        "class_label": "natural gas-fired power station",
+        "count": 14
+      },
+      {
+        "class_qid": "Q50687555",
+        "class_label": "onshore wind farm",
+        "count": 13
+      },
+      {
+        "class_qid": "Q261604",
+        "class_label": "oil-fired power station",
+        "count": 9
+      },
+      {
+        "class_qid": "Q6558431",
+        "class_label": "coal-fired power station",
+        "count": 9
+      },
+      {
+        "class_qid": "Q12323",
+        "class_label": "dam",
+        "count": 7
+      },
+      {
+        "class_qid": "Q1427536",
+        "class_label": "gas turbine power station",
+        "count": 4
+      }
+    ]
+  },
+  "P1101": {
+    "label": "floors above ground",
+    "classes": [
+      {
+        "class_qid": "Q41176",
+        "class_label": "building",
+        "count": 30
+      },
+      {
+        "class_qid": "Q27686",
+        "class_label": "hotel",
+        "count": 22
+      },
+      {
+        "class_qid": "Q11303",
+        "class_label": "skyscraper",
+        "count": 15
+      },
+      {
+        "class_qid": "Q13402009",
+        "class_label": "apartment building",
+        "count": 12
+      },
+      {
+        "class_qid": "Q1021645",
+        "class_label": "office building",
+        "count": 9
+      },
+      {
+        "class_qid": "Q3947",
+        "class_label": "house",
+        "count": 9
+      },
+      {
+        "class_qid": "Q18142",
+        "class_label": "tower block",
+        "count": 8
+      },
+      {
+        "class_qid": "Q811979",
+        "class_label": "built structure",
+        "count": 4
+      }
+    ]
+  },
+  "P6125": {
+    "label": "number of volunteers",
+    "classes": [
+      {
+        "class_qid": "Q163740",
+        "class_label": "nonprofit organization",
+        "count": 85
+      },
+      {
+        "class_qid": "Q708676",
+        "class_label": "charitable organization",
+        "count": 28
+      },
+      {
+        "class_qid": "Q124830213",
+        "class_label": "museum of a public entity",
+        "count": 13
+      },
+      {
+        "class_qid": "Q207694",
+        "class_label": "art museum",
+        "count": 10
+      },
+      {
+        "class_qid": "Q614316",
+        "class_label": "private museum",
+        "count": 10
+      },
+      {
+        "class_qid": "Q43229",
+        "class_label": "organization",
+        "count": 9
+      },
+      {
+        "class_qid": "Q92755865",
+        "class_label": "religious museum",
+        "count": 8
+      },
+      {
+        "class_qid": "Q33506",
+        "class_label": "museum",
+        "count": 8
+      }
+    ]
+  },
+  "P2138": {
+    "label": "total liabilities",
+    "classes": [],
+    "error": "HTTP Error 502: Bad Gateway"
+  },
+  "P1120": {
+    "label": "number of deaths",
+    "classes": [
+      {
+        "class_qid": "Q3241045",
+        "class_label": "disease outbreak",
+        "count": 23
+      },
+      {
+        "class_qid": "Q3199915",
+        "class_label": "massacre",
+        "count": 17
+      },
+      {
+        "class_qid": "Q734271",
+        "class_label": "mass grave",
+        "count": 10
+      },
+      {
+        "class_qid": "Q744913",
+        "class_label": "aviation accident",
+        "count": 8
+      },
+      {
+        "class_qid": "Q1078765",
+        "class_label": "railway accident",
+        "count": 8
+      },
+      {
+        "class_qid": "Q21480300",
+        "class_label": "mass shooting",
+        "count": 7
+      },
+      {
+        "class_qid": "Q891854",
+        "class_label": "bomb attack",
+        "count": 5
+      },
+      {
+        "class_qid": "Q3839081",
+        "class_label": "disaster",
+        "count": 5
+      }
+    ]
+  },
+  "P3087": {
+    "label": "fiscal/tax revenue",
+    "classes": [
+      {
+        "class_qid": "Q24764",
+        "class_label": "municipality of the Philippines",
+        "count": 117
+      },
+      {
+        "class_qid": "Q106078286",
+        "class_label": "component city",
+        "count": 11
+      },
+      {
+        "class_qid": "Q24746",
+        "class_label": "province of the Philippines",
+        "count": 9
+      },
+      {
+        "class_qid": "Q29946056",
+        "class_label": "highly urbanized city",
+        "count": 2
+      },
+      {
+        "class_qid": "Q3184121",
+        "class_label": "municipality of Brazil",
+        "count": 2
+      },
+      {
+        "class_qid": "Q23442",
+        "class_label": "island",
+        "count": 1
+      },
+      {
+        "class_qid": "Q620509",
+        "class_label": "military town",
+        "count": 1
+      },
+      {
+        "class_qid": "Q19610511",
+        "class_label": "township",
+        "count": 1
+      }
+    ]
+  },
+  "P5044": {
+    "label": "number of spoilt votes",
+    "classes": [
+      {
+        "class_qid": "Q152450",
+        "class_label": "municipal election",
+        "count": 47
+      },
+      {
+        "class_qid": "Q51591359",
+        "class_label": "voting result",
+        "count": 44
+      },
+      {
+        "class_qid": "Q19571328",
+        "class_label": "electoral result",
+        "count": 34
+      },
+      {
+        "class_qid": "Q40231",
+        "class_label": "public election",
+        "count": 7
+      },
+      {
+        "class_qid": "Q7864918",
+        "class_label": "UK Parliamentary by-election",
+        "count": 2
+      },
+      {
+        "class_qid": "Q24097670",
+        "class_label": "voting round",
+        "count": 2
+      },
+      {
+        "class_qid": "Q7999562",
+        "class_label": "Wigan Metropolitan Borough Council election",
+        "count": 2
+      },
+      {
+        "class_qid": "Q7353823",
+        "class_label": "Rochdale Metropolitan Borough Council election",
+        "count": 2
+      }
+    ]
+  },
+  "P2052": {
+    "label": "speed",
+    "classes": [
+      {
+        "class_qid": "Q11446",
+        "class_label": "ship",
+        "count": 25
+      },
+      {
+        "class_qid": "Q19832486",
+        "class_label": "locomotive class",
+        "count": 17
+      },
+      {
+        "class_qid": "Q811704",
+        "class_label": "rolling stock class",
+        "count": 11
+      },
+      {
+        "class_qid": "Q559026",
+        "class_label": "ship class",
+        "count": 10
+      },
+      {
+        "class_qid": "Q39804",
+        "class_label": "cruise ship",
+        "count": 5
+      },
+      {
+        "class_qid": "Q124056273",
+        "class_label": "artillery model",
+        "count": 4
+      },
+      {
+        "class_qid": "Q20646670",
+        "class_label": "hilly stage",
+        "count": 3
+      },
+      {
+        "class_qid": "Q63040754",
+        "class_label": "multiple unit class",
+        "count": 2
+      }
+    ]
+  },
+  "P2234": {
+    "label": "volume as quantity",
+    "classes": [
+      {
+        "class_qid": "Q23397",
+        "class_label": "lake",
+        "count": 74
+      },
+      {
+        "class_qid": "Q131681",
+        "class_label": "reservoir",
+        "count": 36
+      },
+      {
+        "class_qid": "Q12323",
+        "class_label": "dam",
+        "count": 23
+      },
+      {
+        "class_qid": "Q62011240",
+        "class_label": "dam with volume capacity of less than 3 hm\u00b3",
+        "count": 21
+      },
+      {
+        "class_qid": "Q62009185",
+        "class_label": "dam with height less than 10 meters",
+        "count": 15
+      },
+      {
+        "class_qid": "Q30092776",
+        "class_label": "lake water body",
+        "count": 7
+      },
+      {
+        "class_qid": "Q104093746",
+        "class_label": "lake or pond",
+        "count": 6
+      },
+      {
+        "class_qid": "Q848944",
+        "class_label": "merchant vessel",
+        "count": 6
+      }
+    ]
+  },
+  "P6570": {
+    "label": "number of words",
+    "classes": [
+      {
+        "class_qid": "Q309481",
+        "class_label": "obituary",
+        "count": 97
+      },
+      {
+        "class_qid": "Q5707594",
+        "class_label": "news article",
+        "count": 43
+      },
+      {
+        "class_qid": "Q3331189",
+        "class_label": "version, edition or translation",
+        "count": 6
+      },
+      {
+        "class_qid": "Q554211",
+        "class_label": "State of the Union address",
+        "count": 2
+      },
+      {
+        "class_qid": "Q7725634",
+        "class_label": "literary work",
+        "count": 1
+      },
+      {
+        "class_qid": "Q1224889",
+        "class_label": "digital edition",
+        "count": 1
+      },
+      {
+        "class_qid": "Q1161138",
+        "class_label": "incipit",
+        "count": 1
+      },
+      {
+        "class_qid": "Q7096525",
+        "class_label": "opening sentence",
+        "count": 1
+      }
+    ]
+  },
+  "P2147": {
+    "label": "rotation period",
+    "classes": [
+      {
+        "class_qid": "Q3863",
+        "class_label": "asteroid",
+        "count": 148
+      },
+      {
+        "class_qid": "Q265392",
+        "class_label": "near-Earth object",
+        "count": 10
+      },
+      {
+        "class_qid": "Q217526",
+        "class_label": "near-Earth asteroid",
+        "count": 3
+      },
+      {
+        "class_qid": "Q59423687",
+        "class_label": "potentially hazardous asteroid",
+        "count": 3
+      }
+    ]
+  },
+  "P1867": {
+    "label": "eligible voters",
+    "classes": [
+      {
+        "class_qid": "Q51591359",
+        "class_label": "voting result",
+        "count": 54
+      },
+      {
+        "class_qid": "Q40231",
+        "class_label": "public election",
+        "count": 38
+      },
+      {
+        "class_qid": "Q5116010",
+        "class_label": "election to the Parliament of Catalonia",
+        "count": 11
+      },
+      {
+        "class_qid": "Q152450",
+        "class_label": "municipal election",
+        "count": 9
+      },
+      {
+        "class_qid": "Q15154951",
+        "class_label": "municipal elections in Finland",
+        "count": 4
+      },
+      {
+        "class_qid": "Q1057954",
+        "class_label": "by-election",
+        "count": 4
+      },
+      {
+        "class_qid": "Q7404395",
+        "class_label": "Salford City Council election",
+        "count": 3
+      },
+      {
+        "class_qid": "Q7353823",
+        "class_label": "Rochdale Metropolitan Borough Council election",
+        "count": 2
+      }
+    ]
+  },
+  "P1410": {
+    "label": "number of seats in assembly",
+    "classes": [
+      {
+        "class_qid": "Q104146934",
+        "class_label": "United States of America state-level electoral district",
+        "count": 38
+      },
+      {
+        "class_qid": "Q24887161",
+        "class_label": "local political party",
+        "count": 22
+      },
+      {
+        "class_qid": "Q27971968",
+        "class_label": "constituency of the House of Commons",
+        "count": 20
+      },
+      {
+        "class_qid": "Q7278",
+        "class_label": "political party",
+        "count": 15
+      },
+      {
+        "class_qid": "Q17202187",
+        "class_label": "federal electoral district of Canada",
+        "count": 15
+      },
+      {
+        "class_qid": "Q17166756",
+        "class_label": "United States congressional district",
+        "count": 8
+      },
+      {
+        "class_qid": "Q3032154",
+        "class_label": "electoral district of New South Wales",
+        "count": 6
+      },
+      {
+        "class_qid": "Q50240982",
+        "class_label": "Constituency of South Korean National Assembly",
+        "count": 5
+      }
+    ]
+  },
+  "P2660": {
+    "label": "topographic prominence",
+    "classes": [
+      {
+        "class_qid": "Q8502",
+        "class_label": "mountain",
+        "count": 99
+      },
+      {
+        "class_qid": "Q54050",
+        "class_label": "hill",
+        "count": 33
+      },
+      {
+        "class_qid": "Q207326",
+        "class_label": "summit",
+        "count": 29
+      },
+      {
+        "class_qid": "Q3618634",
+        "class_label": "subpeak",
+        "count": 9
+      },
+      {
+        "class_qid": "Q12059057",
+        "class_label": "one-thousander",
+        "count": 5
+      },
+      {
+        "class_qid": "Q131860194",
+        "class_label": "minor summit",
+        "count": 5
+      },
+      {
+        "class_qid": "Q233165",
+        "class_label": "two-thousander",
+        "count": 4
+      },
+      {
+        "class_qid": "Q8072",
+        "class_label": "volcano",
+        "count": 2
+      }
+    ]
+  },
+  "P2665": {
+    "label": "alcohol by volume",
+    "classes": [
+      {
+        "class_qid": "Q44",
+        "class_label": "beer",
+        "count": 25
+      },
+      {
+        "class_qid": "Q2493192",
+        "class_label": "Imperial stout",
+        "count": 20
+      },
+      {
+        "class_qid": "Q139801897",
+        "class_label": "Double New England India Pale Ale",
+        "count": 15
+      },
+      {
+        "class_qid": "Q103350505",
+        "class_label": "New England India Pale Ale",
+        "count": 15
+      },
+      {
+        "class_qid": "Q131444218",
+        "class_label": "American India Pale Ale",
+        "count": 9
+      },
+      {
+        "class_qid": "Q7565081",
+        "class_label": "sour beer",
+        "count": 8
+      },
+      {
+        "class_qid": "Q103351936",
+        "class_label": "Triple India Pale Ale",
+        "count": 5
+      },
+      {
+        "class_qid": "Q1543214",
+        "class_label": "India Pale Ale",
+        "count": 5
+      }
+    ]
+  },
+  "P1603": {
+    "label": "number of cases",
+    "classes": [
+      {
+        "class_qid": "Q3241045",
+        "class_label": "disease outbreak",
+        "count": 91
+      },
+      {
+        "class_qid": "Q1475712",
+        "class_label": "noise-induced hearing loss",
+        "count": 4
+      },
+      {
+        "class_qid": "Q48143",
+        "class_label": "meningitis",
+        "count": 3
+      },
+      {
+        "class_qid": "Q75913269",
+        "class_label": "group or class of strains",
+        "count": 2
+      },
+      {
+        "class_qid": "Q104450895",
+        "class_label": "variants of SARS-CoV-2",
+        "count": 2
+      },
+      {
+        "class_qid": "Q105758262",
+        "class_label": "variant of concern",
+        "count": 2
+      },
+      {
+        "class_qid": "Q1190554",
+        "class_label": "occurrence",
+        "count": 2
+      },
+      {
+        "class_qid": "Q21871294",
+        "class_label": "group or class of living things",
+        "count": 2
+      }
+    ]
+  },
+  "P2295": {
+    "label": "net profit",
+    "classes": [
+      {
+        "class_qid": "Q4830453",
+        "class_label": "business",
+        "count": 122
+      },
+      {
+        "class_qid": "Q6881511",
+        "class_label": "enterprise",
+        "count": 61
+      },
+      {
+        "class_qid": "Q3778211",
+        "class_label": "legal person",
+        "count": 39
+      },
+      {
+        "class_qid": "Q891723",
+        "class_label": "public company",
+        "count": 21
+      },
+      {
+        "class_qid": "Q43229",
+        "class_label": "organization",
+        "count": 10
+      },
+      {
+        "class_qid": "Q270791",
+        "class_label": "state-owned enterprise",
+        "count": 6
+      },
+      {
+        "class_qid": "Q783794",
+        "class_label": "company",
+        "count": 5
+      },
+      {
+        "class_qid": "Q22687",
+        "class_label": "bank",
+        "count": 3
+      }
+    ]
+  },
+  "P8843": {
+    "label": "poverty incidence",
+    "classes": [
+      {
+        "class_qid": "Q24764",
+        "class_label": "municipality of the Philippines",
+        "count": 134
+      },
+      {
+        "class_qid": "Q24746",
+        "class_label": "province of the Philippines",
+        "count": 7
+      },
+      {
+        "class_qid": "Q106078286",
+        "class_label": "component city",
+        "count": 3
+      },
+      {
+        "class_qid": "Q6256",
+        "class_label": "country",
+        "count": 2
+      },
+      {
+        "class_qid": "Q3624078",
+        "class_label": "sovereign state",
+        "count": 2
+      },
+      {
+        "class_qid": "Q29946056",
+        "class_label": "highly urbanized city",
+        "count": 2
+      },
+      {
+        "class_qid": "Q106079704",
+        "class_label": "independent component city",
+        "count": 1
+      },
+      {
+        "class_qid": "Q112099",
+        "class_label": "island country",
+        "count": 1
+      }
+    ]
+  },
+  "P2130": {
+    "label": "capital cost",
+    "classes": [
+      {
+        "class_qid": "Q11424",
+        "class_label": "film",
+        "count": 74
+      },
+      {
+        "class_qid": "Q170584",
+        "class_label": "project",
+        "count": 42
+      },
+      {
+        "class_qid": "Q202866",
+        "class_label": "animated film",
+        "count": 6
+      },
+      {
+        "class_qid": "Q24862",
+        "class_label": "short film",
+        "count": 5
+      },
+      {
+        "class_qid": "Q16917",
+        "class_label": "hospital",
+        "count": 2
+      },
+      {
+        "class_qid": "Q91122",
+        "class_label": "bunker",
+        "count": 2
+      },
+      {
+        "class_qid": "Q1940855",
+        "class_label": "Q1940855",
+        "count": 1
+      },
+      {
+        "class_qid": "Q8719053",
+        "class_label": "music venue",
+        "count": 1
+      }
+    ]
+  },
+  "P2144": {
+    "label": "frequency",
+    "classes": [
+      {
+        "class_qid": "Q14350",
+        "class_label": "radio station",
+        "count": 107
+      },
+      {
+        "class_qid": "Q114359721",
+        "class_label": "NOAA Weather Radio station",
+        "count": 16
+      },
+      {
+        "class_qid": "Q174814",
+        "class_label": "electrical substation",
+        "count": 8
+      },
+      {
+        "class_qid": "Q1413664",
+        "class_label": "audio frequency",
+        "count": 5
+      },
+      {
+        "class_qid": "Q137473569",
+        "class_label": "musical pitch",
+        "count": 5
+      },
+      {
+        "class_qid": "Q4830453",
+        "class_label": "business",
+        "count": 4
+      },
+      {
+        "class_qid": "Q2477741",
+        "class_label": "German ultralight airfield",
+        "count": 3
+      },
+      {
+        "class_qid": "Q5204199",
+        "class_label": "DAB ensemble",
+        "count": 2
+      }
+    ]
+  },
+  "P2261": {
+    "label": "beam",
+    "classes": [
+      {
+        "class_qid": "Q106179098",
+        "class_label": "sailboat class",
+        "count": 18
+      },
+      {
+        "class_qid": "Q11446",
+        "class_label": "ship",
+        "count": 17
+      },
+      {
+        "class_qid": "Q39804",
+        "class_label": "cruise ship",
+        "count": 10
+      },
+      {
+        "class_qid": "Q559026",
+        "class_label": "ship class",
+        "count": 10
+      },
+      {
+        "class_qid": "Q14970",
+        "class_label": "tanker",
+        "count": 9
+      },
+      {
+        "class_qid": "Q174736",
+        "class_label": "destroyer",
+        "count": 6
+      },
+      {
+        "class_qid": "Q852190",
+        "class_label": "shipwreck",
+        "count": 5
+      },
+      {
+        "class_qid": "Q2055880",
+        "class_label": "passenger vessel",
+        "count": 5
+      }
+    ]
+  },
+  "P1114": {
+    "label": "quantity",
+    "classes": [
+      {
+        "class_qid": "Q19832486",
+        "class_label": "locomotive class",
+        "count": 21
+      },
+      {
+        "class_qid": "Q811704",
+        "class_label": "rolling stock class",
+        "count": 15
+      },
+      {
+        "class_qid": "Q106213203",
+        "class_label": "marriage statistics",
+        "count": 11
+      },
+      {
+        "class_qid": "Q106205197",
+        "class_label": "birth statistics",
+        "count": 9
+      },
+      {
+        "class_qid": "Q926578",
+        "class_label": "paratype",
+        "count": 9
+      },
+      {
+        "class_qid": "Q1875630",
+        "class_label": "aircraft fleet",
+        "count": 6
+      },
+      {
+        "class_qid": "Q2360980",
+        "class_label": "unit of amount",
+        "count": 6
+      },
+      {
+        "class_qid": "Q2159241",
+        "class_label": "type specimen",
+        "count": 4
+      }
+    ]
+  },
+  "P5595": {
+    "label": "number of platform faces",
+    "classes": [
+      {
+        "class_qid": "Q55488",
+        "class_label": "railway station",
+        "count": 110
+      },
+      {
+        "class_qid": "Q4312270",
+        "class_label": "railway station above ground",
+        "count": 50
+      },
+      {
+        "class_qid": "Q85882206",
+        "class_label": "unmanned station",
+        "count": 30
+      },
+      {
+        "class_qid": "Q123094976",
+        "class_label": "Q123094976",
+        "count": 19
+      },
+      {
+        "class_qid": "Q928830",
+        "class_label": "metro station",
+        "count": 16
+      },
+      {
+        "class_qid": "Q22808403",
+        "class_label": "underground station",
+        "count": 15
+      },
+      {
+        "class_qid": "Q11670533",
+        "class_label": "elevated station",
+        "count": 14
+      },
+      {
+        "class_qid": "Q2175765",
+        "class_label": "tram stop",
+        "count": 14
+      }
+    ]
+  },
+  "P1081": {
+    "label": "Human Development Index",
+    "classes": [
+      {
+        "class_qid": "Q3184121",
+        "class_label": "municipality of Brazil",
+        "count": 138
+      },
+      {
+        "class_qid": "Q6256",
+        "class_label": "country",
+        "count": 8
+      },
+      {
+        "class_qid": "Q3624078",
+        "class_label": "sovereign state",
+        "count": 8
+      },
+      {
+        "class_qid": "Q902814",
+        "class_label": "border city",
+        "count": 7
+      },
+      {
+        "class_qid": "Q1549591",
+        "class_label": "big city",
+        "count": 6
+      },
+      {
+        "class_qid": "Q7270",
+        "class_label": "republic",
+        "count": 2
+      },
+      {
+        "class_qid": "Q123480",
+        "class_label": "landlocked country",
+        "count": 2
+      },
+      {
+        "class_qid": "Q514860",
+        "class_label": "province of Armenia",
+        "count": 2
+      }
+    ]
+  },
+  "P2257": {
+    "label": "event interval",
+    "classes": [
+      {
+        "class_qid": "Q18608583",
+        "class_label": "recurring sporting event",
+        "count": 45
+      },
+      {
+        "class_qid": "Q13406554",
+        "class_label": "sports competition",
+        "count": 21
+      },
+      {
+        "class_qid": "Q47443726",
+        "class_label": "recurring tennis tournament",
+        "count": 16
+      },
+      {
+        "class_qid": "Q1318941",
+        "class_label": "stage race",
+        "count": 7
+      },
+      {
+        "class_qid": "Q15991303",
+        "class_label": "association football league",
+        "count": 7
+      },
+      {
+        "class_qid": "Q2912397",
+        "class_label": "single-day road race",
+        "count": 6
+      },
+      {
+        "class_qid": "Q220505",
+        "class_label": "film festival",
+        "count": 5
+      },
+      {
+        "class_qid": "Q15275719",
+        "class_label": "recurring event",
+        "count": 5
+      }
+    ]
+  },
+  "P5045": {
+    "label": "number of blank votes",
+    "classes": [
+      {
+        "class_qid": "Q19571328",
+        "class_label": "electoral result",
+        "count": 56
+      },
+      {
+        "class_qid": "Q152450",
+        "class_label": "municipal election",
+        "count": 51
+      },
+      {
+        "class_qid": "Q14509381",
+        "class_label": "Dutch general election",
+        "count": 30
+      },
+      {
+        "class_qid": "Q24097670",
+        "class_label": "voting round",
+        "count": 6
+      },
+      {
+        "class_qid": "Q92482708",
+        "class_label": "2001 Cypriot Municipal Councils Elections",
+        "count": 2
+      },
+      {
+        "class_qid": "Q7404395",
+        "class_label": "Salford City Council election",
+        "count": 2
+      },
+      {
+        "class_qid": "Q126456312",
+        "class_label": "European Parliament election in Denmark",
+        "count": 1
+      },
+      {
+        "class_qid": "Q20102321",
+        "class_label": "eleccions al Consell General d'Aran",
+        "count": 1
+      }
+    ]
+  },
+  "P2131": {
+    "label": "nominal GDP",
+    "classes": [
+      {
+        "class_qid": "Q6256",
+        "class_label": "country",
+        "count": 44
+      },
+      {
+        "class_qid": "Q3624078",
+        "class_label": "sovereign state",
+        "count": 42
+      },
+      {
+        "class_qid": "Q6456916",
+        "class_label": "national economy",
+        "count": 20
+      },
+      {
+        "class_qid": "Q100773131",
+        "class_label": "regional economy",
+        "count": 13
+      },
+      {
+        "class_qid": "Q7270",
+        "class_label": "republic",
+        "count": 12
+      },
+      {
+        "class_qid": "Q123480",
+        "class_label": "landlocked country",
+        "count": 10
+      },
+      {
+        "class_qid": "Q112099",
+        "class_label": "island country",
+        "count": 7
+      },
+      {
+        "class_qid": "Q11815167",
+        "class_label": "archipelagic state",
+        "count": 5
+      }
+    ]
+  },
+  "P2769": {
+    "label": "budget",
+    "classes": [
+      {
+        "class_qid": "Q1298668",
+        "class_label": "science project",
+        "count": 80
+      },
+      {
+        "class_qid": "Q54875403",
+        "class_label": "research grant",
+        "count": 72
+      },
+      {
+        "class_qid": "Q2860456",
+        "class_label": "departmental archives",
+        "count": 19
+      },
+      {
+        "class_qid": "Q11424",
+        "class_label": "film",
+        "count": 10
+      },
+      {
+        "class_qid": "Q604177",
+        "class_label": "municipal archive",
+        "count": 4
+      },
+      {
+        "class_qid": "Q667509",
+        "class_label": "municipality of Austria",
+        "count": 3
+      },
+      {
+        "class_qid": "Q875538",
+        "class_label": "public university",
+        "count": 3
+      },
+      {
+        "class_qid": "Q45400320",
+        "class_label": "open-access publisher",
+        "count": 2
+      }
+    ]
+  }
+}

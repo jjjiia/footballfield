@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Football Tester</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <style>
+    html, body { height: 100%; margin: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    #map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+
+    #panel {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 8px;
+      padding: 16px;
+      width: 340px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+    }
+    #panel h1 {
+      font-size: 15px;
+      margin: 0 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    #panel .nav-link { font-size: 11px; color: #666; margin-bottom: 12px; display: block; }
+    #place-status {
+      font-size: 13px;
+      color: #333;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    #place-status .inactive-tag {
+      color: #b00;
+      font-weight: 700;
+      margin-left: 4px;
+    }
+    .nav-buttons { display: flex; gap: 8px; margin-bottom: 12px; }
+    .nav-buttons button, #reset-btn, #copy-btn {
+      font-size: 13px;
+      padding: 6px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .nav-buttons button:hover, #reset-btn:hover, #copy-btn:hover { background: #f0f0f0; }
+    #live-values {
+      font-family: ui-monospace, "SF Mono", Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+    #live-values span { color: #666; }
+    #json-out {
+      font-family: ui-monospace, "SF Mono", Consolas, monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      background: #f6f6f6;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px;
+      margin: 0 0 10px;
+      user-select: all;
+    }
+    #copy-btn { width: 100%; box-sizing: border-box; margin-bottom: 8px; }
+    #copy-status { font-size: 11px; color: #2a8f2a; height: 14px; }
+    #reset-btn { width: 100%; box-sizing: border-box; }
+    #hint { font-size: 11px; color: #888; margin-top: 10px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div id="panel">
+    <h1>Football Tester &mdash; Places</h1>
+    <a class="nav-link" href="unit_tester.html">Tuning a unit's rectangle instead? &rarr; Unit Tester</a>
+    <div id="place-status">Loading places.json&hellip;</div>
+    <div class="nav-buttons">
+      <button id="prev-btn">&larr; Prev</button>
+      <button id="next-btn">Next &rarr;</button>
+    </div>
+    <div id="live-values"></div>
+    <pre id="json-out"></pre>
+    <button id="copy-btn">Copy JSON</button>
+    <div id="copy-status"></div>
+    <button id="reset-btn">Reset view to stored value</button>
+    <div id="hint">Drag/scroll/rotate the map to adjust, then copy the JSON above into places.json. Arrow keys also move between places.</div>
+  </div>
+
+  <script>
+    mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ";
+    const STYLE = "mapbox://styles/jjjiia123/cmmb9euid00at01qr9mbfapn7";
+
+    // Same football-field comparison rectangle football.html draws, so you
+    // can judge each place's zoom/center against a real field-sized object
+    // while tuning it here. (Same geometry helpers as football.html.)
+    const ftToM = (ft) => ft * 0.3048;
+    const FIELD_WIDTH_M = ftToM(160);
+    const FIELD_LENGTH_M = ftToM(360);
+
+    function metersPerDeg(lat) {
+      const rad = lat * Math.PI / 180;
+      return { mPerDegLat: 111132.92, mPerDegLng: 111320.0 * Math.cos(rad) };
+    }
+
+    function buildScreenVerticalRectangle(centerLngLat, widthM, heightM, mapBearingDeg) {
+      const [lng0, lat0] = centerLngLat;
+      const { mPerDegLat, mPerDegLng } = metersPerDeg(lat0);
+      const hw = widthM / 2;
+      const hh = heightM / 2;
+      const corners = [[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh], [-hw, -hh]];
+      const theta = (-mapBearingDeg) * Math.PI / 180;
+      const cosT = Math.cos(theta);
+      const sinT = Math.sin(theta);
+      return corners.map(([x, y]) => {
+        const xr = x * cosT - y * sinT;
+        const yr = x * sinT + y * cosT;
+        return [lng0 + xr / mPerDegLng, lat0 + yr / mPerDegLat];
+      });
+    }
+
+    function makeFieldFeature(map) {
+      const c = map.getCenter();
+      const ring = buildScreenVerticalRectangle([c.lng, c.lat], FIELD_WIDTH_M, FIELD_LENGTH_M, map.getBearing());
+      ring.push(ring[0]);
+      return { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [ring] } };
+    }
+
+    const map = new mapboxgl.Map({
+      container: "map",
+      style: STYLE,
+      center: [0, 0],
+      zoom: 2,
+      pitch: 0,
+      bearingSnap: 0 // otherwise Mapbox silently snaps any bearing within 7° of north to exactly 0
+    });
+    map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "bottom-right");
+
+    map.on("load", () => {
+      map.addSource("field", {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [makeFieldFeature(map)] }
+      });
+      map.addLayer({
+        id: "field-shadow", type: "line", source: "field",
+        paint: { "line-color": "#000", "line-width": 14, "line-opacity": 0.4, "line-blur": 6 }
+      });
+      map.addLayer({
+        id: "field-fill", type: "fill", source: "field",
+        paint: { "fill-color": "#ffcf01", "fill-opacity": 0 }
+      });
+      map.addLayer({
+        id: "field-outline", type: "line", source: "field",
+        paint: { "line-color": "#fff", "line-width": 4 }
+      });
+
+      let raf = null;
+      map.on("move", () => {
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+          raf = null;
+          const src = map.getSource("field");
+          if (src) src.setData({ type: "FeatureCollection", features: [makeFieldFeature(map)] });
+        });
+      });
+    });
+
+    const placeStatusEl = document.getElementById("place-status");
+    const liveValuesEl = document.getElementById("live-values");
+    const jsonOutEl = document.getElementById("json-out");
+    const copyStatusEl = document.getElementById("copy-status");
+
+    let places = [];
+    let index = 0;
+
+    function currentPlace() { return places[index]; }
+
+    function jsonFor(name, lat, lng, zoom, bearing) {
+      return JSON.stringify({
+        name,
+        lat: Math.round(lat * 1e6) / 1e6,
+        lng: Math.round(lng * 1e6) / 1e6,
+        zoom: Math.round(zoom * 100) / 100,
+        bearing: Math.round(bearing * 1e6) / 1e6
+      });
+    }
+
+    // Called continuously as the map moves, so the readout always reflects
+    // exactly what's on screen right now.
+    function updateLiveValues() {
+      const c = map.getCenter();
+      const zoom = map.getZoom();
+      const bearing = map.getBearing();
+      liveValuesEl.innerHTML =
+        `<span>lat</span> ${c.lat.toFixed(6)}<br>` +
+        `<span>lng</span> ${c.lng.toFixed(6)}<br>` +
+        `<span>zoom</span> ${zoom.toFixed(2)}<br>` +
+        `<span>bearing</span> ${bearing.toFixed(6)}`;
+      jsonOutEl.textContent = jsonFor(currentPlace().name, c.lat, c.lng, zoom, bearing);
+    }
+
+    function showPlace(i) {
+      index = (i + places.length) % places.length;
+      const p = currentPlace();
+      placeStatusEl.innerHTML =
+        `Place ${index + 1} / ${places.length}<br><strong>${p.name}</strong>` +
+        (p.active === false ? '<span class="inactive-tag">inactive</span>' : "");
+      map.jumpTo({ center: [p.lng, p.lat], zoom: p.zoom, bearing: p.bearing || 0 });
+      updateLiveValues();
+      copyStatusEl.textContent = "";
+    }
+
+    document.getElementById("prev-btn").addEventListener("click", () => showPlace(index - 1));
+    document.getElementById("next-btn").addEventListener("click", () => showPlace(index + 1));
+    document.getElementById("reset-btn").addEventListener("click", () => showPlace(index));
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") showPlace(index + 1);
+      if (e.key === "ArrowLeft") showPlace(index - 1);
+    });
+
+    document.getElementById("copy-btn").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(jsonOutEl.textContent);
+        copyStatusEl.textContent = "Copied!";
+      } catch (err) {
+        copyStatusEl.textContent = "Couldn't copy automatically -- select the text above and copy manually.";
+      }
+    });
+
+    map.on("move", updateLiveValues);
+
+    // Independent of the map's own "load" (which waits on style/tile
+    // network requests) -- the camera can be positioned as soon as both
+    // the map object exists and the place list has arrived.
+    fetch("places.json")
+      .then((r) => r.json())
+      .then((data) => {
+        places = data;
+        if (!places.length) {
+          placeStatusEl.textContent = "places.json is empty.";
+          return;
+        }
+        showPlace(0);
+      });
+  </script>
+</body>
+</html>

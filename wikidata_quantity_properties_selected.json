@@ -1,0 +1,2357 @@
+{
+  "P1082": {
+    "label": "population",
+    "description": "number of people inhabiting the place; number of people of subject",
+    "usage_count": 4569911
+  },
+  "P1104": {
+    "label": "number of pages",
+    "description": "number of pages in an edition of a written work; see allowed units constraint for valid values to use for units in conjunction with a number",
+    "usage_count": 2701871
+  },
+  "P2067": {
+    "label": "mass",
+    "description": "mass (in colloquial usage also known as weight) of the item",
+    "usage_count": 1718981
+  },
+  "P2044": {
+    "label": "elevation above sea level",
+    "description": "height of the item (geographical object) as measured relative to sea level",
+    "usage_count": 1592694
+  },
+  "P2048": {
+    "label": "height",
+    "description": "vertical length of an entity",
+    "usage_count": 1436862
+  },
+  "P2049": {
+    "label": "width",
+    "description": "width of an object",
+    "usage_count": 1178794
+  },
+  "P2046": {
+    "label": "area",
+    "description": "area occupied by an object",
+    "usage_count": 830173
+  },
+  "P8687": {
+    "label": "social media followers",
+    "description": "number of subscribers on a particular social media website (use as main statement only; see P3744 instead for qualifier). Qualify with \"point in time\" and property for account. For Twitter, use numeric id.",
+    "usage_count": 778457
+  },
+  "P1436": {
+    "label": "collection or exhibition size",
+    "description": "number of items in a collection or exhibition",
+    "usage_count": 536149
+  },
+  "P1132": {
+    "label": "number of participants",
+    "description": "number of participants of an event, e.g. people or groups of people that take part in the event (NO units)",
+    "usage_count": 488201
+  },
+  "P2139": {
+    "label": "total revenue",
+    "description": "income gained by an organization during a given time frame. Not to be confused with fiscal revenue",
+    "usage_count": 416589
+  },
+  "P2043": {
+    "label": "length",
+    "description": "measured dimension of an object",
+    "usage_count": 397724
+  },
+  "P1540": {
+    "label": "male population",
+    "description": "number of male people inhabiting the place; number of male people of subject",
+    "usage_count": 385450
+  },
+  "P1539": {
+    "label": "female population",
+    "description": "number of female people inhabiting the place; number of female people of subject",
+    "usage_count": 382898
+  },
+  "P2047": {
+    "label": "duration",
+    "description": "length of time of an event or process",
+    "usage_count": 365801
+  },
+  "P2403": {
+    "label": "total assets",
+    "description": "value of assets held by a private or public entity",
+    "usage_count": 363677
+  },
+  "P2899": {
+    "label": "minimum age",
+    "description": "minimum age for, for example, movie certification",
+    "usage_count": 354802
+  },
+  "P8093": {
+    "label": "donations",
+    "description": "sum of donations an organization receives",
+    "usage_count": 323523
+  },
+  "P4080": {
+    "label": "number of houses",
+    "description": "number of houses in given territorial entity",
+    "usage_count": 295511
+  },
+  "P2196": {
+    "label": "count of students",
+    "description": "number of pupils or students of any type in an educational organization. Qualify with \"point in time\" (P585) or \"time period\" (P2348).",
+    "usage_count": 280879
+  },
+  "P1181": {
+    "label": "numeric value",
+    "description": "numerical value of a number, a mathematical constant, or a physical constant",
+    "usage_count": 249794
+  },
+  "P7316": {
+    "label": "number of decimal digits",
+    "description": "number of decimal digits of a natural number",
+    "usage_count": 247480
+  },
+  "P1128": {
+    "label": "employees",
+    "description": "total number of employees of a company at a given \"point in time\" (P585). Most recent data would generally have preferred rank; data for previous years normal rank (not deprecated rank). Add data for recent years, don't overwrite",
+    "usage_count": 228188
+  },
+  "P2386": {
+    "label": "diameter",
+    "description": "diameter of a circular or spherical object",
+    "usage_count": 202948
+  },
+  "P4135": {
+    "label": "maximum age",
+    "description": "highest age a person is eligible to do something, for example be member in youth organisation or sport teams, some positions like judges, clinical trials, etc",
+    "usage_count": 200118
+  },
+  "P3872": {
+    "label": "patronage",
+    "description": "number of passengers, patrons or visitors in specified time period",
+    "usage_count": 172171
+  },
+  "P2284": {
+    "label": "price",
+    "description": "published price listed or paid for a product (use with unit of currency)",
+    "usage_count": 143631
+  },
+  "P3934": {
+    "label": "face value",
+    "description": "value printed on a coin, stamp or banknote by the issuing authority",
+    "usage_count": 141304
+  },
+  "P2635": {
+    "label": "number of parts of this work",
+    "description": "the number of parts that a work comprises",
+    "usage_count": 132257
+  },
+  "P4895": {
+    "label": "time index",
+    "description": "indicate when something happens relative to its beginning",
+    "usage_count": 108238
+  },
+  "P1174": {
+    "label": "visitors per year",
+    "description": "number of people visiting a location or an event each year",
+    "usage_count": 100163
+  },
+  "P5205": {
+    "label": "stroke count",
+    "description": "number of strokes in a Chinese, Japanese, Korean, N\u00fcshu, Yi, Tangut, Khitan, Jurchen, or traditional Vietnamese character",
+    "usage_count": 96776
+  },
+  "P6498": {
+    "label": "illiterate population",
+    "description": "number of illiterate people within a territorial entity (typically determined during a census)",
+    "usage_count": 92825
+  },
+  "P1113": {
+    "label": "number of episodes",
+    "description": "number of episodes in a film/TV/radio series",
+    "usage_count": 88900
+  },
+  "P1093": {
+    "label": "gross tonnage",
+    "description": "unitless index related to a ship's overall internal volume",
+    "usage_count": 86015
+  },
+  "P1352": {
+    "label": "ranking",
+    "description": "subject's ordinal position as qualitatively evaluated relative to other members of a group",
+    "usage_count": 80663
+  },
+  "P2124": {
+    "label": "member count",
+    "description": "number of entities that are part of an organization at a particular time",
+    "usage_count": 72690
+  },
+  "P11200": {
+    "label": "tiratge",
+    "description": "number of musical bars for each section of a sardana",
+    "usage_count": 64103
+  },
+  "P1971": {
+    "label": "number of children",
+    "description": "number of children of the person, animal, or character",
+    "usage_count": 63731
+  },
+  "P2547": {
+    "label": "perimeter",
+    "description": "linear distance around the outside of an object",
+    "usage_count": 60846
+  },
+  "P10622": {
+    "label": "per capita income",
+    "description": "average income earned per person in a given area (city, region, country, etc.) in a specified year",
+    "usage_count": 52649
+  },
+  "P1831": {
+    "label": "electorate",
+    "description": "number of persons qualified to vote during elections",
+    "usage_count": 47545
+  },
+  "P2437": {
+    "label": "number of seasons",
+    "description": "number of seasons a television or radio series has had",
+    "usage_count": 45963
+  },
+  "P1350": {
+    "label": "number of matches played/races/starts",
+    "description": "matches or games a player or a team played during an event. Also a total number of matches a player officially appeared in during the whole career",
+    "usage_count": 45955
+  },
+  "P2053": {
+    "label": "watershed area",
+    "description": "size of a stream's watershed (drainage basin)",
+    "usage_count": 38368
+  },
+  "P3157": {
+    "label": "event distance",
+    "description": "distance over which a race or other event is conducted or was achieved",
+    "usage_count": 38121
+  },
+  "P1868": {
+    "label": "ballots cast",
+    "description": "total number of ballot(s) cast, including invalid or blank ballots",
+    "usage_count": 35670
+  },
+  "P5436": {
+    "label": "number of viewers/listeners",
+    "description": "number of viewers of a television or broadcasting program; web traffic on websites",
+    "usage_count": 34923
+  },
+  "P1697": {
+    "label": "total valid votes",
+    "description": "vote count for the elections (excluding invalid votes)",
+    "usage_count": 34833
+  },
+  "P1103": {
+    "label": "number of platform tracks",
+    "description": "number of tracks served by the platforms at a railway station",
+    "usage_count": 34670
+  },
+  "P2402": {
+    "label": "total expenditure",
+    "description": "amount of spending by this public or private entity, not to be confused with fiscal expenditure",
+    "usage_count": 34669
+  },
+  "P1083": {
+    "label": "maximum capacity",
+    "description": "number of people allowed for a venue or vehicle",
+    "usage_count": 34437
+  },
+  "P2101": {
+    "label": "melting point",
+    "description": "temperature at which a solid changes its state from solid to liquid at atmospheric pressure",
+    "usage_count": 32868
+  },
+  "P6589": {
+    "label": "endowment",
+    "description": "sum of donations for the ongoing support of a not-for-profit institution",
+    "usage_count": 32831
+  },
+  "P2927": {
+    "label": "water as percent of area",
+    "description": "which percentage of the territory of this item inside coast line and international bounderies is water. Use \"percent\" (Q11229) as unit",
+    "usage_count": 30823
+  },
+  "P2610": {
+    "label": "thickness",
+    "description": "extent from one surface to the opposite",
+    "usage_count": 28429
+  },
+  "P2109": {
+    "label": "nominal power output",
+    "description": "power produced by the engine, plant, or reactor (use with unit of power)",
+    "usage_count": 27962
+  },
+  "P1101": {
+    "label": "floors above ground",
+    "description": "above ground floor count of a building (ground floor and attic included)",
+    "usage_count": 27867
+  },
+  "P6125": {
+    "label": "number of volunteers",
+    "description": "number of people who volunteer for an organization at a particular time",
+    "usage_count": 26940
+  },
+  "P2138": {
+    "label": "total liabilities",
+    "description": "sum of all present obligations of the entity to transfer economic resources as a result of past events",
+    "usage_count": 26457
+  },
+  "P1120": {
+    "label": "number of deaths",
+    "description": "total (cumulative) number of people/animals who died since start as a direct result of an event or cause",
+    "usage_count": 26174
+  },
+  "P3087": {
+    "label": "fiscal/tax revenue",
+    "description": "fiscal revenue of a public entity (not for private entities)",
+    "usage_count": 25270
+  },
+  "P5044": {
+    "label": "number of spoilt votes",
+    "description": "number of spoilt votes in a voting round for a specfic position in a election (excluding blank votes; use P5045 instead)",
+    "usage_count": 23878
+  },
+  "P2052": {
+    "label": "speed",
+    "description": "magnitude of the velocity of the item",
+    "usage_count": 22020
+  },
+  "P2234": {
+    "label": "volume as quantity",
+    "description": "quantity of three-dimensional space",
+    "usage_count": 21723
+  },
+  "P6570": {
+    "label": "number of words",
+    "description": "number of words in text",
+    "usage_count": 21612
+  },
+  "P1867": {
+    "label": "eligible voters",
+    "description": "number of eligible voters for a particular election",
+    "usage_count": 19820
+  },
+  "P1410": {
+    "label": "number of seats in assembly",
+    "description": "number of seats a political party, faction, or group has in a given assembly",
+    "usage_count": 18414
+  },
+  "P2660": {
+    "label": "topographic prominence",
+    "description": "height of a mountain or hill relative to the lowest contour line encircling it (on Earth, maximum 8,848 m)",
+    "usage_count": 18166
+  },
+  "P2665": {
+    "label": "alcohol by volume",
+    "description": "percentage of alcohol in a fluid",
+    "usage_count": 17871
+  },
+  "P1603": {
+    "label": "number of cases",
+    "description": "cumulative number of confirmed, probable and suspected occurrences",
+    "usage_count": 17423
+  },
+  "P2295": {
+    "label": "net profit",
+    "description": "private entity profit after accounting for all costs",
+    "usage_count": 16407
+  },
+  "P8843": {
+    "label": "poverty incidence",
+    "description": "proportion of households with per capita income/expenditure less than the per capita poverty threshold to the total number of households",
+    "usage_count": 15575
+  },
+  "P2130": {
+    "label": "capital cost",
+    "description": "amount of money spent on building or producing an object",
+    "usage_count": 15080
+  },
+  "P2144": {
+    "label": "frequency",
+    "description": "frequency in Hz at which the subject works, for example the frequency a radio station can be received",
+    "usage_count": 14864
+  },
+  "P2261": {
+    "label": "beam",
+    "description": "width of a ship at its widest point measured at its nominal waterline",
+    "usage_count": 14782
+  },
+  "P1114": {
+    "label": "quantity",
+    "description": "number of instances of this subject in the universe of the subject (the actual number of instances in Wikidata may be lower or higher)",
+    "usage_count": 14639
+  },
+  "P5595": {
+    "label": "number of platform faces",
+    "description": "number of continuous platform edges facing a track or vehicle guideway in a station (often, but not always, the same as P1103 and the number of platform numbers). See property talk page for illustrated samples",
+    "usage_count": 14362
+  },
+  "P1081": {
+    "label": "Human Development Index",
+    "description": "HDI value of a region",
+    "usage_count": 12372
+  },
+  "P2257": {
+    "label": "event interval",
+    "description": "standard nominal interval between scheduled or regularly recurring events. Include unit of time, e.g. \"year\" (Q577). 1/(event frequency). Time period of periodically occurring event",
+    "usage_count": 12320
+  },
+  "P5045": {
+    "label": "number of blank votes",
+    "description": "number of blank votes in a voting round for a specific position in a election",
+    "usage_count": 11649
+  },
+  "P2131": {
+    "label": "nominal GDP",
+    "description": "market value of all officially recognized final goods and services produced within a country in a given period of time",
+    "usage_count": 11082
+  },
+  "P2769": {
+    "label": "budget",
+    "description": "assigned monetary amount for a project (for the estimated cost of a film, also commonly referred to as budget, use P2130)",
+    "usage_count": 10353
+  },
+  "P3362": {
+    "label": "operating income",
+    "description": "private entity operating income",
+    "usage_count": 9689
+  },
+  "P2121": {
+    "label": "prize money",
+    "description": "amount in a specific currency",
+    "usage_count": 9684
+  },
+  "P2896": {
+    "label": "publication interval",
+    "description": "standard publication interval for daily or periodical publications",
+    "usage_count": 9627
+  },
+  "P2132": {
+    "label": "nominal GDP per capita",
+    "description": "country's total GDP divided by the population",
+    "usage_count": 9574
+  },
+  "P8010": {
+    "label": "number of recoveries",
+    "description": "number of cases that recovered from disease",
+    "usage_count": 9441
+  },
+  "P4442": {
+    "label": "mean age",
+    "description": "mean age in a given place",
+    "usage_count": 9233
+  },
+  "P1342": {
+    "label": "number of seats",
+    "description": "total number of seats/members in an assembly (legislative house or similar)",
+    "usage_count": 8704
+  },
+  "P8887": {
+    "label": "water area",
+    "description": "area/surface of a geographical entity that is covered by water",
+    "usage_count": 8636
+  },
+  "P1339": {
+    "label": "number of injured",
+    "description": "number of people with non-fatal injuries in an event",
+    "usage_count": 8087
+  },
+  "P1100": {
+    "label": "number of cylinders",
+    "description": "number of cylinders in a piston engine or compressor",
+    "usage_count": 8012
+  },
+  "P2142": {
+    "label": "box office",
+    "description": "box office takings accumulated by a film",
+    "usage_count": 7964
+  },
+  "P2137": {
+    "label": "total equity",
+    "description": "amount of equity value for an entity",
+    "usage_count": 7843
+  },
+  "P2929": {
+    "label": "lighthouse range",
+    "description": "the distance at which the light can be seen. If the light has colors, there will be several ranges, one for each color. Use qualifier \"color\" (P462)",
+    "usage_count": 7801
+  },
+  "P13171": {
+    "label": "bequest income",
+    "description": "the sum a organisations receives from bequests/legacies in a timeframe",
+    "usage_count": 7725
+  },
+  "P2134": {
+    "label": "total reserves",
+    "description": "total reserves comprise holdings of monetary gold, special drawing rights, reserves of IMF members held by the IMF, and holdings of foreign exchange under the control of monetary authorities",
+    "usage_count": 7702
+  },
+  "P2659": {
+    "label": "topographic isolation",
+    "description": "minimum distance to a point of higher elevation",
+    "usage_count": 7404
+  },
+  "P6545": {
+    "label": "total assists in career",
+    "description": "goalscoring statistic",
+    "usage_count": 7251
+  },
+  "P4876": {
+    "label": "number of records",
+    "description": "number of values of an identifier or records in a catalog",
+    "usage_count": 7120
+  },
+  "P8733": {
+    "label": "number of rooms",
+    "description": "number of rooms in a building",
+    "usage_count": 7090
+  },
+  "P1351": {
+    "label": "number of points/goals/set scored",
+    "description": "goals / points scored in a match or an event used as qualifier to the participant. Use P1358 for league points.",
+    "usage_count": 6998
+  },
+  "P6088": {
+    "label": "beer bitterness",
+    "description": "bitterness of beer in International Bittering Units scale",
+    "usage_count": 6959
+  },
+  "P7725": {
+    "label": "litter size",
+    "description": "number of young born/laid at the same time by one animal",
+    "usage_count": 6797
+  },
+  "P2097": {
+    "label": "term length of position",
+    "description": "length of time in years (unit: Q577) a person (usually a politician) is to serve in a particular position. Do not add bounds.",
+    "usage_count": 6660
+  },
+  "P2555": {
+    "label": "fee",
+    "description": "fee or toll payable to use, transit or enter the subject (only for one-time fees, do NOT use it for an ongoing fee, tuition fee or trading fee)",
+    "usage_count": 5714
+  },
+  "P1279": {
+    "label": "inflation rate",
+    "description": "percent change in the consumer price index (CPI)",
+    "usage_count": 5657
+  },
+  "P5043": {
+    "label": "number of abstentions",
+    "description": "number of abstentions in a voting round of an election",
+    "usage_count": 5625
+  },
+  "P2299": {
+    "label": "PPP GDP per capita",
+    "description": "GDP divided by the population total and adjusted for CPI",
+    "usage_count": 5275
+  },
+  "P4010": {
+    "label": "GDP (PPP)",
+    "description": "gross domestic product (GDP) at purchasing power parity (current international $)",
+    "usage_count": 5254
+  },
+  "P10091": {
+    "label": "death rate",
+    "description": "the total number of persons dead per 1,000 population per year",
+    "usage_count": 4994
+  },
+  "P1086": {
+    "label": "atomic number",
+    "description": "number of protons found in the nucleus of the atom",
+    "usage_count": 4969
+  },
+  "P2250": {
+    "label": "life expectancy",
+    "description": "average life expectancy for this group or species",
+    "usage_count": 4924
+  },
+  "P7584": {
+    "label": "age estimated by a dating method",
+    "description": "estimation of the age of a star, geological feature, fossil or object",
+    "usage_count": 4865
+  },
+  "P5991": {
+    "label": "carbon footprint",
+    "description": "total emissions caused by an individual, event, organisation, or product, expressed as carbon dioxide equivalent; has to be calculated via a scientificly proven methodology",
+    "usage_count": 4837
+  },
+  "P1148": {
+    "label": "neutron number",
+    "description": "number of neutrons of an isotope",
+    "usage_count": 4778
+  },
+  "P11035": {
+    "label": "crossing number",
+    "description": "crossing number for mathematical knots; the crossing number of a knot is the smallest number of crossings of any diagram of the knot. It is a knot invariant.",
+    "usage_count": 4403
+  },
+  "P3039": {
+    "label": "wheelbase",
+    "description": "horizontal distance between the centers of the front and rear wheels",
+    "usage_count": 4390
+  },
+  "P3575": {
+    "label": "data size",
+    "description": "size of a software, dataset, neural network, or individual file",
+    "usage_count": 4354
+  },
+  "P2351": {
+    "label": "number of graves",
+    "description": "number of burial places in a cemetery or necropolis",
+    "usage_count": 4328
+  },
+  "P4841": {
+    "label": "total fertility rate",
+    "description": "average number of children that would be born to a woman over her lifetime who lives in this territorial entity",
+    "usage_count": 4295
+  },
+  "P1661": {
+    "label": "Alexa rank",
+    "description": "the website's Alexa ranking with \"point in time\" (P585) as a qualifier for each value",
+    "usage_count": 4280
+  },
+  "P2324": {
+    "label": "quantity buried",
+    "description": "number of remains buried or interred",
+    "usage_count": 4050
+  },
+  "P2114": {
+    "label": "half-life",
+    "description": "time required for the amount of something to fall to half its initial value",
+    "usage_count": 3670
+  },
+  "P2154": {
+    "label": "binding energy",
+    "description": "energy required to disassemble a whole system into separate parts",
+    "usage_count": 3442
+  },
+  "P3086": {
+    "label": "speed limit",
+    "description": "maximum speed allowed on a transport route or in a certain area",
+    "usage_count": 3335
+  },
+  "P1355": {
+    "label": "number of wins",
+    "description": "number of sporting matches, games or events won",
+    "usage_count": 3288
+  },
+  "P2895": {
+    "label": "maximum sustained winds",
+    "description": "maximum sustained wind evaluated by agency",
+    "usage_count": 3152
+  },
+  "P1123": {
+    "label": "parity quantum number",
+    "description": "property of particles",
+    "usage_count": 3119
+  },
+  "P2054": {
+    "label": "density",
+    "description": "density of a substance with phase of matter and temperature as qualifiers",
+    "usage_count": 3076
+  },
+  "P10814": {
+    "label": "number of housing units",
+    "description": "number of housing units (dwellings) in a specific place (such as city, county, state, country etc.)",
+    "usage_count": 2989
+  },
+  "P5982": {
+    "label": "annual number of weddings",
+    "description": "number of marriages per year in a location",
+    "usage_count": 2985
+  },
+  "P2370": {
+    "label": "conversion to SI unit",
+    "description": "conversion of the unit into a coherent SI unit",
+    "usage_count": 2846
+  },
+  "P1098": {
+    "label": "number of speakers, writers, or signers",
+    "description": "number of people who use a language",
+    "usage_count": 2810
+  },
+  "P2021": {
+    "label": "Erd\u0151s number",
+    "description": "the \"collaborative distance\" between mathematician Paul Erd\u0151s and another person. Use point in time (P585) as qualifier and should be used with a source.",
+    "usage_count": 2762
+  },
+  "P2148": {
+    "label": "distance from river mouth",
+    "description": "qualifier for P974 statements on streams",
+    "usage_count": 2715
+  },
+  "P2957": {
+    "label": "throughput",
+    "description": "volume of units that do or can pass through or be transported by the object",
+    "usage_count": 2684
+  },
+  "P3457": {
+    "label": "case fatality rate",
+    "description": "proportion of patients who die of a particular medical condition out of all who have this condition within a given time frame",
+    "usage_count": 2576
+  },
+  "P2102": {
+    "label": "boiling point",
+    "description": "temperature at which a substance changes its phase from liquid to gas (indicate the corresponding pressure as qualifier)",
+    "usage_count": 2522
+  },
+  "P2442": {
+    "label": "conversion to standard unit",
+    "description": "translation of the value of a measurement to different units",
+    "usage_count": 2514
+  },
+  "P7770": {
+    "label": "egg incubation period",
+    "description": "amount of time needed for incubation of eggs for this animal taxon (birds, fish, reptiles, monotremes)",
+    "usage_count": 2414
+  },
+  "P1548": {
+    "label": "maximum Strahler number",
+    "description": "highest Strahler number of a stream, creek, or river",
+    "usage_count": 2394
+  },
+  "P2145": {
+    "label": "explosive energy equivalent",
+    "description": "amount of energy discharged during an explosion",
+    "usage_count": 2366
+  },
+  "P1301": {
+    "label": "number of elevators",
+    "description": "number of elevators in a building",
+    "usage_count": 2311
+  },
+  "P2218": {
+    "label": "net worth",
+    "description": "totality of wealth possessed by a person",
+    "usage_count": 2309
+  },
+  "P2595": {
+    "label": "maximum gradient",
+    "description": "maximum gradient on a route, expressed as a percentage",
+    "usage_count": 2305
+  },
+  "P2787": {
+    "label": "longest span",
+    "description": "length of the longest span of a bridge, a natural arch",
+    "usage_count": 2208
+  },
+  "P1752": {
+    "label": "scale",
+    "description": "proportional ratio of a linear dimension of a model, map, etc, to the same feature of the original - 1:n. Use 1 for lifesize",
+    "usage_count": 2055
+  },
+  "P10648": {
+    "label": "podium finishes",
+    "description": "number of podium finishes a participant achieved",
+    "usage_count": 2013
+  },
+  "P1139": {
+    "label": "floors below ground",
+    "description": "total number of below ground floors of the building",
+    "usage_count": 1920
+  },
+  "P5027": {
+    "label": "number of representations",
+    "description": "number of shows (including the premiere) of a concert tour or a performing arts production",
+    "usage_count": 1918
+  },
+  "P2573": {
+    "label": "number of out-of-school children",
+    "description": "number of out-of-school children reported for a place",
+    "usage_count": 1915
+  },
+  "P6249": {
+    "label": "narrative age",
+    "description": "age of a fictional character (use qualifiers like P10663 (applies to work) to restrict the age to a certain work)",
+    "usage_count": 1838
+  },
+  "P2226": {
+    "label": "market capitalization",
+    "description": "total value of issued shares by a publicly traded company",
+    "usage_count": 1791
+  },
+  "P11593": {
+    "label": "Inequality-adjusted Human Development Index",
+    "description": "Inequality-adjusted Human Development Index (IHDI) value of a country",
+    "usage_count": 1756
+  },
+  "P1358": {
+    "label": "points for",
+    "description": "number of points in a league table or decathlon. (Use P1351 for goals/points in a match)",
+    "usage_count": 1672
+  },
+  "P5822": {
+    "label": "admission rate",
+    "description": "ratio of the number of applicants admitted to the total number of applicants",
+    "usage_count": 1584
+  },
+  "P1561": {
+    "label": "number of survivors",
+    "description": "number of people surviving an event",
+    "usage_count": 1538
+  },
+  "P9279": {
+    "label": "Egapro gender equality index",
+    "description": "index value for a company per regulations in France",
+    "usage_count": 1538
+  },
+  "P3864": {
+    "label": "suicide rate",
+    "description": "amount of suicides per 100,000 people and year in the place or group",
+    "usage_count": 1502
+  },
+  "P4250": {
+    "label": "defined daily dose",
+    "description": "average maintenance dose per day for a medicine used for its main indication in adults",
+    "usage_count": 1479
+  },
+  "P4036": {
+    "label": "field of view",
+    "description": "angular extent of the observable world that can be seen or sensed by the item",
+    "usage_count": 1464
+  },
+  "P4912": {
+    "label": "century breaks",
+    "description": "in snooker, the number of career century breaks at offic\u0456al professional tournaments",
+    "usage_count": 1452
+  },
+  "P3886": {
+    "label": "number of perpetrators",
+    "description": "number of perpetrators in an event, as reported by reliable sources",
+    "usage_count": 1428
+  },
+  "P5526": {
+    "label": "valency",
+    "description": "number of arguments controlled by a verbal predicate",
+    "usage_count": 1409
+  },
+  "P2556": {
+    "label": "bore",
+    "description": "cylinder bore represents the size, in terms of diameter, of the cylinder in which a piston travels",
+    "usage_count": 1407
+  },
+  "P10263": {
+    "label": "admission yield rate",
+    "description": "percentage of admitted applicants who accept the admission offer",
+    "usage_count": 1397
+  },
+  "P1725": {
+    "label": "beats per minute",
+    "description": "tempo of a musical work, indicated numerically (use P1558 for qualitative tempo markings)",
+    "usage_count": 1362
+  },
+  "P12651": {
+    "label": "authorised capital",
+    "description": "maximum amount of share capital that the company is authorised to issue to shareholders",
+    "usage_count": 1348
+  },
+  "P7863": {
+    "label": "aperture",
+    "description": "aperture of a camera lens",
+    "usage_count": 1279
+  },
+  "P4909": {
+    "label": "number of players in region",
+    "description": "number of registered players in a sport or people practicing a sport in a region",
+    "usage_count": 1275
+  },
+  "P8011": {
+    "label": "number of medical tests",
+    "description": "cumulative number of medical tests",
+    "usage_count": 1274
+  },
+  "P6897": {
+    "label": "literacy rate",
+    "description": "percentage of the population that is not illiterate",
+    "usage_count": 1266
+  },
+  "P2557": {
+    "label": "stroke",
+    "description": "length of the motion in reciprocating engines and other mechanisms",
+    "usage_count": 1256
+  },
+  "P2076": {
+    "label": "temperature",
+    "description": "qualifier to indicate at what temperature something took place",
+    "usage_count": 1246
+  },
+  "P8753": {
+    "label": "annual average daily traffic",
+    "description": "daily traffic through a certain point, as yearly average",
+    "usage_count": 1216
+  },
+  "P4214": {
+    "label": "longest observed lifespan",
+    "description": "age of the oldest specimen of a taxon for which the age can be verified",
+    "usage_count": 1166
+  },
+  "P10367": {
+    "label": "number of lanes",
+    "description": "number of lanes on this road in a given direction",
+    "usage_count": 1114
+  },
+  "P6753": {
+    "label": "number of polling stations",
+    "description": "number of polling stations, and correspondively of electoral precincts, in certain electoral district or during certain elections",
+    "usage_count": 1110
+  },
+  "P2928": {
+    "label": "storage capacity",
+    "description": "data storage size of a device",
+    "usage_count": 1108
+  },
+  "P8368": {
+    "label": "number of branches",
+    "description": "number of branches or stores affiliated with a chain, brand or company",
+    "usage_count": 1076
+  },
+  "P1088": {
+    "label": "Mohs' hardness",
+    "description": "qualitative ordinal scale characterizing scratch resistance of various minerals",
+    "usage_count": 1060
+  },
+  "P10640": {
+    "label": "pole positions",
+    "description": "number of races started in pole position",
+    "usage_count": 1040
+  },
+  "P1356": {
+    "label": "number of losses",
+    "description": "number of sporting matches, games or events lost",
+    "usage_count": 1021
+  },
+  "P2791": {
+    "label": "power consumed",
+    "description": "electrical power consumed by an appliance or facility",
+    "usage_count": 969
+  },
+  "P12712": {
+    "label": "population by native language",
+    "description": "native language population of a place",
+    "usage_count": 968
+  },
+  "P9107": {
+    "label": "number of vaccinations",
+    "description": "number of people vaccinated, qualify with \"point in time\" (P585)",
+    "usage_count": 959
+  },
+  "P4253": {
+    "label": "number of constituencies",
+    "description": "number of constituencies related to a legislative body",
+    "usage_count": 937
+  },
+  "P3744": {
+    "label": "number of subscribers",
+    "description": "number of subscribers for subscription-based companies, e.g. telecommunication companies, newspapers, pay-TV channels, software, etc.",
+    "usage_count": 913
+  },
+  "P4184": {
+    "label": "slope",
+    "description": "angle the surface of an item makes with the horizontal",
+    "usage_count": 900
+  },
+  "P2404": {
+    "label": "time-weighted average exposure limit",
+    "description": "recommended or required concentration limit for chemical exposure in a workplace in a given work day",
+    "usage_count": 861
+  },
+  "P3618": {
+    "label": "base salary",
+    "description": "gross salary of a position or a person (not including bonuses or other forms of remuneration)",
+    "usage_count": 823
+  },
+  "P1198": {
+    "label": "unemployment rate",
+    "description": "portion of a workforce population that is not employed",
+    "usage_count": 816
+  },
+  "P8763": {
+    "label": "birth rate",
+    "description": "the total number of live births per 1,000 population",
+    "usage_count": 776
+  },
+  "P2119": {
+    "label": "vapor pressure",
+    "description": "pressure exerted by a vapor in thermodynamic equilibrium with its condensed phases",
+    "usage_count": 754
+  },
+  "P1345": {
+    "label": "number of victims of killer",
+    "description": "people killed by the subject, both legal and illegal",
+    "usage_count": 713
+  },
+  "P2844": {
+    "label": "incidence",
+    "description": "probability of occurrence of a given condition in a population within a specified period of time",
+    "usage_count": 701
+  },
+  "P2873": {
+    "label": "time in space",
+    "description": "time in space by an astronaut or cosmonaut",
+    "usage_count": 698
+  },
+  "P11412": {
+    "label": "minimum focusing distance",
+    "description": "minimum focusing distance between the camera and the object required by the objective to be able to focus",
+    "usage_count": 671
+  },
+  "P4140": {
+    "label": "energy storage capacity",
+    "description": "storage capacity of a battery or energy storage system",
+    "usage_count": 600
+  },
+  "P3063": {
+    "label": "gestation period",
+    "description": "amount of time needed for gestation for this animal taxon",
+    "usage_count": 576
+  },
+  "P8682": {
+    "label": "number of negative votes",
+    "description": "number of votes that a referendum, proposal, bill, etc. has been rejected in a vote",
+    "usage_count": 542
+  },
+  "P8683": {
+    "label": "number of support votes",
+    "description": "number of votes that a referendum, proposal, bill, etc. has received support in a vote. Other vote-counting properties are aimed at general elections where voting translates into support, but there is no explicit option to vote for / against",
+    "usage_count": 522
+  },
+  "P12549": {
+    "label": "height of letters",
+    "description": "height of the letters of an inscription",
+    "usage_count": 522
+  },
+  "P2240": {
+    "label": "median lethal dose (LD50)",
+    "description": "the dose required to kill half the members of a tested population after a specified test duration (LC\u2085\u2080 \u2192 P2712)",
+    "usage_count": 520
+  },
+  "P2793": {
+    "label": "clearance",
+    "description": "distance between surface under bridge and bottom of a bridge deck",
+    "usage_count": 516
+  },
+  "P2790": {
+    "label": "net tonnage",
+    "description": "dimensionless index calculated from the total moulded volume of the ship's cargo spaces by using a mathematical formula",
+    "usage_count": 508
+  },
+  "P2527": {
+    "label": "earthquake magnitude on the moment magnitude scale",
+    "description": "magnitude of an earthquake according to the moment magnitude scale",
+    "usage_count": 500
+  },
+  "P2128": {
+    "label": "flash point",
+    "description": "lowest temperature at which it can vaporize to form an ignitable mixture in air. Add qualifier for measurement method (P459): open cup or closed cup. Not equal to fire point.",
+    "usage_count": 496
+  },
+  "P5071": {
+    "label": "boiler pressure",
+    "description": "pressure at which a steam boiler operates. Use P1013 as qualifier to indicate if it is maximum pressure.",
+    "usage_count": 484
+  },
+  "P1833": {
+    "label": "number of registered users/contributors",
+    "description": "number of registered users on a website",
+    "usage_count": 468
+  },
+  "P1590": {
+    "label": "number of casualties",
+    "description": "number of people dead or injured because of this event. Used when precise data on number of deaths and number of injured is unavailable.",
+    "usage_count": 467
+  },
+  "P5069": {
+    "label": "service life",
+    "description": "product's total life in use from the point of sale to the point of discard",
+    "usage_count": 444
+  },
+  "P8247": {
+    "label": "nominal share capital",
+    "description": "total of the nominal values of the issued ordinary and preference shares of the entity",
+    "usage_count": 440
+  },
+  "P6591": {
+    "label": "maximum temperature record",
+    "description": "maximum temperature reached at this location",
+    "usage_count": 419
+  },
+  "P2112": {
+    "label": "wing area",
+    "description": "area of an aircraft's wing surfaces",
+    "usage_count": 414
+  },
+  "P2212": {
+    "label": "angular distance",
+    "description": "size of the angle between the direction from the observer towards this object, and the direction toward another object specified in the P2210 qualifier",
+    "usage_count": 404
+  },
+  "P1359": {
+    "label": "number of points/goals conceded",
+    "description": "points conceded or goals against (use in league table items)",
+    "usage_count": 385
+  },
+  "P1446": {
+    "label": "number of missing",
+    "description": "number of people missing after an event - qualify with \"point in time (P585)\"",
+    "usage_count": 366
+  },
+  "P2228": {
+    "label": "maximum thrust",
+    "description": "maximum thrust specified for a jet or rocket engine",
+    "usage_count": 359
+  },
+  "P5582": {
+    "label": "number of arrests",
+    "description": "the number of arrests made by public officials during or resulting from an event",
+    "usage_count": 357
+  },
+  "P2103": {
+    "label": "size of team at start",
+    "description": "number of players/sled dogs/etc. in a team at the start of a match or race",
+    "usage_count": 353
+  },
+  "P8340": {
+    "label": "estimated value",
+    "description": "estimated value of a house, company, patent, etc",
+    "usage_count": 335
+  },
+  "P2197": {
+    "label": "production rate",
+    "description": "amount of a given material produced in a given time",
+    "usage_count": 333
+  },
+  "P2797": {
+    "label": "sound power level",
+    "description": "level of sound power at a reference value of 1 pW",
+    "usage_count": 329
+  },
+  "P6710": {
+    "label": "linear reference",
+    "description": "nominal distance commonly used to describe location along a route. Defined by operator/authority, it might not reflect physical distance",
+    "usage_count": 329
+  },
+  "P1418": {
+    "label": "orbits completed",
+    "description": "number of orbits a spacecraft has done around a body",
+    "usage_count": 323
+  },
+  "P8594": {
+    "label": "ride height",
+    "description": "ground clearance of vehicle or distance between the base of a vehicle tire and the lowest point",
+    "usage_count": 321
+  },
+  "P3559": {
+    "label": "maximum size or capacity",
+    "description": "maximum allowed/supported/usable (data) size",
+    "usage_count": 316
+  },
+  "P3530": {
+    "label": "par",
+    "description": "predetermined number of strokes a 0-handicap golfer should require to complete a hole, a round or a tournament",
+    "usage_count": 308
+  },
+  "P3000": {
+    "label": "marriageable age",
+    "description": "minimum age at which a person is generally allowed by law to marry. Use qualifier \"applies to part\" (P518), to specify if it applies only to males (Q6581097), females (Q6581072) or both genders (Q27177113)",
+    "usage_count": 301
+  },
+  "P3041": {
+    "label": "luminous intensity",
+    "description": "measure of the emitted light intensity",
+    "usage_count": 301
+  },
+  "P2374": {
+    "label": "natural abundance",
+    "description": "relative proportion of an isotope as found in nature (Earth's crust, or other location with qualifiers)",
+    "usage_count": 288
+  },
+  "P3020": {
+    "label": "residence time of water",
+    "description": "time water remains in a lake or sea",
+    "usage_count": 287
+  },
+  "P2806": {
+    "label": "vibration",
+    "description": "level of vibration measured",
+    "usage_count": 277
+  },
+  "P7422": {
+    "label": "minimum temperature record",
+    "description": "lowest temperature reached at this location",
+    "usage_count": 275
+  },
+  "P2884": {
+    "label": "mains voltage",
+    "description": "voltage of residential mains electricity in a country or region",
+    "usage_count": 261
+  },
+  "P2219": {
+    "label": "real GDP growth rate",
+    "description": "percentage change in nominal gross domestic product from one year to the next minus the inflation rate",
+    "usage_count": 249
+  },
+  "P2217": {
+    "label": "cruise speed",
+    "description": "design cruise speed",
+    "usage_count": 245
+  },
+  "P8876": {
+    "label": "number of taxpayers",
+    "description": "number of persons liable for a tax",
+    "usage_count": 241
+  },
+  "P2202": {
+    "label": "lower flammable limit",
+    "description": "the lower bound of the concentration range over which a flammable mixture of gas or vapour in air can be ignited at a given temperature and pressure (0-1)",
+    "usage_count": 230
+  },
+  "P1125": {
+    "label": "Gini coefficient",
+    "description": "measure of statistical dispersion intended to represent the income distribution of a nation's residents",
+    "usage_count": 229
+  },
+  "P2661": {
+    "label": "target interest rate",
+    "description": "benchmark interest rate of the central bank",
+    "usage_count": 228
+  },
+  "P7787": {
+    "label": "heading",
+    "description": "direction of an object or structure (eg. building) or direction (yaw) of a camera (or the viewer), measured as clockwise angle from the North, given in degrees, radians or other units",
+    "usage_count": 227
+  },
+  "P7462": {
+    "label": "graph diameter",
+    "description": "maximum eccentricity of any vertex in the graph",
+    "usage_count": 222
+  },
+  "P5066": {
+    "label": "operating temperature",
+    "description": "temperature at which a device operates. Use qualifier \"criterion used\" (P1013) and values such as \"maximum\" (Q10578722), \"minimum\" (Q10585806), etc.",
+    "usage_count": 220
+  },
+  "P7391": {
+    "label": "graph radius",
+    "description": "the minimum eccentricity of any vertex of a graph",
+    "usage_count": 220
+  },
+  "P12919": {
+    "label": "public funding",
+    "description": "amount of public funding an organisation receives",
+    "usage_count": 215
+  },
+  "P13749": {
+    "label": "display size (diagonal)",
+    "description": "diagonal length of the viewable area of a rectangular electronic display",
+    "usage_count": 214
+  },
+  "P5167": {
+    "label": "vehicles per thousand people",
+    "description": "number of vehicles per 1000 people. Use qualifier determination method (P459) to describe how it's done.",
+    "usage_count": 209
+  },
+  "P2855": {
+    "label": "VAT rate",
+    "description": "percentage value-added tax in this country or region. Do not use for sales tax. For specialised rates, use qualifiers",
+    "usage_count": 208
+  },
+  "P2998": {
+    "label": "age of candidacy",
+    "description": "minimum age at which a person can legally qualify to hold certain elected government offices",
+    "usage_count": 203
+  },
+  "P2203": {
+    "label": "upper flammable limit",
+    "description": "upper bound of the concentration range over which a flammable mixture of gas or vapour in air can be ignited at a given temperature and pressure (0-1)",
+    "usage_count": 191
+  },
+  "P2300": {
+    "label": "minimal lethal dose",
+    "description": "lowest dose of a toxic substance in an environmental medium that kills individual organisms or test species under a defined set of conditions",
+    "usage_count": 191
+  },
+  "P1193": {
+    "label": "prevalence",
+    "description": "portion in percent of a population with a given disease or disorder",
+    "usage_count": 180
+  },
+  "P6794": {
+    "label": "minimum wage",
+    "description": "lowest wage which can be paid legally in a state for working",
+    "usage_count": 180
+  },
+  "P4103": {
+    "label": "assets under management",
+    "description": "total market value of financial assets which a financial institution manages on behalf of its clients and itself",
+    "usage_count": 171
+  },
+  "P4137": {
+    "label": "muzzle velocity",
+    "description": "speed of a projectile at the moment it leaves the muzzle of a gun",
+    "usage_count": 168
+  },
+  "P11547": {
+    "label": "Happy Planet Index score",
+    "description": "The Happy Planet Index (HPI) is an index of human well-being and environmental impact that was introduced by the New Economics Foundation in 2006",
+    "usage_count": 165
+  },
+  "P2068": {
+    "label": "thermal conductivity",
+    "description": "property of a material that describes how efficiently heat is conducted",
+    "usage_count": 157
+  },
+  "P2997": {
+    "label": "age of majority",
+    "description": "threshold of adulthood as recognized or declared in law. Use qualifiers \"statement is subject of\" (P805) to link to item for articles with more detail. Use \"start time\" (P580) or \"point in time\" (P585) for historic data",
+    "usage_count": 156
+  },
+  "P13635": {
+    "label": "warranty period",
+    "description": "warranty period of this product as covered by the original manufacturer or creator",
+    "usage_count": 150
+  },
+  "P4163": {
+    "label": "magnification",
+    "description": "amount of optical magnification provided",
+    "usage_count": 144
+  },
+  "P12655": {
+    "label": "number of submissions",
+    "description": "number of submissions, e.g., submitted papers to a conference",
+    "usage_count": 138
+  },
+  "P6711": {
+    "label": "data transfer speed",
+    "description": "transfer speed through a bus or a communication medium",
+    "usage_count": 137
+  },
+  "P2075": {
+    "label": "speed of sound",
+    "description": "speed of sound waves in a material. Use qualifiers to specify the measurement conditions.",
+    "usage_count": 129
+  },
+  "P4999": {
+    "label": "number of clubs",
+    "description": "number of clubs active in a given sport for a region",
+    "usage_count": 129
+  },
+  "P6856": {
+    "label": "average speed",
+    "description": "average speed of a transport line, service or network, or of a vehicle when used on such a line, service or network",
+    "usage_count": 121
+  },
+  "P3488": {
+    "label": "minimal incubation period in humans",
+    "description": "minimal time between an infection and the onset of disease symptoms in infected humans",
+    "usage_count": 119
+  },
+  "P3487": {
+    "label": "maximal incubation period in humans",
+    "description": "maximal time between an infection and the onset of disease symptoms in infected humans",
+    "usage_count": 118
+  },
+  "P2658": {
+    "label": "Scoville grade",
+    "description": "scale measuring pungency of chili peppers (values from 0 to 16,000,000,000)",
+    "usage_count": 112
+  },
+  "P10768": {
+    "label": "Similarweb ranking",
+    "description": "the website's Similarweb global ranking",
+    "usage_count": 111
+  },
+  "P9440": {
+    "label": "pH value",
+    "description": "acidity and alkalinity of an aqueous solution",
+    "usage_count": 110
+  },
+  "P5141": {
+    "label": "coastline",
+    "description": "length of the coastline (sea shore) of the region. Use qualifier \"determination method\" (P459) to define how it's determined/which granularity is used.",
+    "usage_count": 106
+  },
+  "P2133": {
+    "label": "total debt",
+    "description": "amount of debt for a company, organization or public entity",
+    "usage_count": 105
+  },
+  "P3271": {
+    "label": "compulsory education (maximum age)",
+    "description": "maximum age for children when compulsory education ends. Qualifiers: \"subject of\" to link to more detail. If applicable, use qualifier P31 with value \"varies by state/province\" (Q27145860). Use \"start time\" or \"point in time\" for historic data.",
+    "usage_count": 105
+  },
+  "P8621": {
+    "label": "turning radius",
+    "description": "radius of smallest circle a particular automobile or similar vehicle can turn along",
+    "usage_count": 100
+  },
+  "P5230": {
+    "label": "chromosome count",
+    "description": "karyological information on the number of chromosomes typical for a species (2n)",
+    "usage_count": 89
+  },
+  "P1099": {
+    "label": "number of masts",
+    "description": "number of masts a ship has",
+    "usage_count": 88
+  },
+  "P11413": {
+    "label": "sampling rate",
+    "description": "frequency at which a system measures a continuous-time signal; use with units like \u201chertz\u201d and \u201cframes per second\u201d",
+    "usage_count": 86
+  },
+  "P3001": {
+    "label": "retirement age",
+    "description": "the age at which most people normally retire from work",
+    "usage_count": 83
+  },
+  "P10649": {
+    "label": "number of likes",
+    "description": "number of likes, favorites, stars, upvotes, or reactions received on a social media post or profile",
+    "usage_count": 73
+  },
+  "P12649": {
+    "label": "number of accepted contributions",
+    "description": "number of accepted submissions, e.g., conference articles to a conference",
+    "usage_count": 73
+  },
+  "P3337": {
+    "label": "generation time",
+    "description": "average time from one generation to another within the same population",
+    "usage_count": 71
+  },
+  "P3529": {
+    "label": "median income",
+    "description": "median household income in a place",
+    "usage_count": 71
+  },
+  "P9927": {
+    "label": "number of tries marked",
+    "description": "number of tries marked during a rugby competition",
+    "usage_count": 70
+  },
+  "P3036": {
+    "label": "precipitation height",
+    "description": "maximum height of snow or rain during an event or space of time",
+    "usage_count": 69
+  },
+  "P13414": {
+    "label": "number of downloads",
+    "description": "number of downloads of times this application or creative work have been downloaded",
+    "usage_count": 68
+  },
+  "P3270": {
+    "label": "compulsory education (minimum age)",
+    "description": "minimum age for children when compulsory education starts. Qualifiers: \"subject of\" to link to more detail. If applicable, use qualifier P31 with value \"varies by state/province\" (Q27145860). Use \"start time\" or \"point in time\" for historic data.",
+    "usage_count": 66
+  },
+  "P2230": {
+    "label": "torque",
+    "description": "torque of a machine, a motor/engine/powerplant, or a vehicle",
+    "usage_count": 64
+  },
+  "P3013": {
+    "label": "surface tension",
+    "description": "physical property of liquid",
+    "usage_count": 62
+  },
+  "P14143": {
+    "label": "annual greenhouse gas emissions",
+    "description": "carbon dioxide equivalent emissions by this entity in a year",
+    "usage_count": 60
+  },
+  "P2599": {
+    "label": "block size",
+    "description": "size of block for this block cipher or hash function",
+    "usage_count": 58
+  },
+  "P2645": {
+    "label": "mean lifetime",
+    "description": "inverse of exponential decay rate; half-life is ln(2) times this value",
+    "usage_count": 58
+  },
+  "P12221": {
+    "label": "battery life",
+    "description": "length of time after a full charge that a device can continue to work under normal use before it needs its battery to be recharged",
+    "usage_count": 51
+  },
+  "P4350": {
+    "label": "salinity",
+    "description": "amount of dissolved salt in a body of water",
+    "usage_count": 50
+  },
+  "P3465": {
+    "label": "maximum frequency of audible sound",
+    "description": "maximum frequency of audible sound for this species",
+    "usage_count": 49
+  },
+  "P6639": {
+    "label": "capacity factor",
+    "description": "percentage of maximum power output provided on average by a given power station or power generation unit",
+    "usage_count": 49
+  },
+  "P2143": {
+    "label": "genome size",
+    "description": "size of the genome in base pairs",
+    "usage_count": 48
+  },
+  "P2113": {
+    "label": "sublimation temperature",
+    "description": "temperature at which a substance changes directly from solid to gaseous (indicate corresponding pressure qualifier)",
+    "usage_count": 38
+  },
+  "P2232": {
+    "label": "cash",
+    "description": "the value of cash and securities held by a state government",
+    "usage_count": 37
+  },
+  "P2320": {
+    "label": "aftershocks",
+    "description": "number of smaller earthquakes which follow a significant earthquake",
+    "usage_count": 36
+  },
+  "P3792": {
+    "label": "rate of fire",
+    "description": "the frequency at which a specific weapon can fire or launch its projectiles",
+    "usage_count": 36
+  },
+  "P8622": {
+    "label": "hill size",
+    "description": "ski jumping hill size",
+    "usage_count": 33
+  },
+  "P2999": {
+    "label": "age of consent",
+    "description": "youngest age at which a person can legally consent to sexual activity",
+    "usage_count": 30
+  },
+  "P9924": {
+    "label": "number of evacuated",
+    "description": "number of people who have to be evacuated as a result of an event such as a natural or human disaster",
+    "usage_count": 30
+  },
+  "P5483": {
+    "label": "hardness",
+    "description": "measure of how resistant solid matter is to various kinds of permanent shape change when a force is applied",
+    "usage_count": 29
+  },
+  "P3395": {
+    "label": "heart rate",
+    "description": "speed of the heartbeat measured by the number of contractions of the heart per minute (bpm)",
+    "usage_count": 28
+  },
+  "P7862": {
+    "label": "period of lactation",
+    "description": "the interval from the onset of milk production to weaning",
+    "usage_count": 27
+  },
+  "P4500": {
+    "label": "family relationship degree",
+    "description": "kinship degree, degree of consanguinity, generation of people with this kinship type when clearly identifiable.",
+    "usage_count": 26
+  },
+  "P10651": {
+    "label": "number of comments",
+    "description": "number of comments or replies received on a social media post",
+    "usage_count": 25
+  },
+  "P10756": {
+    "label": "number of reblogs",
+    "description": "number of reblogs, reposts, retweets, crossposts, or on-platform shares received on a social media post",
+    "usage_count": 25
+  },
+  "P4448": {
+    "label": "cash back",
+    "description": "cash or points received for spending money as part of a loyalty program",
+    "usage_count": 23
+  },
+  "P5479": {
+    "label": "ultimate tensile strength",
+    "description": "material property measuring the tensil strengh at break",
+    "usage_count": 23
+  },
+  "P9548": {
+    "label": "earned run average",
+    "description": "earned run average of a baseball pitcher in a career or season",
+    "usage_count": 21
+  },
+  "P2135": {
+    "label": "total exports",
+    "description": "amount of goods and services sold to other countries",
+    "usage_count": 18
+  },
+  "P8049": {
+    "label": "number of hospitalized cases",
+    "description": "number of cases that are hospitalized",
+    "usage_count": 18
+  },
+  "P10823": {
+    "label": "fastest laps",
+    "description": "number of fastest laps a driver is credited with over a series, season, or career",
+    "usage_count": 18
+  },
+  "P2854": {
+    "label": "disease burden",
+    "description": "impact of a health problem as measured by financial cost, mortality, morbidity, or other indicators. It is often quantified in terms of quality-adjusted life years (QALYs) or disability-adjusted life years (DALYs)",
+    "usage_count": 17
+  },
+  "P12432": {
+    "label": "age of onset of sexual maturity",
+    "description": "point in time after which an individual attains the ability to reproduce sexually",
+    "usage_count": 16
+  },
+  "P12469": {
+    "label": "graduation rate",
+    "description": "proportion of students who graduate from the institution in the given timeframe",
+    "usage_count": 16
+  },
+  "P2710": {
+    "label": "minimal lethal concentration",
+    "description": "lowest concentration of a toxic substance in an environmental medium that kills individual organisms or test species under a defined set of conditions",
+    "usage_count": 15
+  },
+  "P10322": {
+    "label": "time in the pouch",
+    "description": "the time the animal spends in the pouch",
+    "usage_count": 15
+  },
+  "P4218": {
+    "label": "shelf life",
+    "description": "length of time that a commodity may be stored without becoming unfit for use or consumption",
+    "usage_count": 14
+  },
+  "P5708": {
+    "label": "force",
+    "description": "quantitative value of the interaction between two objects",
+    "usage_count": 14
+  },
+  "P11081": {
+    "label": "won sets",
+    "description": "number of sets won",
+    "usage_count": 14
+  },
+  "P11899": {
+    "label": "median household income",
+    "description": "median of the household income (cumulated salaries etc.) of a specific place, such as city, state, country",
+    "usage_count": 14
+  },
+  "P13238": {
+    "label": "entry height",
+    "description": "height of the entrance above ground level for boarding vehicles",
+    "usage_count": 14
+  },
+  "P2542": {
+    "label": "acceptable daily intake",
+    "description": "estimate of the amount of a food additive, expressed on a body weight basis, that can be ingested daily over a lifetime without appreciable health risk",
+    "usage_count": 13
+  },
+  "P4295": {
+    "label": "readership",
+    "description": "average number of readers of a newspaper or other periodical, per issue",
+    "usage_count": 13
+  },
+  "P6695": {
+    "label": "number of sentences",
+    "description": "number of sentences in this text",
+    "usage_count": 12
+  },
+  "P6089": {
+    "label": "beer color",
+    "description": "color of beer in Standard Reference Method",
+    "usage_count": 11
+  },
+  "P2834": {
+    "label": "individual tax rate",
+    "description": "percentage tax rate on individuals by income",
+    "usage_count": 10
+  },
+  "P8890": {
+    "label": "power consumption index",
+    "description": "value of the relative energy consumption from the energy certificate of a building",
+    "usage_count": 10
+  },
+  "P2292": {
+    "label": "consumption rate",
+    "description": "rate at which a product is consumed",
+    "usage_count": 9
+  },
+  "P3492": {
+    "label": "basic reproduction number",
+    "description": "number of infections caused by one infection within an uninfected population",
+    "usage_count": 9
+  },
+  "P3891": {
+    "label": "observing time available",
+    "description": "amount of observing time available at a telescope (or other instrument)",
+    "usage_count": 9
+  },
+  "P8891": {
+    "label": "heating energy consumption index",
+    "description": "value of the relative heating consumption from the energy certificate of a building",
+    "usage_count": 9
+  },
+  "P11698": {
+    "label": "student retention rate",
+    "description": "proportion of first-year students at the educational institution who return for their second year",
+    "usage_count": 9
+  },
+  "P12470": {
+    "label": "normal graduation time",
+    "description": "expected or typical duration of an educational program from matriculation to graduation",
+    "usage_count": 9
+  },
+  "P14433": {
+    "label": "maximum vehicle height",
+    "description": "maximum authorized height for vehicles (especially heavy goods vehicles) on a bridge, tunnel or road segment (regulatory limit from signage)",
+    "usage_count": 9
+  },
+  "P13745": {
+    "label": "parts per area",
+    "description": "average number of parts per unit of area",
+    "usage_count": 8
+  },
+  "P2297": {
+    "label": "employment by economic sector",
+    "description": "employment divided by sector",
+    "usage_count": 7
+  },
+  "P3253": {
+    "label": "optimum viable temperature",
+    "description": "operating temperature where the culturing of micro-organisms and/or enzyme activity thrives best",
+    "usage_count": 7
+  },
+  "P5899": {
+    "label": "interest rate",
+    "description": "yearly interest rate",
+    "usage_count": 7
+  },
+  "P9217": {
+    "label": "stolen bases",
+    "description": "number of bases stolen by a baseball player in a career or game(s)",
+    "usage_count": 7
+  },
+  "P2136": {
+    "label": "total imports",
+    "description": "amount of goods and services bought from other countries",
+    "usage_count": 5
+  },
+  "P7079": {
+    "label": "shrinkage",
+    "description": "reduction in the size of something, or the process of becoming smaller, typically when a material return to room temperature after heating",
+    "usage_count": 5
+  },
+  "P10209": {
+    "label": "number of triples",
+    "description": "total amount of triples in an RDF dataset",
+    "usage_count": 5
+  },
+  "P10659": {
+    "label": "number of medals",
+    "description": "sports awards",
+    "usage_count": 5
+  },
+  "P10676": {
+    "label": "number of references",
+    "description": "number of references of an item, e.g. of a scholarly article",
+    "usage_count": 5
+  },
+  "P13564": {
+    "label": "third-gender population",
+    "description": "number of third-gender people inhabiting the place",
+    "usage_count": 5
+  },
+  "P13668": {
+    "label": "operating cost",
+    "description": "estimated or averae ongoing recurring cost for operating or using an object",
+    "usage_count": 5
+  },
+  "P14471": {
+    "label": "paid-up capital",
+    "description": "portion of a company\u2019s issued share capital that has been paid by shareholders",
+    "usage_count": 5
+  },
+  "P2362": {
+    "label": "time to altitude",
+    "description": "time required by the subject to reach the specified altitude, from sea level",
+    "usage_count": 4
+  },
+  "P9184": {
+    "label": "number of hits",
+    "description": "number of hits earned in a baseball career or game(s)",
+    "usage_count": 4
+  },
+  "P10273": {
+    "label": "Corruption Perceptions Index",
+    "description": "Corruption Perceptions Index by Country",
+    "usage_count": 4
+  },
+  "P10636": {
+    "label": "number of conferences",
+    "description": "",
+    "usage_count": 4
+  },
+  "P14432": {
+    "label": "maximum vehicle weight",
+    "description": "maximum authorized weight (tonnage / gross vehicle weight) for vehicles (especially heavy goods vehicles) on a bridge, tunnel or road segment (load limit)",
+    "usage_count": 4
+  },
+  "P14788": {
+    "label": "located at a height",
+    "description": "a property intended to indicate the height of any objects from the ground",
+    "usage_count": 4
+  },
+  "P1689": {
+    "label": "central government debt as a percent of GDP",
+    "description": "State debt in relation to gross domestic product",
+    "usage_count": 3
+  },
+  "P4447": {
+    "label": "minimum spend bonus",
+    "description": "reward for spending a sum of money",
+    "usage_count": 3
+  },
+  "P9077": {
+    "label": "number of aid beneficiaries",
+    "description": "number of people reached with international aid programmes, actions and humanitarian activities. Qualify with \"point in time\" (P585) where appropriate",
+    "usage_count": 3
+  },
+  "P9180": {
+    "label": "number of at bats",
+    "description": "number of batting attempts in a baseball career or game(s)",
+    "usage_count": 3
+  },
+  "P9190": {
+    "label": "runs batted in",
+    "description": "number of RBIs attributed to a baseball player in a career or game(s)",
+    "usage_count": 3
+  },
+  "P9396": {
+    "label": "trade union membership rate",
+    "description": "rate of members of trade unions in proportion to the total number of workers",
+    "usage_count": 3
+  },
+  "P10650": {
+    "label": "number of dislikes",
+    "description": "number of dislikes or downvotes received on a social media post",
+    "usage_count": 3
+  },
+  "P12417": {
+    "label": "Environmental Performance Index",
+    "description": "value of the EPI index for this country",
+    "usage_count": 3
+  },
+  "P13828": {
+    "label": "luminance",
+    "description": "measured quantity of photometric brightness (luminous intensity per area)",
+    "usage_count": 3
+  },
+  "P14430": {
+    "label": "maximum vehicle length",
+    "description": "maximum authorized length for vehicles (especially heavy goods vehicles) on a bridge, tunnel or road segment",
+    "usage_count": 3
+  },
+  "P14431": {
+    "label": "maximum vehicle width",
+    "description": "maximum authorized width for vehicles (especially heavy goods vehicles) on a bridge, tunnel or road segment",
+    "usage_count": 3
+  },
+  "P14875": {
+    "label": "collective bargaining coverage",
+    "description": "Percentage of workers covered by collective agreement coverage. This is distinct from union membership rate, because non-union members can also be covered, for example France has 7% union density but 98% collective bargaining coverage.",
+    "usage_count": 3
+  },
+  "P3251": {
+    "label": "minimum viable temperature",
+    "description": "lowest operating temperature where the culturing of micro-organisms and/or enzyme activity occurs",
+    "usage_count": 2
+  },
+  "P3486": {
+    "label": "normal respiratory rate",
+    "description": "normal number of respiratory cycles (inspiration and exhalation) per minute, measured in an individual",
+    "usage_count": 2
+  },
+  "P9188": {
+    "label": "bases on balls",
+    "description": "number of walks in a baseball career or game(s)",
+    "usage_count": 2
+  },
+  "P9220": {
+    "label": "doubles hit",
+    "description": "number of doubles hit by a baseball player in a career or game(s)",
+    "usage_count": 2
+  },
+  "P9225": {
+    "label": "triples hit",
+    "description": "number of triples hit by a baseball player in a career or game(s)",
+    "usage_count": 2
+  },
+  "P14052": {
+    "label": "free height",
+    "description": "vertical distance from the floor level to the lowest obstruction in the ceiling of an indoor or outdoor space",
+    "usage_count": 2
+  },
+  "P2294": {
+    "label": "balance of trade",
+    "description": "exports minus imports. not to be confused with current account balance and balance of payments",
+    "usage_count": 1
+  },
+  "P2296": {
+    "label": "money supply",
+    "description": "amount of currency the central bank has injected in the economy (MO, M1, M2, M3)",
+    "usage_count": 1
+  },
+  "P2662": {
+    "label": "consumption rate per capita",
+    "description": "rate of consumption of a product divided by the population",
+    "usage_count": 1
+  },
+  "P3252": {
+    "label": "maximum viable temperature",
+    "description": "highest operating temperature where the culturing of micro-organisms and/or enzyme activity occurs",
+    "usage_count": 1
+  },
+  "P1092": {
+    "label": "total produced",
+    "description": "quantity of item produced",
+    "usage_count": 0
+  },
+  "P1107": {
+    "label": "proportion",
+    "description": "to be used as a qualifier, value must be between 0 and 1",
+    "usage_count": 0
+  },
+  "P1110": {
+    "label": "attendance",
+    "description": "number of people (spectators, ticket holders) at an event or exhibition",
+    "usage_count": 0
+  },
+  "P1111": {
+    "label": "votes received",
+    "description": "qualifier stating the number of votes for a candidate in an election",
+    "usage_count": 0
+  },
+  "P1129": {
+    "label": "national team appearances",
+    "description": "total number of games officially played by a sportsman for national team",
+    "usage_count": 0
+  },
+  "P1314": {
+    "label": "number of spans",
+    "description": "number of spans a bridge has",
+    "usage_count": 0
+  },
+  "P1357": {
+    "label": "number of draws/ties",
+    "description": "number of matches or games drawn or tied in a league or an event",
+    "usage_count": 0
+  },
+  "P1373": {
+    "label": "daily patronage",
+    "description": "number of daily passengers, patrons or visitors in specified time period",
+    "usage_count": 0
+  },
+  "P1390": {
+    "label": "match time of event",
+    "description": "time into a game when an event occurs (use with a unit)",
+    "usage_count": 0
+  },
+  "P1538": {
+    "label": "number of households",
+    "description": "total number of households in this place, includes dwellings of all types",
+    "usage_count": 0
+  },
+  "P1674": {
+    "label": "number confirmed",
+    "description": "qualifier; number of instances or occurrences classified as confirmed for reporting purposes",
+    "usage_count": 0
+  },
+  "P1675": {
+    "label": "number probable",
+    "description": "qualifier; number of instances or occurrences classified as probable (vs. confirmed) for reporting purposes",
+    "usage_count": 0
+  },
+  "P1676": {
+    "label": "number suspected",
+    "description": "qualifier; number of instances or occurrences classified as suspected for reporting purposes",
+    "usage_count": 0
+  },
+  "P1872": {
+    "label": "minimum number of players",
+    "description": "minimum numbers of players of a game",
+    "usage_count": 0
+  },
+  "P1873": {
+    "label": "maximum number of players",
+    "description": "maximum numbers of players of a game",
+    "usage_count": 0
+  },
+  "P2050": {
+    "label": "wingspan",
+    "description": "distance from one wingtip to the other, of an airplane or an animal",
+    "usage_count": 0
+  },
+  "P2073": {
+    "label": "vehicle range",
+    "description": "distance a vehicle can travel without refuelling",
+    "usage_count": 0
+  },
+  "P2105": {
+    "label": "size of team at finish",
+    "description": "number of players/sled dogs/etc. in a team at the end of the race or match",
+    "usage_count": 0
+  },
+  "P2151": {
+    "label": "focal length",
+    "description": "focal length of lens (telescope, etc.)",
+    "usage_count": 0
+  },
+  "P2220": {
+    "label": "household wealth",
+    "description": "net worth of consumers",
+    "usage_count": 0
+  },
+  "P2225": {
+    "label": "discharge",
+    "description": "volume rate of water flow which is transported through a given cross-sectional area",
+    "usage_count": 0
+  },
+  "P2312": {
+    "label": "maximum value",
+    "description": "qualifier indicating the highest possible value of a quantity; \"no value\" can be used to specify no upper bound",
+    "usage_count": 0
+  },
+  "P2313": {
+    "label": "minimum value",
+    "description": "qualifier indicating the lowest possible value of a quantity; \"no value\" can be used to specify no lower bound",
+    "usage_count": 0
+  },
+  "P2415": {
+    "label": "personal best",
+    "description": "an individual's best performance in a given discipline",
+    "usage_count": 0
+  },
+  "P2436": {
+    "label": "voltage",
+    "description": "difference in electric potential between two points (indicated in volt)",
+    "usage_count": 0
+  },
+  "P2528": {
+    "label": "earthquake magnitude on the Richter magnitude scale",
+    "description": "magnitude of an earthquake according to the Richter magnitude scale",
+    "usage_count": 0
+  },
+  "P2630": {
+    "label": "cost of damage",
+    "description": "monetary value of damage caused by this event",
+    "usage_count": 0
+  },
+  "P2664": {
+    "label": "units sold",
+    "description": "sales figures of an object",
+    "usage_count": 0
+  },
+  "P2781": {
+    "label": "race time",
+    "description": "officially recorded time elapsed in a sports race",
+    "usage_count": 0
+  },
+  "P2835": {
+    "label": "lowest income threshold",
+    "description": "lowest income for which the tax rate applies, qualifier for P2834 (individual tax rate)",
+    "usage_count": 0
+  },
+  "P2836": {
+    "label": "highest income threshold",
+    "description": "highest income for which the tax rate applies, qualifier for P2834 (individual tax rate)",
+    "usage_count": 0
+  },
+  "P2911": {
+    "label": "time gap",
+    "description": "time gap to winner time (P2781)",
+    "usage_count": 0
+  },
+  "P2955": {
+    "label": "point of penalty",
+    "description": "point of penalty in a tournament",
+    "usage_count": 0
+  },
+  "P3260": {
+    "label": "points awarded",
+    "description": "points awarded to the winning person, team or work for a win, draw, tie or loss. If no points are awarded for some category of finish (e.g. loss) use value 0 not ''no value''.",
+    "usage_count": 0
+  },
+  "P3629": {
+    "label": "age of subject at event",
+    "description": "the age of the subject according to the cited source at the time of an event. Used as a qualifier of significant event property",
+    "usage_count": 0
+  },
+  "P3740": {
+    "label": "number of works",
+    "description": "qualifier on identifiers, e.g. for creators or locations, giving the number of works in the external database associated with the subject of the identifier",
+    "usage_count": 0
+  },
+  "P3983": {
+    "label": "sports league level",
+    "description": "the level of the sport league in the sport league system",
+    "usage_count": 0
+  },
+  "P4131": {
+    "label": "annual energy output",
+    "description": "annual energy output of a power plant",
+    "usage_count": 0
+  },
+  "P4176": {
+    "label": "effective firing range",
+    "description": "distance within which a weapon can be used effectively",
+    "usage_count": 0
+  },
+  "P4403": {
+    "label": "caliber",
+    "description": "inner diameter of the gun barrel for a weapon",
+    "usage_count": 0
+  },
+  "P4445": {
+    "label": "grace period",
+    "description": "period immediately after the deadline for an obligation during which a fee is waived",
+    "usage_count": 0
+  },
+  "P4511": {
+    "label": "vertical depth",
+    "description": "vertical distance from a horizontal area to a point below. Compare with \"horizontal depth\" (P5524)",
+    "usage_count": 0
+  },
+  "P4519": {
+    "label": "payload mass",
+    "description": "amount of mass that can be transported by the vehicle",
+    "usage_count": 0
+  },
+  "P4825": {
+    "label": "deductions (in figure skating)",
+    "description": "for figure skating scores breakdown",
+    "usage_count": 0
+  },
+  "P4851": {
+    "label": "maximum food additive use level",
+    "description": "maximum allowed level of food additive permitted in a quantity of food",
+    "usage_count": 0
+  },
+  "P5022": {
+    "label": "test score",
+    "description": "score that the item achieved in a test; use as qualifier for \"test taken\" (P5021)",
+    "usage_count": 0
+  },
+  "P5065": {
+    "label": "wind speed",
+    "description": "wind flow velocity recorded during a given moment or period of time",
+    "usage_count": 0
+  },
+  "P5281": {
+    "label": "residual stroke count",
+    "description": "(qualifier) number of residual stroke in addition to radical of Chinese character",
+    "usage_count": 0
+  },
+  "P5349": {
+    "label": "laps completed",
+    "description": "number of laps completed by a race participant",
+    "usage_count": 0
+  },
+  "P5592": {
+    "label": "number of works accessible online",
+    "description": "qualifier on external identifiers, for the number of works in a collection or items in a database which are freely accessible online (if different from P3740)",
+    "usage_count": 0
+  },
+  "P5594": {
+    "label": "moisture absorption",
+    "description": "quantity of moisture a material would absorb in given conditions",
+    "usage_count": 0
+  },
+  "P5596": {
+    "label": "relative humidity",
+    "description": "ratio of the partial pressure of water vapor to the equilibrium vapor pressure of water at a given temperature",
+    "usage_count": 0
+  },
+  "P5608": {
+    "label": "fatigue limit",
+    "description": "amplitude (or range) of cyclic stress that can be applied to the material without causing fatigue failure",
+    "usage_count": 0
+  },
+  "P5630": {
+    "label": "prisoner count",
+    "description": "number of inmates or prisioners held in this prison",
+    "usage_count": 0
+  },
+  "P5894": {
+    "label": "tuition fee",
+    "description": "the tuition fee at an educational instition (default duration:1 year, use duration qualifier to specify)",
+    "usage_count": 0
+  },
+  "P5895": {
+    "label": "foreign transaction fee",
+    "description": "foreign transaction fee applies to payments in foreign currencies",
+    "usage_count": 0
+  },
+  "P5896": {
+    "label": "trading fee",
+    "description": "fee charged when buying stock or commodities at exchanges or at a bank",
+    "usage_count": 0
+  },
+  "P5897": {
+    "label": "account charge / subscription fee",
+    "description": "a monthly/yearly fee for using a service or account; use qualifier duration to specify the billing cycle",
+    "usage_count": 0
+  },
+  "P5898": {
+    "label": "borrowing rate",
+    "description": "the p.a. borrowing/lending rate",
+    "usage_count": 0
+  },
+  "P6000": {
+    "label": "water footprint",
+    "description": "total volume of fresh water used to produce the goods and services consumed by the individual or community or produced by the business",
+    "usage_count": 0
+  },
+  "P6075": {
+    "label": "embodied energy",
+    "description": "sum of all the energy required to produce any goods or services, considered as if that energy was incorporated or 'embodied' in the product itself",
+    "usage_count": 0
+  },
+  "P6343": {
+    "label": "urban population",
+    "description": "number of people living within the territorial entity who live in its urban parts",
+    "usage_count": 0
+  },
+  "P6344": {
+    "label": "rural population",
+    "description": "number of people living within the territorial entity who live in its rural parts",
+    "usage_count": 0
+  },
+  "P6499": {
+    "label": "literate population",
+    "description": "number of literate people within a territorial entity (typically determined during a census)",
+    "usage_count": 0
+  },
+  "P6509": {
+    "label": "total goals in career",
+    "description": "goalscoring statistic",
+    "usage_count": 0
+  },
+  "P6543": {
+    "label": "total shots in career",
+    "description": "sports statistic",
+    "usage_count": 0
+  },
+  "P6544": {
+    "label": "total points in career",
+    "description": "sports statistic",
+    "usage_count": 0
+  },
+  "P6546": {
+    "label": "penalty minutes in career",
+    "description": "sports statistic",
+    "usage_count": 0
+  },
+  "P6590": {
+    "label": "highest break",
+    "description": "highest break made by a snooker player in their career or in a tournament",
+    "usage_count": 0
+  },
+  "P6697": {
+    "label": "Football Money League rank",
+    "description": "rank in the Deloitte Football Money League",
+    "usage_count": 0
+  },
+  "P6757": {
+    "label": "exposure time",
+    "description": "length of time a image sensor or photographic film was exposed to light to create this image.",
+    "usage_count": 0
+  },
+  "P6789": {
+    "label": "ISO speed",
+    "description": "light sensitivity of film or digital sensor (e.g. ISO/ASA 100)",
+    "usage_count": 0
+  },
+  "P6801": {
+    "label": "number of hospital beds",
+    "description": "number of inpatient beds",
+    "usage_count": 0
+  },
+  "P7297": {
+    "label": "cumulative elevation gain",
+    "description": "measure of the difference in height between two points on the terrain, when following a track",
+    "usage_count": 0
+  },
+  "P7328": {
+    "label": "amount cataloged",
+    "description": "amount or size of the collection that has been described or cataloged",
+    "usage_count": 0
+  },
+  "P7887": {
+    "label": "number of reviews/ratings",
+    "description": "qualifier on review score to state the number of user reviews, user ratings or critic reviews",
+    "usage_count": 0
+  },
+  "P7971": {
+    "label": "food energy",
+    "description": "amount of chemical energy that animals (including humans) derive from this item",
+    "usage_count": 0
+  },
+  "P8328": {
+    "label": "Democracy Index",
+    "description": "Democracy Index rating of a country",
+    "usage_count": 0
+  },
+  "P8476": {
+    "label": "BTI Governance Index",
+    "description": "measures change of countries towards democracy and market economy",
+    "usage_count": 0
+  },
+  "P8477": {
+    "label": "BTI Status Index",
+    "description": "measures change of countries towards democracy and market economy",
+    "usage_count": 0
+  },
+  "P8884": {
+    "label": "number of points/goals attempted",
+    "description": "shots or other attempts to score points in a sporting event",
+    "usage_count": 0
+  },
+  "P9140": {
+    "label": "time played",
+    "description": "time (usually minutes) played by a participant in a sporting event",
+    "usage_count": 0
+  },
+  "P9238": {
+    "label": "staking percentage",
+    "description": "percentage of the funds that participates actively in a proof-of-stake network",
+    "usage_count": 0
+  },
+  "P10610": {
+    "label": "number of teachers",
+    "description": "number of teachers at an educational facility",
+    "usage_count": 0
+  },
+  "P10623": {
+    "label": "number of blood donors",
+    "description": "number of people that have donated blood for an organization at a particular time",
+    "usage_count": 0
+  },
+  "P10681": {
+    "label": "government debt-to-GDP ratio",
+    "description": "ratio used to measure the level of debt in relationship to a country's GDP",
+    "usage_count": 0
+  },
+  "P13361": {
+    "label": "number of goals scored in penalty shootouts",
+    "description": "total number of goals scored by a team in a penalty shootout",
+    "usage_count": 0
+  },
+  "P14047": {
+    "label": "crowdfunding target",
+    "description": "target goal of this crowdfunding campaign",
+    "usage_count": 0
+  }
+}

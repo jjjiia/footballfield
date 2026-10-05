@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Rivers by Length</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .viz-root { max-width: 1200px; margin: 0 auto; padding-inline: 16px; }
+
+  .header { padding-block: 16px 8px; }
+  h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 13px; margin: 0; }
+  .axis-note { color: var(--text-muted); font-size: 11px; margin: 4px 0 0; font-style: italic; }
+
+  .strip-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0 16px 16px;
+    margin-top: 8px;
+  }
+  svg { display: block; width: 100%; overflow: visible; }
+  .axis text { fill: var(--text-muted); font-size: 11px; }
+  .axis path, .axis line { stroke: var(--gridline); }
+  .bar { fill: var(--series-1); }
+  .bar:hover { fill: var(--text-primary); }
+
+  #tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: var(--text-primary);
+    color: var(--surface-1);
+    font-size: 12px;
+    padding: 6px 9px;
+    border-radius: 6px;
+    max-width: 260px;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    z-index: 10;
+  }
+  #tooltip .tt-value { font-weight: 700; }
+  #tooltip .tt-title { color: var(--text-secondary, #c3c2b7); }
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <div class="header">
+    <h1>Rivers by Length</h1>
+    <p class="subtitle" id="subtitle">Loading&hellip;</p>
+    <p class="axis-note">Bins are equal width on a log scale (km), since river lengths span from a few metres to thousands of kilometres.</p>
+  </div>
+  <div class="strip-card">
+    <div id="chart"></div>
+  </div>
+</div>
+<div id="tooltip"></div>
+
+<script>
+// Precomputed in Python (see build_rivers_histogram.py) -- bin edges and
+// counts are computed once offline; this just renders the bars.
+const PAYLOAD = __DATA_PLACEHOLDER__; // { bins: [{lo,hi,count}, ...], min_km, max_km, total }
+const { bins, total } = PAYLOAD;
+
+const MARGIN = { top: 30, right: 20, bottom: 40, left: 50 };
+const WIDTH = 1120;
+const HEIGHT = 480;
+const innerWidth = WIDTH - MARGIN.left - MARGIN.right;
+const innerHeight = HEIGHT - MARGIN.top - MARGIN.bottom;
+
+document.getElementById("subtitle").textContent =
+  `${total.toLocaleString()} rivers, binned by length (${bins.length} bins, log scale).`;
+
+function formatKm(v) {
+  if (v >= 1000) return d3.format(",.0f")(v) + " km";
+  if (v >= 1) return d3.format(",.2f")(v) + " km";
+  return d3.format(",.3f")(v) + " km";
+}
+
+const x = d3.scaleLog()
+  .domain([bins[0].lo, bins[bins.length - 1].hi])
+  .range([0, innerWidth]);
+
+const y = d3.scaleLinear()
+  .domain([0, d3.max(bins, d => d.count)])
+  .nice()
+  .range([innerHeight, 0]);
+
+const svg = d3.create("svg")
+  .attr("viewBox", `0 0 ${WIDTH} ${HEIGHT}`)
+  .attr("height", HEIGHT);
+
+const g = svg.append("g").attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
+
+g.append("g")
+  .attr("class", "axis")
+  .attr("transform", `translate(0,${innerHeight})`)
+  .call(d3.axisBottom(x).ticks(10, "~s").tickFormat(d => d3.format("~s")(d) + " km"));
+
+g.append("g")
+  .attr("class", "axis")
+  .call(d3.axisLeft(y).ticks(6, "~s"));
+
+g.append("g")
+  .selectAll("rect")
+  .data(bins)
+  .join("rect")
+  .attr("class", "bar")
+  .attr("x", d => x(d.lo) + 1)
+  .attr("width", d => Math.max(0, x(d.hi) - x(d.lo) - 1))
+  .attr("y", d => y(d.count))
+  .attr("height", d => innerHeight - y(d.count))
+  .on("pointermove", (event, d) => {
+    tooltip.innerHTML = "";
+    const titleEl = document.createElement("div");
+    titleEl.className = "tt-title";
+    titleEl.textContent = `${formatKm(d.lo)} – ${formatKm(d.hi)}`;
+    const valueEl = document.createElement("div");
+    valueEl.className = "tt-value";
+    valueEl.textContent = `${d.count.toLocaleString()} rivers`;
+    tooltip.appendChild(titleEl);
+    tooltip.appendChild(valueEl);
+    tooltip.style.opacity = 1;
+    tooltip.style.left = (event.clientX + 14) + "px";
+    tooltip.style.top = (event.clientY + 14) + "px";
+  })
+  .on("pointerleave", () => {
+    tooltip.style.opacity = 0;
+  });
+
+const tooltip = document.getElementById("tooltip");
+
+document.getElementById("chart").appendChild(svg.node());
+</script>
+</body>
+</html>

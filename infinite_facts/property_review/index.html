@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Property Review</title>
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: #0b0b0c;
+    color: #f2f2f2;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  #app {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-sizing: border-box;
+  }
+  #progress {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 14px;
+    color: #999;
+    letter-spacing: 0.04em;
+  }
+  #card {
+    max-width: 640px;
+    width: 100%;
+    text-align: center;
+  }
+  #pid {
+    font-size: 13px;
+    color: #777;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  #label {
+    font-size: 40px;
+    font-weight: 700;
+    margin: 0 0 16px;
+    line-height: 1.15;
+    word-break: break-word;
+  }
+  #description {
+    font-size: 16px;
+    color: #bbb;
+    line-height: 1.5;
+    margin: 0 0 20px;
+  }
+  #usage {
+    font-size: 14px;
+    color: #666;
+  }
+  #hints {
+    position: fixed;
+    bottom: 28px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+  }
+  .key {
+    display: inline-block;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin: 0 4px;
+    font-weight: 600;
+    color: #ddd;
+  }
+  #flash {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+  #flash.keep { background: rgba(60, 200, 100, 0.15); opacity: 1; }
+  #flash.discard { background: rgba(220, 70, 70, 0.15); opacity: 1; }
+  #flash.unsure { background: rgba(230, 180, 40, 0.15); opacity: 1; }
+  #done {
+    text-align: center;
+    font-size: 22px;
+  }
+  #done a {
+    color: #6cf;
+  }
+  a { color: inherit; }
+</style>
+</head>
+<body>
+  <div id="flash"></div>
+  <div id="progress"></div>
+  <div id="app">
+    <div id="card">
+      <div id="pid"></div>
+      <div id="label"></div>
+      <div id="description"></div>
+      <div id="usage"></div>
+    </div>
+  </div>
+  <div id="hints">
+    <span class="key">Y</span>keep &nbsp;&nbsp;
+    <span class="key">N</span>discard &nbsp;&nbsp;
+    <span class="key">U</span>unsure &nbsp;&nbsp;
+    <span class="key">Z</span>undo
+  </div>
+
+<script>
+let items = [];
+let decisions = {};
+let order = [];
+let cursor = 0;
+
+const cardEl = document.getElementById('card');
+const pidEl = document.getElementById('pid');
+const labelEl = document.getElementById('label');
+const descEl = document.getElementById('description');
+const usageEl = document.getElementById('usage');
+const progressEl = document.getElementById('progress');
+const flashEl = document.getElementById('flash');
+const appEl = document.getElementById('app');
+
+async function load() {
+  try {
+    const res = await fetch('/api/items');
+    if (!res.ok) throw new Error(`server responded ${res.status}`);
+    const data = await res.json();
+    items = data.items;
+    decisions = data.state.decisions || {};
+    order = data.state.order || [];
+    cursor = items.findIndex(it => !(it.id in decisions));
+    if (cursor === -1) cursor = items.length;
+    render();
+  } catch (err) {
+    appEl.innerHTML = `<div id="done">Could not load items: ${err.message}.<br><br>
+      Make sure you started the server (<code>python3 server.py</code>)<br>
+      and are viewing it at <code>http://localhost:8765/</code>,<br>
+      not opening this file directly.</div>`;
+  }
+}
+
+function keptCount() {
+  return Object.values(decisions).filter(d => d === 'y').length;
+}
+
+function unsureCount() {
+  return Object.values(decisions).filter(d => d === 'u').length;
+}
+
+function render() {
+  if (cursor >= items.length) {
+    appEl.innerHTML = `<div id="done">Done. Reviewed ${items.length}, kept ${keptCount()}, unsure ${unsureCount()}.<br><br>
+      Saved to <code>wikidata_quantity_properties_selected.json</code><br>
+      and <code>wikidata_quantity_properties_unsure.json</code></div>`;
+    progressEl.textContent = '';
+    return;
+  }
+  const it = items[cursor];
+  pidEl.textContent = it.id;
+  labelEl.textContent = it.label || '(no label)';
+  descEl.textContent = it.description || '(no description)';
+  usageEl.textContent = `usage: ${(it.usage_count || 0).toLocaleString()}`;
+  progressEl.textContent = `${cursor} / ${items.length} reviewed — ${keptCount()} kept, ${unsureCount()} unsure`;
+}
+
+function flash(kind) {
+  flashEl.className = kind;
+  setTimeout(() => { flashEl.className = ''; }, 150);
+}
+
+async function decide(decision) {
+  if (cursor >= items.length) return;
+  const it = items[cursor];
+  decisions[it.id] = decision;
+  order.push(it.id);
+  cursor++;
+  flash(decision === 'y' ? 'keep' : decision === 'u' ? 'unsure' : 'discard');
+  render();
+  fetch('/api/decision', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: it.id, decision })
+  }).catch(() => {});
+}
+
+async function undo() {
+  if (order.length === 0) return;
+  const lastId = order.pop();
+  delete decisions[lastId];
+  cursor = items.findIndex(it => it.id === lastId);
+  render();
+  fetch('/api/undo', { method: 'POST' }).catch(() => {});
+}
+
+window.addEventListener('keydown', (e) => {
+  const k = e.key.toLowerCase();
+  if (k === 'y') decide('y');
+  else if (k === 'n') decide('n');
+  else if (k === 'u') decide('u');
+  else if (k === 'z') undo();
+});
+
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unit Tester</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <style>
+    html, body { height: 100%; margin: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    #map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+
+    #panel {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 8px;
+      padding: 16px;
+      width: 340px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+    }
+    #panel h1 {
+      font-size: 15px;
+      margin: 0 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    #panel .nav-link { font-size: 11px; color: #666; margin-bottom: 12px; display: block; }
+    #unit-status {
+      font-size: 13px;
+      color: #333;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    #unit-status .no-place-tag {
+      color: #888;
+      font-weight: 400;
+      margin-left: 4px;
+      font-size: 11px;
+    }
+    .nav-buttons { display: flex; gap: 8px; margin-bottom: 14px; }
+    .nav-buttons button, #reset-btn, #copy-btn {
+      font-size: 13px;
+      padding: 6px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .nav-buttons button:hover, #reset-btn:hover, #copy-btn:hover { background: #f0f0f0; }
+
+    .outline-fields { display: flex; gap: 10px; margin-bottom: 14px; }
+    .outline-field { flex: 1; }
+    .outline-field label { display: block; font-size: 11px; color: #666; margin-bottom: 4px; }
+    .outline-field input {
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 13px;
+      padding: 6px 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    }
+
+    #live-values {
+      font-family: ui-monospace, "SF Mono", Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+    #live-values span { color: #666; }
+    #json-out {
+      font-family: ui-monospace, "SF Mono", Consolas, monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      background: #f6f6f6;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px;
+      margin: 0 0 10px;
+      user-select: all;
+    }
+    #copy-btn { width: 100%; box-sizing: border-box; margin-bottom: 8px; }
+    #copy-status { font-size: 11px; color: #2a8f2a; height: 14px; }
+    #reset-btn { width: 100%; box-sizing: border-box; }
+    #hint { font-size: 11px; color: #888; margin-top: 10px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div id="panel">
+    <h1>Unit Tester</h1>
+    <a class="nav-link" href="football_tester.html">Tuning a place's camera instead? &rarr; Football Tester</a>
+    <div id="unit-status">Loading units.json&hellip;</div>
+    <div class="nav-buttons">
+      <button id="prev-btn">&larr; Prev</button>
+      <button id="next-btn">Next &rarr;</button>
+    </div>
+    <div class="outline-fields">
+      <div class="outline-field">
+        <label id="width-label" for="width-input">Width</label>
+        <input id="width-input" type="number" step="1" />
+      </div>
+      <div class="outline-field">
+        <label id="length-label" for="length-input">Length</label>
+        <input id="length-input" type="number" step="1" />
+      </div>
+    </div>
+    <div id="live-values"></div>
+    <pre id="json-out"></pre>
+    <button id="copy-btn">Copy JSON</button>
+    <div id="copy-status"></div>
+    <button id="reset-btn">Reset to stored place/outline</button>
+    <div id="hint">Edit width/length to resize the rectangle, and (if this unit has a place) drag/scroll/rotate the map to adjust its camera too. Copy the JSON below into units.json. Arrow keys also move between units.</div>
+  </div>
+
+  <script>
+    mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ";
+    const STYLE = "mapbox://styles/jjjiia123/cmmb9euid00at01qr9mbfapn7";
+
+    const ftToM = (ft) => ft * 0.3048;
+    const mToFt = (m) => m / 0.3048;
+
+    // Same screen-vertical-rectangle math football.html uses to draw its
+    // comparison shape, reused here so the outline you tune looks exactly
+    // like it will on the real page.
+    function metersPerDeg(lat) {
+      const rad = lat * Math.PI / 180;
+      return { mPerDegLat: 111132.92, mPerDegLng: 111320.0 * Math.cos(rad) };
+    }
+
+    function localCornersToScreenVerticalRing(centerLngLat, localCorners, mapBearingDeg) {
+      const [lng0, lat0] = centerLngLat;
+      const { mPerDegLat, mPerDegLng } = metersPerDeg(lat0);
+      const theta = (-mapBearingDeg) * Math.PI / 180;
+      const cosT = Math.cos(theta);
+      const sinT = Math.sin(theta);
+      return localCorners.map(([x, y]) => {
+        const xr = x * cosT - y * sinT;
+        const yr = x * sinT + y * cosT;
+        return [lng0 + xr / mPerDegLng, lat0 + yr / mPerDegLat];
+      });
+    }
+
+    function rectangleLocalCorners(widthM, heightM) {
+      const hw = widthM / 2;
+      const hh = heightM / 2;
+      return [[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh], [-hw, -hh]];
+    }
+
+    // Regular polygon (e.g. the Pentagon's real 5-sided footprint) from a
+    // side length -- same formula as football.html.
+    function regularPolygonLocalCorners(sideM, sides) {
+      const R = sideM / (2 * Math.sin(Math.PI / sides));
+      const corners = [];
+      for (let k = 0; k < sides; k++) {
+        const theta = Math.PI / 2 + k * (2 * Math.PI / sides);
+        corners.push([R * Math.cos(theta), R * Math.sin(theta)]);
+      }
+      corners.push(corners[0]);
+      return corners;
+    }
+
+    // widthM/heightM are read live off the current unit's state (mutated by
+    // the width/length inputs), not fixed constants -- that's the whole
+    // point of this tool.
+    let liveWidthM = 50;
+    let liveHeightM = 50;
+
+    function makeFieldFeature(map) {
+      const c = map.getCenter();
+      const bearing = map.getBearing();
+      const shape = currentUnit() && currentUnit().shape;
+      const localCorners = shape === "pentagon"
+        ? regularPolygonLocalCorners(liveWidthM, 5)
+        : rectangleLocalCorners(liveWidthM, liveHeightM);
+      const ring = localCornersToScreenVerticalRing([c.lng, c.lat], localCorners, bearing);
+      ring.push(ring[0]);
+      return { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [ring] } };
+    }
+
+    const map = new mapboxgl.Map({
+      container: "map",
+      style: STYLE,
+      center: [-73.9973, 40.7308], // arbitrary starting point until units.json loads
+      zoom: 16,
+      pitch: 0,
+      bearingSnap: 0 // otherwise Mapbox silently snaps any bearing within 7° of north to exactly 0
+    });
+    map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "bottom-right");
+
+    function redrawField() {
+      const src = map.getSource("field");
+      if (src) src.setData({ type: "FeatureCollection", features: [makeFieldFeature(map)] });
+    }
+
+    map.on("load", () => {
+      map.addSource("field", {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [makeFieldFeature(map)] }
+      });
+      map.addLayer({
+        id: "field-shadow", type: "line", source: "field",
+        paint: { "line-color": "#000", "line-width": 14, "line-opacity": 0.4, "line-blur": 6 }
+      });
+      map.addLayer({
+        id: "field-fill", type: "fill", source: "field",
+        paint: { "fill-color": "#ffcf01", "fill-opacity": 0 }
+      });
+      map.addLayer({
+        id: "field-outline", type: "line", source: "field",
+        paint: { "line-color": "#fff", "line-width": 4 }
+      });
+
+      let raf = null;
+      map.on("move", () => {
+        if (raf) return;
+        raf = requestAnimationFrame(() => { raf = null; redrawField(); });
+      });
+    });
+
+    const unitStatusEl = document.getElementById("unit-status");
+    const widthLabelEl = document.getElementById("width-label");
+    const lengthLabelEl = document.getElementById("length-label");
+    const widthInputEl = document.getElementById("width-input");
+    const lengthInputEl = document.getElementById("length-input");
+    const liveValuesEl = document.getElementById("live-values");
+    const jsonOutEl = document.getElementById("json-out");
+    const copyStatusEl = document.getElementById("copy-status");
+
+    const round6 = (v) => Math.round(v * 1e6) / 1e6;
+    const round2 = (v) => Math.round(v * 100) / 100;
+
+    let units = [];
+    let index = 0;
+
+    function currentUnit() { return units[index]; }
+    // Feet for units stored in feet (currently just "football field"),
+    // meters for everything else -- matches how units.json already mixes
+    // widthFt/lengthFt and widthM/lengthM per entry.
+    function usesFeet(u) { return u.widthFt != null; }
+
+    // Called continuously as the map moves and whenever the width/length
+    // inputs change, so the readout and pasteable JSON always match what's
+    // actually drawn on screen right now.
+    function updateLiveValues() {
+      const u = currentUnit();
+      const c = map.getCenter();
+      const zoom = map.getZoom();
+      const bearing = map.getBearing();
+      const feet = usesFeet(u);
+      const widthOut = feet ? Math.round(mToFt(liveWidthM)) : round2(liveWidthM);
+      const lengthOut = feet ? Math.round(mToFt(liveHeightM)) : round2(liveHeightM);
+
+      let html = `<span>width</span> ${widthOut} ${feet ? "ft" : "m"}<br><span>length</span> ${lengthOut} ${feet ? "ft" : "m"}`;
+      if (u.place) {
+        html += `<br><span>lat</span> ${c.lat.toFixed(6)}<br><span>lng</span> ${c.lng.toFixed(6)}` +
+          `<br><span>zoom</span> ${zoom.toFixed(2)}<br><span>bearing</span> ${bearing.toFixed(6)}`;
+      }
+      liveValuesEl.innerHTML = html;
+
+      const out = { key: u.key, category: u.category, label: u.label, singular: u.singular, plural: u.plural };
+      if (feet) { out.widthFt = widthOut; out.lengthFt = lengthOut; }
+      else { out.widthM = widthOut; out.lengthM = lengthOut; }
+      if (u.place) {
+        out.place = { lat: round6(c.lat), lng: round6(c.lng), zoom: round2(zoom), bearing: round6(bearing) };
+      }
+      jsonOutEl.textContent = JSON.stringify(out);
+    }
+
+    function applyOutlineToInputs(u) {
+      const feet = usesFeet(u);
+      widthLabelEl.textContent = "Width (" + (feet ? "ft" : "m") + ")";
+      lengthLabelEl.textContent = "Length (" + (feet ? "ft" : "m") + ")";
+      widthInputEl.value = feet ? u.widthFt : u.widthM;
+      lengthInputEl.value = feet ? u.lengthFt : u.lengthM;
+      liveWidthM = feet ? ftToM(u.widthFt) : u.widthM;
+      liveHeightM = feet ? ftToM(u.lengthFt) : u.lengthM;
+    }
+
+    function showUnit(i) {
+      if (!units.length) return;
+      index = (i + units.length) % units.length;
+      const u = currentUnit();
+      unitStatusEl.innerHTML =
+        `${index + 1} / ${units.length}<br><strong>${u.label}</strong>` +
+        (u.place ? "" : '<span class="no-place-tag">(no place -- camera stays put)</span>');
+
+      applyOutlineToInputs(u);
+      if (u.place) {
+        map.jumpTo({ center: [u.place.lng, u.place.lat], zoom: u.place.zoom, bearing: u.place.bearing || 0 });
+      }
+      redrawField();
+      updateLiveValues();
+      copyStatusEl.textContent = "";
+    }
+
+    function onOutlineInput() {
+      const u = currentUnit();
+      const feet = usesFeet(u);
+      const w = parseFloat(widthInputEl.value);
+      const l = parseFloat(lengthInputEl.value);
+      liveWidthM = feet ? ftToM(w || 0) : (w || 0);
+      liveHeightM = feet ? ftToM(l || 0) : (l || 0);
+      redrawField();
+      updateLiveValues();
+    }
+    widthInputEl.addEventListener("input", onOutlineInput);
+    lengthInputEl.addEventListener("input", onOutlineInput);
+
+    document.getElementById("prev-btn").addEventListener("click", () => showUnit(index - 1));
+    document.getElementById("next-btn").addEventListener("click", () => showUnit(index + 1));
+    document.getElementById("reset-btn").addEventListener("click", () => showUnit(index));
+
+    document.addEventListener("keydown", (e) => {
+      if (document.activeElement === widthInputEl || document.activeElement === lengthInputEl) return;
+      if (e.key === "ArrowRight") showUnit(index + 1);
+      if (e.key === "ArrowLeft") showUnit(index - 1);
+    });
+
+    document.getElementById("copy-btn").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(jsonOutEl.textContent);
+        copyStatusEl.textContent = "Copied!";
+      } catch (err) {
+        copyStatusEl.textContent = "Couldn't copy automatically -- select the text above and copy manually.";
+      }
+    });
+
+    map.on("move", updateLiveValues);
+
+    fetch("units.json")
+      .then((r) => r.json())
+      .then((data) => {
+        units = data;
+        if (!units.length) {
+          unitStatusEl.textContent = "units.json is empty.";
+          return;
+        }
+        showUnit(0);
+      });
+  </script>
+</body>
+</html>

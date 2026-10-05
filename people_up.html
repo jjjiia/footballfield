@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>People, Up</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+  <style>
+    .scroll-visual{
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: #fff;
+    }
+    .scroll-visual svg{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .hash-line{ stroke: #000; stroke-width: 3px; stroke-linecap: round; }
+    .hash-bar{ fill: #000; }
+    .hash-label{
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      fill: #111;
+      text-anchor: end;
+      dominant-baseline: middle;
+    }
+    .axis-line{ stroke: #ccc; stroke-width: 1px; }
+    .axis-tick{ stroke: #999; stroke-width: 1px; }
+    .axis-label{
+      font-family: 'Open Sans', sans-serif;
+      font-size: 10px;
+      fill: #888;
+      text-anchor: middle;
+    }
+
+    .scene-nav{
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      pointer-events: none;
+    }
+    .scene-nav .scene-tick{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #bbb;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 11px;
+      transition: color 0.2s ease;
+    }
+    .scene-nav .scene-tick .mark{
+      width: 14px;
+      height: 1px;
+      background: #bbb;
+      transition: background 0.2s ease, width 0.2s ease, height 0.2s ease;
+    }
+    .scene-nav .scene-tick.active{
+      color: #000;
+      font-weight: 700;
+    }
+    .scene-nav .scene-tick.active .mark{
+      background: #000;
+      width: 20px;
+      height: 2px;
+    }
+
+    /* Purely a scroll-trigger measuring stick, no visible or interactive
+       content of its own -- without pointer-events:none it would sit above
+       the sticky visual for the whole scroll (a real bug hit on people.html). */
+    .scroll-steps{ position: relative; pointer-events: none; }
+    .scroll-step{ height: 100vh; }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="index.html">Home</a>
+    <a href="football.html">Football Field</a>
+    <a href="references.html">References</a>
+    <a href="zoom.html">Zoom</a>
+    <a href="you.html">You</a>
+    <a href="infinitecontext.html">Infinite Facts</a>
+    <a href="people.html">People</a>
+    <a href="people_up.html">People, Up</a>
+  </nav>
+
+  <div class="scroll-visual" id="scroll-visual">
+    <svg id="canvas"></svg>
+    <div class="scene-nav" id="scene-nav"></div>
+  </div>
+  <div class="scroll-steps" id="scroll-steps"></div>
+
+  <script>
+    // SCENES: one entry per scroll step. `rows` lists every row that exists
+    // by this scene, top to bottom -- earlier rows are simply repeated
+    // unchanged when a scene only adds a new one below. Rows at 400 or
+    // under are drawn as individual tally hashes; over 400 becomes a single
+    // widening shape instead (see BAR_ROW_THRESHOLD below).
+    // Population figures are real: 2020 Decennial Census (block), ACS 2023
+    // 5-yr (block group through state and the Northeast region), verified
+    // directly against the Census Bureau for a specific NYC address (Queens,
+    // block 2002) via the Census geocoder. Other figures verified directly:
+    // NBA/MLB roster rules, FEC 2024 certified vote totals, Citi Field's
+    // posted capacity, and a distinct-individual count of U.S. presidents
+    // (Cleveland and Trump each hold two numbered terms but count once).
+    // "Total number of Muppets" has no official canonical count -- this is
+    // my own tally of every individually named character across Wikipedia's
+    // "List of Muppets" (main + supporting + named Frackles/Penguins +
+    // the additional-characters table), not an authoritative figure.
+    const SCENES = [
+      { rows: [{ label: "You", count: 1 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }, { label: "Everyone who went to Lucas and Natalie's wedding", count: 75 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }, { label: "Everyone who went to Lucas and Natalie's wedding", count: 75 }, { label: "Size of the Senate", count: 100 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }, { label: "Everyone who went to Lucas and Natalie's wedding", count: 75 }, { label: "Size of the Senate", count: 100 }, { label: "Total number of Muppets", count: 130 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }, { label: "Everyone who went to Lucas and Natalie's wedding", count: 75 }, { label: "Size of the Senate", count: 100 }, { label: "Total number of Muppets", count: 130 }, { label: "People who work in your mom's office", count: 150 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }, { label: "Everyone who went to Lucas and Natalie's wedding", count: 75 }, { label: "Size of the Senate", count: 100 }, { label: "Total number of Muppets", count: 130 }, { label: "People who work in your mom's office", count: 150 }, { label: "People who live on your block", count: 500 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }, { label: "Everyone who went to Lucas and Natalie's wedding", count: 75 }, { label: "Size of the Senate", count: 100 }, { label: "Total number of Muppets", count: 130 }, { label: "People who work in your mom's office", count: 150 }, { label: "People who live on your block", count: 500 }, { label: "Size of Congress", count: 535 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }, { label: "Everyone who went to Lucas and Natalie's wedding", count: 75 }, { label: "Size of the Senate", count: 100 }, { label: "Total number of Muppets", count: 130 }, { label: "People who work in your mom's office", count: 150 }, { label: "People who live on your block", count: 500 }, { label: "Size of Congress", count: 535 }, { label: "The blocks you pass on the way to school", count: 1725 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }, { label: "Everyone who went to Lucas and Natalie's wedding", count: 75 }, { label: "Size of the Senate", count: 100 }, { label: "Total number of Muppets", count: 130 }, { label: "People who work in your mom's office", count: 150 }, { label: "People who live on your block", count: 500 }, { label: "Size of Congress", count: 535 }, { label: "The blocks you pass on the way to school", count: 1725 }, { label: "Seats at Citi Field (Mets stadium)", count: 41922 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }, { label: "Everyone who went to Lucas and Natalie's wedding", count: 75 }, { label: "Size of the Senate", count: 100 }, { label: "Total number of Muppets", count: 130 }, { label: "People who work in your mom's office", count: 150 }, { label: "People who live on your block", count: 500 }, { label: "Size of Congress", count: 535 }, { label: "The blocks you pass on the way to school", count: 1725 }, { label: "Seats at Citi Field (Mets stadium)", count: 41922 }, { label: "Popular vote margin, 2024 election", count: 2284967 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }, { label: "Everyone who went to Lucas and Natalie's wedding", count: 75 }, { label: "Size of the Senate", count: 100 }, { label: "Total number of Muppets", count: 130 }, { label: "People who work in your mom's office", count: 150 }, { label: "People who live on your block", count: 500 }, { label: "Size of Congress", count: 535 }, { label: "The blocks you pass on the way to school", count: 1725 }, { label: "Seats at Citi Field (Mets stadium)", count: 41922 }, { label: "Popular vote margin, 2024 election", count: 2284967 }, { label: "Queens County", count: 2330124 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }, { label: "Everyone who went to Lucas and Natalie's wedding", count: 75 }, { label: "Size of the Senate", count: 100 }, { label: "Total number of Muppets", count: 130 }, { label: "People who work in your mom's office", count: 150 }, { label: "People who live on your block", count: 500 }, { label: "Size of Congress", count: 535 }, { label: "The blocks you pass on the way to school", count: 1725 }, { label: "Seats at Citi Field (Mets stadium)", count: 41922 }, { label: "Popular vote margin, 2024 election", count: 2284967 }, { label: "Queens County", count: 2330124 }, { label: "New York City (5 boroughs)", count: 8516202 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }, { label: "Everyone who went to Lucas and Natalie's wedding", count: 75 }, { label: "Size of the Senate", count: 100 }, { label: "Total number of Muppets", count: 130 }, { label: "People who work in your mom's office", count: 150 }, { label: "People who live on your block", count: 500 }, { label: "Size of Congress", count: 535 }, { label: "The blocks you pass on the way to school", count: 1725 }, { label: "Seats at Citi Field (Mets stadium)", count: 41922 }, { label: "Popular vote margin, 2024 election", count: 2284967 }, { label: "Queens County", count: 2330124 }, { label: "New York City (5 boroughs)", count: 8516202 }, { label: "New York State", count: 19872319 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }, { label: "Everyone who went to Lucas and Natalie's wedding", count: 75 }, { label: "Size of the Senate", count: 100 }, { label: "Total number of Muppets", count: 130 }, { label: "People who work in your mom's office", count: 150 }, { label: "People who live on your block", count: 500 }, { label: "Size of Congress", count: 535 }, { label: "The blocks you pass on the way to school", count: 1725 }, { label: "Seats at Citi Field (Mets stadium)", count: 41922 }, { label: "Popular vote margin, 2024 election", count: 2284967 }, { label: "Queens County", count: 2330124 }, { label: "New York City (5 boroughs)", count: 8516202 }, { label: "New York State", count: 19872319 }, { label: "Northeast region", count: 57222453 }] },
+      { rows: [{ label: "You", count: 1 }, { label: "Your class", count: 20 }, { label: "Supreme Court justices", count: 9 }, { label: "All the people who play a basketball game", count: 10 }, { label: "Your cousins", count: 12 }, { label: "Size of your baseball team", count: 15 }, { label: "All the players on the New York Knicks", count: 15 }, { label: "All the players on the Mets", count: 26 }, { label: "Total number of presidents", count: 45 }, { label: "People who fit on a school bus", count: 72 }, { label: "Everyone who went to Lucas and Natalie's wedding", count: 75 }, { label: "Size of the Senate", count: 100 }, { label: "Total number of Muppets", count: 130 }, { label: "People who work in your mom's office", count: 150 }, { label: "People who live on your block", count: 500 }, { label: "Size of Congress", count: 535 }, { label: "The blocks you pass on the way to school", count: 1725 }, { label: "Seats at Citi Field (Mets stadium)", count: 41922 }, { label: "Popular vote margin, 2024 election", count: 2284967 }, { label: "Queens County", count: 2330124 }, { label: "New York City (5 boroughs)", count: 8516202 }, { label: "New York State", count: 19872319 }, { label: "Northeast region", count: 57222453 }, { label: "United States", count: 332387540 }] },
+    ];
+
+    const NUM_SCENES = SCENES.length;
+    const CORNER_TOP = 60; // first row anchored in the top-left corner
+    const ROW_GAP = 32;
+    const LABEL_FONT_SIZE = 13;
+    const HASH_HEIGHT = LABEL_FONT_SIZE; // hash height matches the label's font size
+    const HASH_GAP = 8;
+    const HASH_SLANT = 5; // px the top leans right of the bottom, tally-mark style
+    const LABEL_GAP = 10; // px between the label and the first hash
+    const HASH_ANIMATION_MS = 45; // delay between each new hash appearing
+    const RIGHT_MARGIN = 24;
+    let hashGap = HASH_GAP; // eased toward its target every frame, shared by every row
+
+    // A row at 400 or under stays individual tally hashes -- small enough
+    // to actually count by eye. Over 400 it becomes a single widening shape
+    // instead, since drawing hundreds/millions of individual marks isn't
+    // practical. Based on the row's own count, not its position.
+    const BAR_ROW_THRESHOLD = 400;
+    function isBarRow(i) {
+      const anim = rowAnim[i];
+      return !!anim && anim.target > BAR_ROW_THRESHOLD;
+    }
+
+    // The shape rows share one scale, eased toward whichever shape row is
+    // currently biggest -- so introducing a much bigger number (say, a
+    // state after a county) visibly shrinks every earlier shape down to
+    // make room, the same way the hash gap shrinks for line rows.
+    let barScaleMax = 1;
+    // How close to the true edge a growing bar gets before the scale starts
+    // giving way -- 0.82 means it starts pushing (shrinking everything
+    // else) once it's 82% of the way across, so the transition is already
+    // underway by the time it reaches the edge instead of snapping there.
+    const BAR_EDGE_TRIGGER = 0.82;
+    function targetBarScaleMax() {
+      // Tracks live progress (`current`), not each row's eventual `target`
+      // -- so the scale doesn't shrink earlier bars pre-emptively just
+      // because a bigger number is coming. It grows once the
+      // currently-animating bar's own count approaches the edge of the
+      // available width (see BAR_EDGE_TRIGGER), not only once it's already
+      // there.
+      let max = 1;
+      rowAnim.forEach((anim, i) => {
+        if (anim && isBarRow(i)) max = Math.max(max, anim.current / BAR_EDGE_TRIGGER);
+      });
+      return max;
+    }
+    function barWidthFor(current, availableWidth) {
+      if (current <= 0) return 0;
+      const frac = Math.min(1, current / barScaleMax);
+      return Math.max(3, frac * availableWidth);
+    }
+
+    // Once the shared scale has grown so much that an older row's own
+    // (finished) size is a sliver of it, that row stops carrying any visual
+    // information -- it's just a label pointing at nothing (a bar too thin
+    // to see, or hashes packed tighter than the eye can separate). Rather
+    // than let it sit there forever, it fades out and its row-height
+    // collapses to 0, so every row below slides up to fill the gap. Applies
+    // to hash rows too, not just bars -- both are now on the same
+    // barScaleMax-driven scale, so both can shrink into insignificance.
+    const ROW_COLLAPSE_FRAC = 0.01;
+    function isRowCollapsed(anim, i) {
+      if (!anim || anim.target <= 0) return false;
+      if (anim.current < anim.target) return false; // still growing in -- judge it once settled
+      return anim.target / barScaleMax < ROW_COLLAPSE_FRAC;
+    }
+
+    const svg = document.getElementById("canvas");
+    const svgNS = "http://www.w3.org/2000/svg";
+    const marksLayer = document.createElementNS(svgNS, "g");
+    svg.appendChild(marksLayer);
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    // Left-side scroll progress rail: one tick + number per scene, with the
+    // current one highlighted as you scroll (same pattern as people.html).
+    const sceneNavEl = document.getElementById("scene-nav");
+    for (let s = 0; s < NUM_SCENES; s++) {
+      const row = document.createElement("div");
+      row.className = "scene-tick";
+      row.dataset.scene = String(s);
+      row.innerHTML = `<span class="mark"></span><span class="num">${s + 1}</span>`;
+      sceneNavEl.appendChild(row);
+    }
+    const sceneTickEls = Array.from(sceneNavEl.querySelectorAll(".scene-tick"));
+    function renderSceneNav(sceneIdx) {
+      sceneTickEls.forEach((el, i) => el.classList.toggle("active", i === sceneIdx));
+    }
+
+    // Per-row animation state, keyed by row index -- persists across scene
+    // changes so a row that already finished growing doesn't restart, and
+    // scrolling back and forth doesn't retrigger it either.
+    const rowAnim = [];
+
+    // The x where every row's hashes/bar starts -- shared across all rows,
+    // and fixed once up front from the widest label in the WHOLE dataset
+    // (not just whichever labels happen to be visible right now). That
+    // keeps it from jumping around whenever a longer/shorter label enters
+    // or leaves; labels right-align against this column and every
+    // bar/hash-run starts at exactly this x, so widths stay comparable and
+    // the left margin (and the axis, which shares it) never moves.
+    let sharedStartX = LABEL_GAP + LABEL_GAP;
+    function computeSharedStartX() {
+      const probe = document.createElementNS(svgNS, "text");
+      probe.setAttribute("class", "hash-label");
+      probe.setAttribute("font-size", LABEL_FONT_SIZE);
+      probe.setAttribute("x", -9999);
+      probe.setAttribute("y", -9999);
+      marksLayer.appendChild(probe);
+      let maxLabelWidth = 0;
+      const allLabels = new Set();
+      SCENES.forEach(scene => scene.rows.forEach(row => allLabels.add(row.label)));
+      allLabels.forEach(text => {
+        probe.textContent = text;
+        maxLabelWidth = Math.max(maxLabelWidth, probe.getBBox().width);
+      });
+      marksLayer.removeChild(probe);
+      sharedStartX = LABEL_GAP + maxLabelWidth + LABEL_GAP;
+    }
+
+    // How tightly hashes need to be packed. Each hash is 1 unit on the exact
+    // same per-unit scale the shape rows use (available / barScaleMax) --
+    // so a tally of 20 always occupies precisely the width a bar of 20
+    // would, and it keeps shrinking in lockstep for as long as barScaleMax
+    // keeps growing from later, bigger rows -- no floor, so it never just
+    // freezes at some minimum, it shrinks all the way into a blur and then
+    // past it, until isRowCollapsed() fades the row out entirely. HASH_GAP
+    // is only a ceiling, for early scenes before any shape row has set a
+    // meaningful scale (barScaleMax starts at 1, which alone would make
+    // hashes absurdly wide); the per-row fit check below is a second
+    // ceiling, so a big count can never overflow the screen.
+    function targetHashGap() {
+      const available = Math.max(20, width - RIGHT_MARGIN - sharedStartX);
+      let tightest = Math.min(HASH_GAP, available / barScaleMax);
+      rowAnim.forEach((anim, i) => {
+        // Shape rows don't use hashGap at all -- including them here would
+        // crush the gap for every line row down to nothing.
+        if (!anim || anim.target <= 0 || isBarRow(i)) return;
+        tightest = Math.min(tightest, available / anim.target);
+      });
+      return Math.max(0, tightest);
+    }
+
+    const AXIS_BOTTOM_MARGIN = 50;
+
+    // Same "nice" (1/2/5 x a power of ten) tick-step approach used for
+    // people.html's number line -- keeps a reasonable, readable tick count
+    // no matter how large barScaleMax has grown.
+    function niceTickStep(span, targetCount) {
+      const raw = span / targetCount;
+      const magnitude = Math.pow(10, Math.floor(Math.log10(raw)));
+      const norm = raw / magnitude;
+      const niceNorm = norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10;
+      return niceNorm * magnitude;
+    }
+    function formatAxisValue(v) {
+      if (v >= 1e9) return (Math.round(v / 1e8) / 10) + "B";
+      if (v >= 1e6) return (Math.round(v / 1e5) / 10) + "M";
+      if (v >= 1e3) return (Math.round(v / 100) / 10) + "K";
+      return String(Math.round(v));
+    }
+
+    // Redrawn every frame from the live (still-easing) barScaleMax, so the
+    // axis's range visibly grows in step with the shapes it's measuring,
+    // rather than jumping between scenes.
+    function renderAxis() {
+      const hasBarRow = rowAnim.some((a, i) => a && isBarRow(i) && a.target > 0);
+      if (!hasBarRow) return;
+      const axisY = height - AXIS_BOTTOM_MARGIN;
+      const axisLeft = sharedStartX; // lines up with where every bar itself starts
+      const axisRight = width - RIGHT_MARGIN;
+      const span = Math.max(1, barScaleMax);
+      const step = niceTickStep(span, 6);
+
+      const baseline = document.createElementNS(svgNS, "line");
+      baseline.setAttribute("class", "axis-line");
+      baseline.setAttribute("x1", axisLeft);
+      baseline.setAttribute("x2", axisRight);
+      baseline.setAttribute("y1", axisY);
+      baseline.setAttribute("y2", axisY);
+      marksLayer.appendChild(baseline);
+
+      for (let v = 0; v <= span + step * 0.001; v += step) {
+        const x = axisLeft + (v / span) * (axisRight - axisLeft);
+        const tick = document.createElementNS(svgNS, "line");
+        tick.setAttribute("class", "axis-tick");
+        tick.setAttribute("x1", x);
+        tick.setAttribute("x2", x);
+        tick.setAttribute("y1", axisY - 4);
+        tick.setAttribute("y2", axisY + 4);
+        marksLayer.appendChild(tick);
+
+        const label = document.createElementNS(svgNS, "text");
+        label.setAttribute("class", "axis-label");
+        label.setAttribute("x", x);
+        label.setAttribute("y", axisY + 18);
+        label.textContent = formatAxisValue(v);
+        marksLayer.appendChild(label);
+      }
+    }
+
+    function renderRows() {
+      marksLayer.innerHTML = "";
+      const labelX = sharedStartX - LABEL_GAP; // right edge of the label column
+
+      let y = CORNER_TOP;
+      rowAnim.forEach((anim, i) => {
+        if (!anim || (anim.current <= 0 && anim.target <= 0)) return;
+        if (anim.presence === undefined) anim.presence = 1;
+        const rowY = y + HASH_HEIGHT;
+        // A collapsing row's own row-height shrinks toward 0 along with its
+        // opacity, so the rows below slide up into the freed space instead
+        // of leaving a gap where it used to be.
+        y += ROW_GAP * anim.presence;
+        if (anim.presence < 0.02) return; // fully collapsed -- not worth drawing
+
+        const group = document.createElementNS(svgNS, "g");
+        group.setAttribute("opacity", anim.presence);
+        marksLayer.appendChild(group);
+
+        const label = document.createElementNS(svgNS, "text");
+        label.setAttribute("class", "hash-label");
+        label.setAttribute("font-size", LABEL_FONT_SIZE);
+        label.textContent = anim.label;
+        label.setAttribute("x", labelX);
+        label.setAttribute("y", rowY - HASH_HEIGHT / 2);
+        group.appendChild(label);
+
+        const startX = sharedStartX;
+        if (isBarRow(i)) {
+          // One slanted bar (same slant as an individual hash) that widens
+          // to represent the count, instead of thousands/millions of
+          // individual strokes.
+          const available = Math.max(20, width - RIGHT_MARGIN - startX);
+          const barWidth = barWidthFor(anim.current, available);
+          const bar = document.createElementNS(svgNS, "polygon");
+          bar.setAttribute("class", "hash-bar");
+          const points = [
+            [startX, rowY],
+            [startX + barWidth, rowY],
+            [startX + barWidth + HASH_SLANT, rowY - HASH_HEIGHT],
+            [startX + HASH_SLANT, rowY - HASH_HEIGHT],
+          ].map(p => p.join(",")).join(" ");
+          bar.setAttribute("points", points);
+          group.appendChild(bar);
+        } else {
+          for (let h = 0; h < anim.current; h++) {
+            const x = startX + h * hashGap;
+            const line = document.createElementNS(svgNS, "line");
+            line.setAttribute("class", "hash-line");
+            line.setAttribute("x1", x);
+            line.setAttribute("x2", x + HASH_SLANT);
+            line.setAttribute("y1", rowY);
+            line.setAttribute("y2", rowY - HASH_HEIGHT);
+            group.appendChild(line);
+          }
+        }
+      });
+      renderAxis();
+    }
+
+    // Continuously eases the shared gap toward whatever the current rows
+    // need, and redraws every frame -- this is what makes the gap visibly
+    // shrink smoothly (for every row at once) as a count grows, instead of
+    // snapping to a new spacing.
+    function tickLayout() {
+      hashGap += (targetHashGap() - hashGap) * 0.12;
+      barScaleMax += (targetBarScaleMax() - barScaleMax) * 0.08;
+      rowAnim.forEach((anim, i) => {
+        if (!anim) return;
+        if (anim.presence === undefined) anim.presence = 1;
+        const target = isRowCollapsed(anim, i) ? 0 : 1;
+        anim.presence += (target - anim.presence) * 0.1;
+      });
+      renderRows();
+      requestAnimationFrame(tickLayout);
+    }
+    computeSharedStartX();
+    requestAnimationFrame(tickLayout);
+
+    function animateRow(i) {
+      const anim = rowAnim[i];
+      // Always restart fresh: the target may have just reversed direction
+      // (e.g. scrolling back), so the step size needs recomputing for
+      // whatever the current distance actually is, not whatever it was
+      // when a still-running timer from before was set up.
+      if (anim.timer) clearInterval(anim.timer);
+      // Adding exactly one hash per tick works fine for small counts, but
+      // would take minutes for a row in the thousands -- step size scales
+      // up so every row finishes growing (or shrinking) in roughly the same
+      // real time regardless of distance. Shrinking (scrolling back) uses
+      // far fewer ticks than growing, since retracting something you've
+      // already seen should read as quick, not a mirror of the reveal pace.
+      const shrinking = anim.target < anim.current;
+      const ticks = shrinking ? 20 : 80;
+      const step = Math.max(1, Math.ceil(Math.abs(anim.target - anim.current) / ticks));
+      anim.timer = setInterval(() => {
+        if (anim.current === anim.target) {
+          clearInterval(anim.timer);
+          anim.timer = null;
+        } else if (anim.current < anim.target) {
+          anim.current = Math.min(anim.target, anim.current + step);
+        } else {
+          anim.current = Math.max(anim.target, anim.current - step);
+        }
+      }, HASH_ANIMATION_MS);
+    }
+
+    function renderHashes(sceneIdx) {
+      // Rendering itself is driven continuously by tickLayout() below; this
+      // just updates each row's target and (re)starts its animation toward
+      // it -- growing for a row newly in this scene, shrinking back to
+      // nothing for one that isn't (including line rows like "Your class"
+      // when scrolling back before it existed).
+      const rows = SCENES[sceneIdx].rows;
+      rows.forEach((row, i) => {
+        if (!rowAnim[i]) rowAnim[i] = { label: row.label, current: 0, target: 0, timer: null, presence: 1 };
+        rowAnim[i].label = row.label;
+        rowAnim[i].target = row.count;
+        animateRow(i);
+      });
+      for (let i = rows.length; i < rowAnim.length; i++) {
+        if (!rowAnim[i]) continue;
+        rowAnim[i].target = 0;
+        animateRow(i);
+      }
+    }
+
+    let currentScene = -1;
+    function applyScene(sceneIdx) {
+      if (sceneIdx === currentScene) return;
+      currentScene = sceneIdx;
+      renderHashes(sceneIdx);
+      renderSceneNav(sceneIdx);
+    }
+
+    const stepsContainer = document.getElementById("scroll-steps");
+    const steps = [];
+    for (let s = 1; s < NUM_SCENES; s++) {
+      const step = document.createElement("div");
+      step.className = "scroll-step";
+      step.dataset.scene = String(s);
+      stepsContainer.appendChild(step);
+      steps.push(step);
+    }
+
+    let ticking = false;
+    function updateScene() {
+      ticking = false;
+      const half = window.innerHeight / 2;
+      let activeScene = 0;
+      for (let s = 0; s < steps.length; s++) {
+        if (steps[s].getBoundingClientRect().top < half) activeScene = s + 1;
+      }
+      applyScene(activeScene);
+    }
+    function onScroll() {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(updateScene);
+      }
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      renderHashes(Math.max(0, currentScene));
+    });
+
+    applyScene(0);
+  </script>
+</body>
+</html>

@@ -1,0 +1,667 @@
+{
+  "P2049": {
+    "label": "width",
+    "classes": [
+      {
+        "class_qid": "Q3305213",
+        "class_label": "painting",
+        "count": 100
+      },
+      {
+        "class_qid": "Q93184",
+        "class_label": "drawing",
+        "count": 11
+      },
+      {
+        "class_qid": "Q113813711",
+        "class_label": "coin type",
+        "count": 7
+      },
+      {
+        "class_qid": "Q11060274",
+        "class_label": "print",
+        "count": 6
+      },
+      {
+        "class_qid": "Q125191",
+        "class_label": "photograph",
+        "count": 5
+      },
+      {
+        "class_qid": "Q11446",
+        "class_label": "ship",
+        "count": 4
+      }
+    ]
+  },
+  "P2043": {
+    "label": "length",
+    "classes": [
+      {
+        "class_qid": "Q4022",
+        "class_label": "river",
+        "count": 25
+      },
+      {
+        "class_qid": "Q11446",
+        "class_label": "ship",
+        "count": 15
+      },
+      {
+        "class_qid": "Q79007",
+        "class_label": "street",
+        "count": 9
+      },
+      {
+        "class_qid": "Q459297",
+        "class_label": "qanat",
+        "count": 8
+      },
+      {
+        "class_qid": "Q34442",
+        "class_label": "road",
+        "count": 8
+      },
+      {
+        "class_qid": "Q17210",
+        "class_label": "container ship",
+        "count": 6
+      }
+    ]
+  },
+  "P2386": {
+    "label": "diameter",
+    "classes": [
+      {
+        "class_qid": "Q113813711",
+        "class_label": "coin type",
+        "count": 95
+      },
+      {
+        "class_qid": "Q3863",
+        "class_label": "asteroid",
+        "count": 31
+      },
+      {
+        "class_qid": "Q220659",
+        "class_label": "archaeological artefact",
+        "count": 8
+      },
+      {
+        "class_qid": "Q55818",
+        "class_label": "impact crater",
+        "count": 2
+      },
+      {
+        "class_qid": "Q46847",
+        "class_label": "ring",
+        "count": 2
+      },
+      {
+        "class_qid": "Q41207",
+        "class_label": "coin",
+        "count": 2
+      }
+    ]
+  },
+  "P2547": {
+    "label": "perimeter",
+    "classes": [
+      {
+        "class_qid": "Q23397",
+        "class_label": "lake",
+        "count": 107
+      },
+      {
+        "class_qid": "Q811534",
+        "class_label": "remarkable tree",
+        "count": 19
+      },
+      {
+        "class_qid": "Q30092776",
+        "class_label": "lake water body",
+        "count": 15
+      },
+      {
+        "class_qid": "Q104093746",
+        "class_label": "lake or pond",
+        "count": 13
+      },
+      {
+        "class_qid": "Q2438638",
+        "class_label": "solitary",
+        "count": 7
+      },
+      {
+        "class_qid": "Q2732840",
+        "class_label": "gram panchayat",
+        "count": 4
+      }
+    ]
+  },
+  "P2610": {
+    "label": "thickness",
+    "classes": [
+      {
+        "class_qid": "Q3305213",
+        "class_label": "painting",
+        "count": 46
+      },
+      {
+        "class_qid": "Q860861",
+        "class_label": "sculpture",
+        "count": 20
+      },
+      {
+        "class_qid": "Q10855061",
+        "class_label": "archaeological find",
+        "count": 18
+      },
+      {
+        "class_qid": "Q11723795",
+        "class_label": "item",
+        "count": 13
+      },
+      {
+        "class_qid": "Q220659",
+        "class_label": "archaeological artefact",
+        "count": 12
+      },
+      {
+        "class_qid": "Q1066288",
+        "class_label": "figurine",
+        "count": 8
+      }
+    ]
+  },
+  "P2660": {
+    "label": "topographic prominence",
+    "classes": [
+      {
+        "class_qid": "Q8502",
+        "class_label": "mountain",
+        "count": 105
+      },
+      {
+        "class_qid": "Q54050",
+        "class_label": "hill",
+        "count": 30
+      },
+      {
+        "class_qid": "Q207326",
+        "class_label": "summit",
+        "count": 26
+      },
+      {
+        "class_qid": "Q111177881",
+        "class_label": "main peak",
+        "count": 4
+      },
+      {
+        "class_qid": "Q3618634",
+        "class_label": "subpeak",
+        "count": 4
+      },
+      {
+        "class_qid": "Q233165",
+        "class_label": "two-thousander",
+        "count": 3
+      }
+    ]
+  },
+  "P2261": {
+    "label": "beam",
+    "classes": [
+      {
+        "class_qid": "Q106179098",
+        "class_label": "sailboat class",
+        "count": 17
+      },
+      {
+        "class_qid": "Q11446",
+        "class_label": "ship",
+        "count": 12
+      },
+      {
+        "class_qid": "Q402092",
+        "class_label": "motor ship",
+        "count": 10
+      },
+      {
+        "class_qid": "Q1917626",
+        "class_label": "multi-purpose vessel",
+        "count": 10
+      },
+      {
+        "class_qid": "Q178193",
+        "class_label": "steamboat",
+        "count": 9
+      },
+      {
+        "class_qid": "Q559026",
+        "class_label": "ship class",
+        "count": 8
+      }
+    ]
+  },
+  "P2659": {
+    "label": "topographic isolation",
+    "classes": [
+      {
+        "class_qid": "Q8502",
+        "class_label": "mountain",
+        "count": 102
+      },
+      {
+        "class_qid": "Q54050",
+        "class_label": "hill",
+        "count": 22
+      },
+      {
+        "class_qid": "Q131860194",
+        "class_label": "minor summit",
+        "count": 13
+      },
+      {
+        "class_qid": "Q3618634",
+        "class_label": "subpeak",
+        "count": 11
+      },
+      {
+        "class_qid": "Q111177881",
+        "class_label": "main peak",
+        "count": 10
+      },
+      {
+        "class_qid": "Q12059057",
+        "class_label": "one-thousander",
+        "count": 8
+      }
+    ]
+  },
+  "P3039": {
+    "label": "wheelbase",
+    "classes": [
+      {
+        "class_qid": "Q3231690",
+        "class_label": "car model",
+        "count": 125
+      },
+      {
+        "class_qid": "Q21546143",
+        "class_label": "truck model",
+        "count": 7
+      },
+      {
+        "class_qid": "Q90834785",
+        "class_label": "racing automobile model",
+        "count": 6
+      },
+      {
+        "class_qid": "Q137188246",
+        "class_label": "military vehicle model",
+        "count": 4
+      },
+      {
+        "class_qid": "Q59773381",
+        "class_label": "car model series",
+        "count": 2
+      },
+      {
+        "class_qid": "Q19832486",
+        "class_label": "locomotive class",
+        "count": 2
+      }
+    ]
+  },
+  "P2787": {
+    "label": "longest span",
+    "classes": [
+      {
+        "class_qid": "Q537127",
+        "class_label": "road bridge",
+        "count": 76
+      },
+      {
+        "class_qid": "Q1210334",
+        "class_label": "railway bridge",
+        "count": 24
+      },
+      {
+        "class_qid": "Q12280",
+        "class_label": "bridge",
+        "count": 17
+      },
+      {
+        "class_qid": "Q12570",
+        "class_label": "suspension bridge",
+        "count": 15
+      },
+      {
+        "class_qid": "Q158555",
+        "class_label": "cable-stayed bridge",
+        "count": 14
+      },
+      {
+        "class_qid": "Q1735471",
+        "class_label": "box girder bridge",
+        "count": 11
+      }
+    ]
+  },
+  "P5141": {
+    "label": "coastline",
+    "classes": [
+      {
+        "class_qid": "Q23442",
+        "class_label": "island",
+        "count": 36
+      },
+      {
+        "class_qid": "Q104093746",
+        "class_label": "lake or pond",
+        "count": 9
+      },
+      {
+        "class_qid": "Q6256",
+        "class_label": "country",
+        "count": 8
+      },
+      {
+        "class_qid": "Q23397",
+        "class_label": "lake",
+        "count": 8
+      },
+      {
+        "class_qid": "Q3624078",
+        "class_label": "sovereign state",
+        "count": 7
+      },
+      {
+        "class_qid": "Q1065592",
+        "class_label": "uninhabited island",
+        "count": 5
+      }
+    ]
+  },
+  "P3157": {
+    "label": "event distance",
+    "classes": [
+      {
+        "class_qid": "Q18131152",
+        "class_label": "round",
+        "count": 22
+      },
+      {
+        "class_qid": "Q21246076",
+        "class_label": "rowing event",
+        "count": 17
+      },
+      {
+        "class_qid": "Q20646670",
+        "class_label": "hilly stage",
+        "count": 17
+      },
+      {
+        "class_qid": "Q20646667",
+        "class_label": "plain stage",
+        "count": 13
+      },
+      {
+        "class_qid": "Q20680270",
+        "class_label": "medium mountain stage",
+        "count": 8
+      },
+      {
+        "class_qid": "Q20646668",
+        "class_label": "mountain stage",
+        "count": 6
+      }
+    ]
+  },
+  "P2254": {
+    "label": "maximum operating altitude",
+    "classes": [
+      {
+        "class_qid": "Q15056993",
+        "class_label": "aircraft family",
+        "count": 63
+      },
+      {
+        "class_qid": "Q15056995",
+        "class_label": "aircraft model",
+        "count": 54
+      },
+      {
+        "class_qid": "Q45296117",
+        "class_label": "aircraft type",
+        "count": 7
+      },
+      {
+        "class_qid": "Q11436",
+        "class_label": "aircraft",
+        "count": 5
+      },
+      {
+        "class_qid": "Q15142894",
+        "class_label": "weapon model",
+        "count": 4
+      },
+      {
+        "class_qid": "Q15061018",
+        "class_label": "proposed aircraft model",
+        "count": 2
+      }
+    ]
+  },
+  "P2046": {
+    "label": "area",
+    "classes": [
+      {
+        "class_qid": "Q23397",
+        "class_label": "lake",
+        "count": 11
+      },
+      {
+        "class_qid": "Q473972",
+        "class_label": "protected area",
+        "count": 10
+      },
+      {
+        "class_qid": "Q23442",
+        "class_label": "island",
+        "count": 7
+      },
+      {
+        "class_qid": "Q179049",
+        "class_label": "nature reserve",
+        "count": 5
+      },
+      {
+        "class_qid": "Q4845841",
+        "class_label": "settlement in Croatia",
+        "count": 5
+      },
+      {
+        "class_qid": "Q21573182",
+        "class_label": "natural monument in Germany",
+        "count": 4
+      }
+    ]
+  },
+  "P2053": {
+    "label": "watershed area",
+    "classes": [
+      {
+        "class_qid": "Q4022",
+        "class_label": "river",
+        "count": 93
+      },
+      {
+        "class_qid": "Q131681",
+        "class_label": "reservoir",
+        "count": 23
+      },
+      {
+        "class_qid": "Q23397",
+        "class_label": "lake",
+        "count": 12
+      },
+      {
+        "class_qid": "Q47521",
+        "class_label": "stream",
+        "count": 10
+      },
+      {
+        "class_qid": "Q355304",
+        "class_label": "watercourse",
+        "count": 7
+      },
+      {
+        "class_qid": "Q188025",
+        "class_label": "salt lake",
+        "count": 2
+      }
+    ]
+  },
+  "P8887": {
+    "label": "water area",
+    "classes": [
+      {
+        "class_qid": "Q5951278",
+        "class_label": "urban area of the United States",
+        "count": 49
+      },
+      {
+        "class_qid": "Q498162",
+        "class_label": "census-designated place in the United States",
+        "count": 40
+      },
+      {
+        "class_qid": "Q15127012",
+        "class_label": "town in the United States",
+        "count": 17
+      },
+      {
+        "class_qid": "Q777120",
+        "class_label": "borough of Pennsylvania",
+        "count": 16
+      },
+      {
+        "class_qid": "Q1093829",
+        "class_label": "city in the United States",
+        "count": 15
+      },
+      {
+        "class_qid": "Q17343829",
+        "class_label": "unincorporated community",
+        "count": 10
+      }
+    ]
+  },
+  "P2112": {
+    "label": "wing area",
+    "classes": [
+      {
+        "class_qid": "Q15056995",
+        "class_label": "aircraft model",
+        "count": 67
+      },
+      {
+        "class_qid": "Q15056993",
+        "class_label": "aircraft family",
+        "count": 65
+      },
+      {
+        "class_qid": "Q45296117",
+        "class_label": "aircraft type",
+        "count": 6
+      },
+      {
+        "class_qid": "Q11436",
+        "class_label": "aircraft",
+        "count": 3
+      },
+      {
+        "class_qid": "Q197",
+        "class_label": "airplane",
+        "count": 3
+      },
+      {
+        "class_qid": "Q15061018",
+        "class_label": "proposed aircraft model",
+        "count": 2
+      }
+    ]
+  },
+  "P2790": {
+    "label": "net tonnage",
+    "classes": [
+      {
+        "class_qid": "Q1201871",
+        "class_label": "platform supply vessel",
+        "count": 21
+      },
+      {
+        "class_qid": "Q17210",
+        "class_label": "container ship",
+        "count": 17
+      },
+      {
+        "class_qid": "Q191826",
+        "class_label": "tug",
+        "count": 11
+      },
+      {
+        "class_qid": "Q11446",
+        "class_label": "ship",
+        "count": 10
+      },
+      {
+        "class_qid": "Q14928",
+        "class_label": "oil tanker",
+        "count": 8
+      },
+      {
+        "class_qid": "Q105999",
+        "class_label": "cargo ship",
+        "count": 8
+      }
+    ]
+  },
+  "P8628": {
+    "label": "engine displacement",
+    "classes": [
+      {
+        "class_qid": "Q15057021",
+        "class_label": "engine model",
+        "count": 90
+      },
+      {
+        "class_qid": "Q104259946",
+        "class_label": "outboard motor model",
+        "count": 14
+      },
+      {
+        "class_qid": "Q3231690",
+        "class_label": "car model",
+        "count": 12
+      },
+      {
+        "class_qid": "Q23866334",
+        "class_label": "motorcycle model",
+        "count": 12
+      },
+      {
+        "class_qid": "Q15057020",
+        "class_label": "engine family",
+        "count": 7
+      },
+      {
+        "class_qid": "Q118017625",
+        "class_label": "engine series",
+        "count": 4
+      }
+    ]
+  }
+}

@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Size Data Explorer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6; /* blue: expected/dominant unit */
+    --status-critical:#d03b3b; /* minority/unexpected unit */
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --status-critical:#e66767;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+    --status-critical:#e66767;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding-block: 24px;
+  }
+  .viz-root {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-inline: 16px;
+  }
+  h1 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 4px;
+  }
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin: 0 0 20px;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--gridline);
+  }
+  .tab-btn {
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    padding: 8px 14px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+  .tab-btn.active {
+    color: var(--text-primary);
+    border-bottom-color: var(--series-1);
+  }
+  .tab-panel[hidden] { display: none; }
+
+  .prop-row {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px 8px;
+    margin-bottom: 12px;
+  }
+  .prop-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+  .prop-label {
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .prop-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .prop-flag {
+    font-size: 11px;
+    color: var(--status-critical);
+    font-weight: 600;
+  }
+  svg { display: block; overflow: visible; }
+  .axis text { fill: var(--text-muted); font-size: 10px; }
+  .axis path, .axis line { stroke: var(--gridline); }
+  .dot { fill: var(--series-1); }
+  .dot.flag { fill: var(--status-critical); }
+  .dot-hover { fill: none; stroke: var(--text-primary); stroke-width: 1.5px; pointer-events: none; }
+
+  #tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: var(--text-primary);
+    color: var(--surface-1);
+    font-size: 12px;
+    padding: 6px 9px;
+    border-radius: 6px;
+    max-width: 260px;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    z-index: 10;
+  }
+  #tooltip .tt-value { font-weight: 700; }
+  #tooltip .tt-title { color: var(--text-secondary, #c3c2b7); }
+  #tooltip .tt-hint { color: var(--text-secondary, #c3c2b7); font-size: 10px; margin-top: 3px; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <h1>People Data Explorer</h1>
+  <p class="subtitle">One strip per property &mdash; each dot is one entity, x-position is its value (log scale). Spread out from the pack = worth a second look.</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="demographics">Demographics (6)</button>
+    <button class="tab-btn" data-tab="person">Person (4)</button>
+    <button class="tab-btn" data-tab="organizations">Organizations (7)</button>
+    <button class="tab-btn" data-tab="elections">Elections (9)</button>
+    <button class="tab-btn" data-tab="disasters">Disasters (7)</button>
+    <button class="tab-btn" data-tab="venues">Venues (3)</button>
+    <button class="tab-btn" data-tab="other">Other (6)</button>
+  </div>
+
+  <div class="tab-panel" data-panel="demographics"></div>
+  <div class="tab-panel" data-panel="person" hidden></div>
+  <div class="tab-panel" data-panel="organizations" hidden></div>
+  <div class="tab-panel" data-panel="elections" hidden></div>
+  <div class="tab-panel" data-panel="disasters" hidden></div>
+  <div class="tab-panel" data-panel="venues" hidden></div>
+  <div class="tab-panel" data-panel="other" hidden></div>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+const DATA = __DATA_PLACEHOLDER__;
+
+const ROW_WIDTH = 900;
+const ROW_HEIGHT = 56;
+const MARGIN = { top: 4, right: 16, bottom: 20, left: 16 };
+
+function formatValue(v) {
+  if (v >= 1000) return d3.format(",.0f")(v);
+  if (v >= 1) return d3.format(",.2f")(v);
+  return d3.format(",.4f")(v);
+}
+
+function renderProperty(container, prop) {
+  const row = document.createElement("div");
+  row.className = "prop-row";
+
+  const head = document.createElement("div");
+  head.className = "prop-head";
+  const labelEl = document.createElement("span");
+  labelEl.className = "prop-label";
+  labelEl.textContent = prop.label;
+  const metaEl = document.createElement("span");
+  metaEl.className = "prop-meta";
+  metaEl.textContent = `${prop.items.length.toLocaleString()} entries · ${prop.dominant_unit}`;
+  head.appendChild(labelEl);
+  head.appendChild(metaEl);
+
+  const hasMixedUnits = prop.items.some(d => d.u !== prop.dominant_unit);
+  if (hasMixedUnits) {
+    const flag = document.createElement("span");
+    flag.className = "prop-flag";
+    flag.textContent = "mixed units — red dots differ from the dominant unit";
+    head.appendChild(flag);
+  }
+  row.appendChild(head);
+
+  const innerWidth = ROW_WIDTH - MARGIN.left - MARGIN.right;
+  const innerHeight = ROW_HEIGHT - MARGIN.top - MARGIN.bottom;
+
+  const values = prop.items.map(d => d.v);
+  const x = d3.scaleLog()
+    .domain([d3.min(values), d3.max(values)])
+    .range([0, innerWidth])
+    .nice();
+
+  const svg = d3.create("svg")
+    .attr("viewBox", `0 0 ${ROW_WIDTH} ${ROW_HEIGHT}`)
+    .attr("width", "100%")
+    .attr("height", ROW_HEIGHT);
+
+  const g = svg.append("g").attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
+
+  g.append("g")
+    .attr("class", "axis")
+    .attr("transform", `translate(0,${innerHeight})`)
+    .call(d3.axisBottom(x).ticks(5, "~s"));
+
+  // sorted-by-value copy, for nearest-point lookup on hover
+  const sorted = prop.items.map((d, i) => ({ ...d, i })).sort((a, b) => a.v - b.v);
+  const bisect = d3.bisector(d => d.v).left;
+
+  const cy = innerHeight / 2;
+  const dots = g.append("g")
+    .selectAll("circle")
+    .data(prop.items)
+    .join("circle")
+    .attr("class", d => "dot" + (d.u !== prop.dominant_unit ? " flag" : ""))
+    .attr("cx", d => x(d.v))
+    .attr("cy", () => cy + (Math.random() - 0.5) * (innerHeight * 0.5))
+    .attr("r", 3.5);
+
+  const hoverRing = g.append("circle")
+    .attr("class", "dot-hover")
+    .attr("r", 7)
+    .style("opacity", 0);
+
+  const tooltip = document.getElementById("tooltip");
+  let hovered = null;
+
+  function showNearest(clientX, clientY, svgX) {
+    const value = x.invert(svgX);
+    let idx = bisect(sorted, value);
+    idx = Math.max(0, Math.min(sorted.length - 1, idx));
+    // check neighbor for closer match
+    if (idx > 0 && Math.abs(sorted[idx - 1].v - value) < Math.abs(sorted[idx].v - value)) idx -= 1;
+    const d = sorted[idx];
+    hovered = d;
+
+    hoverRing
+      .attr("cx", x(d.v))
+      .attr("cy", dots.filter((dd, i) => i === d.i).attr("cy"))
+      .style("opacity", 1);
+
+    tooltip.innerHTML = "";
+    const titleEl = document.createElement("div");
+    titleEl.className = "tt-title";
+    titleEl.textContent = d.t;
+    const valueEl = document.createElement("div");
+    valueEl.className = "tt-value";
+    valueEl.textContent = `${formatValue(d.v)} ${d.u}`;
+    tooltip.appendChild(titleEl);
+    tooltip.appendChild(valueEl);
+    if (d.q) {
+      const hintEl = document.createElement("div");
+      hintEl.className = "tt-hint";
+      hintEl.textContent = "click to open on Wikidata";
+      tooltip.appendChild(hintEl);
+    }
+
+    tooltip.style.opacity = 1;
+    tooltip.style.left = (clientX + 14) + "px";
+    tooltip.style.top = (clientY + 14) + "px";
+  }
+
+  svg.style("cursor", "pointer");
+  svg.on("pointermove", (event) => {
+    const [mx] = d3.pointer(event, g.node());
+    showNearest(event.clientX, event.clientY, mx);
+  });
+  svg.on("pointerleave", () => {
+    hoverRing.style("opacity", 0);
+    tooltip.style.opacity = 0;
+    hovered = null;
+  });
+  svg.on("click", () => {
+    if (hovered && hovered.q) {
+      window.open(`https://www.wikidata.org/wiki/${hovered.q}`, "_blank", "noopener");
+    }
+  });
+
+  row.appendChild(svg.node());
+  container.appendChild(row);
+}
+
+for (const dim of ["demographics", "person", "organizations", "elections", "disasters", "venues", "other"]) {
+  const panel = document.querySelector(`[data-panel="${dim}"]`);
+  DATA[dim]
+    .sort((a, b) => b.items.length - a.items.length)
+    .forEach(prop => renderProperty(panel, prop));
+}
+
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const target = btn.dataset.tab;
+    document.querySelectorAll(".tab-panel").forEach(p => {
+      p.hidden = p.dataset.panel !== target;
+    });
+  });
+});
+</script>
+</body>
+</html>

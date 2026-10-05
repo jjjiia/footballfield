@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>People</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  <style>
+    .scroll-visual{
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: #fff;
+    }
+    .scroll-visual svg, .scroll-visual canvas{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .axis-line{ stroke: #000; stroke-width: 1px; }
+    .tick-line{ stroke: #000; stroke-width: 1px; }
+    .tick-text{ fill: #000; font-family: 'Open Sans', sans-serif; font-size: 11px; }
+    .anchor-label{
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      fill: #111;
+      pointer-events: none;
+    }
+    .anchor-value{
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 400;
+      font-size: 11px;
+      fill: #555;
+      pointer-events: none;
+    }
+
+    .caption-box{
+      position: absolute;
+      top: 24px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-family: 'Open Sans', sans-serif;
+      pointer-events: none;
+    }
+    .caption-title{ font-weight: 700; font-size: 20px; color: #000; }
+    .caption-subtitle{ font-weight: 400; font-size: 13px; color: #666; margin-top: 4px; }
+
+    .scene-nav{
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      pointer-events: none;
+    }
+    .scene-nav .scene-tick{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #bbb;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 11px;
+      transition: color 0.2s ease;
+    }
+    .scene-nav .scene-tick .mark{
+      width: 14px;
+      height: 1px;
+      background: #bbb;
+      transition: background 0.2s ease, width 0.2s ease, height 0.2s ease;
+    }
+    .scene-nav .scene-tick.active{
+      color: #000;
+      font-weight: 700;
+    }
+    .scene-nav .scene-tick.active .mark{
+      background: #000;
+      width: 20px;
+      height: 2px;
+    }
+
+    .search-box{
+      position: absolute;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(360px, 80vw);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Open Sans', sans-serif;
+      z-index: 4;
+      pointer-events: auto;
+    }
+    .search-box.active{ display: flex; }
+    .search-box input{
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      outline: none;
+    }
+    .search-box input:focus{ border-color: #888; }
+    .search-suggestions{
+      width: 100%;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .search-suggestions:empty{ display: none; }
+    .search-suggestions .suggestion{
+      padding: 7px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .search-suggestions .suggestion:hover{ background: #f2f2f2; }
+    .search-suggestions .suggestion .s-value{ color: #888; white-space: nowrap; }
+    .search-hint{ font-size: 11px; color: #999; font-style: italic; }
+
+    #tooltip{
+      position: fixed;
+      pointer-events: none;
+      background: #111;
+      color: #fff;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 12px;
+      padding: 6px 9px;
+      border-radius: 6px;
+      max-width: 260px;
+      opacity: 0;
+      transition: opacity 0.1s ease;
+      z-index: 10;
+    }
+    #tooltip .tt-value{ font-weight: 700; }
+    #tooltip .tt-title{ color: #ccc; }
+
+    /* Purely a scroll-trigger measuring stick, no visible or interactive
+       content of its own -- without this, it being positioned and later in
+       the DOM than .scroll-visual made it paint (and capture clicks/focus)
+       on top of the sticky visual for the entire scroll, including the
+       search box. */
+    .scroll-steps{ position: relative; pointer-events: none; }
+    .scroll-step{ height: 100vh; }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="index.html">Football</a>
+    <a href="references.html">References</a>
+    <a href="zoom.html">Zoom</a>
+    <a href="you.html">You</a>
+    <a href="infinitecontext.html">Infinite Facts</a>
+    <a href="people.html">People</a>
+  </nav>
+
+  <div class="scroll-visual" id="scroll-visual">
+    <canvas id="dots-canvas"></canvas>
+    <svg id="axis-svg"></svg>
+    <div class="caption-box">
+      <div class="caption-title" id="caption-title"></div>
+      <div class="caption-subtitle" id="caption-subtitle"></div>
+    </div>
+    <div class="search-box" id="search-box">
+      <input type="text" id="search-input" placeholder="Search anything in this dataset&hellip;" autocomplete="off" />
+      <div class="search-suggestions" id="search-suggestions"></div>
+      <div class="search-hint">Pick a result to drop it onto the line</div>
+    </div>
+    <div class="scene-nav" id="scene-nav"></div>
+  </div>
+  <div class="scroll-steps" id="scroll-steps"></div>
+  <div id="tooltip"></div>
+
+  <script src="people_scenes_config.js"></script>
+  <script>
+    // Real counts of people, from the same verified Wikidata dataset used
+    // elsewhere in this project (infinite_facts/data/raw/wikidata_people.jsonl).
+    const DATA = __DATA_PLACEHOLDER__; // { population, languages, followers, visitors, venues }
+
+    // CATEGORIES and SCENES come from people_scenes_config.js.
+    // A scene can reveal from more than one category at once -- find the
+    // entry for a given category within a specific scene's reveal list.
+    function revealFor(sceneIdx, cat) {
+      return SCENES[sceneIdx].reveal.find(r => r.category === cat);
+    }
+
+    const NUM_SCENES = SCENES.length;
+
+    // Left-side scroll progress rail: one tick + number per scene, with the
+    // current one highlighted as you scroll.
+    const sceneNavEl = document.getElementById("scene-nav");
+    for (let s = 0; s < NUM_SCENES; s++) {
+      const row = document.createElement("div");
+      row.className = "scene-tick";
+      row.dataset.scene = String(s);
+      row.innerHTML = `<span class="mark"></span><span class="num">${s + 1}</span>`;
+      sceneNavEl.appendChild(row);
+    }
+    const sceneTickEls = Array.from(sceneNavEl.querySelectorAll(".scene-tick"));
+    function renderSceneNav(sceneIdx) {
+      sceneTickEls.forEach((el, i) => el.classList.toggle("active", i === sceneIdx));
+    }
+
+    const MARGIN_LEFT = 100;
+    const MARGIN_RIGHT = 40;
+    const AXIS_Y_FRAC = 0.5;
+
+    function formatValue(v) {
+      if (v >= 1e9) return (v / 1e9).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " billion";
+      if (v >= 1e6) return (v / 1e6).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " million";
+      return v.toLocaleString();
+    }
+    function formatTick(v) {
+      if (v === 0) return "0";
+      if (v >= 1e9) return (v / 1e9) + "B";
+      return (v / 1e6) + "M";
+    }
+
+    const svg = d3.select("#axis-svg");
+    const axisLayer = svg.append("g").attr("class", "axis-layer");
+    const labelLayer = svg.append("g").attr("class", "label-layer");
+
+    // Dots are drawn on canvas, not as SVG DOM nodes -- with a couple
+    // thousand of them, redrawing a raster every frame is far cheaper than
+    // having D3 write cx/cy/r/opacity attributes onto that many live
+    // elements every tick, which is what made the SVG version slow.
+    const canvas = document.getElementById("dots-canvas");
+    const ctx = canvas.getContext("2d");
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let axisY = height * AXIS_Y_FRAC;
+
+    function fitCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    fitCanvas();
+
+    // Flatten all items across every category into one array once, each
+    // tagged with its category -- rendered as one <circle> apiece, hidden
+    // until the scene that introduces it.
+    const items = [];
+    for (const cat of Object.keys(CATEGORIES)) {
+      for (const d of DATA[cat]) {
+        items.push({ cat, v: d.v, t: d.t, q: d.q, p: d.p });
+      }
+    }
+
+    // An item's visible/anchor status is decided by scanning every scene up
+    // to sceneIdx that touches its category, in order. Visibility is sticky
+    // -- once named (by `anchors`, `include`, or a bare `all` sweep), it
+    // stays visible forever. The anchor (permanent label) is NOT sticky:
+    // every scene that touches the category re-decides it, so an item only
+    // keeps its label while it's actually listed in that scene's own
+    // `anchors` -- a later same-category scene that doesn't re-list it
+    // (whether or not it lists the item under `include`) lets its label go
+    // automatically, with no need to explicitly demote it. This is what
+    // lets a category come back for more than one scene (e.g. one
+    // continent's countries, then another's) without every new scene
+    // having to re-list everyone from before just to strip their labels.
+    // Items the user has pulled in themselves via the search box (see below)
+    // -- visible and labeled from here on, regardless of what any scene's
+    // own config says, exactly like a permanent anchor.
+    const manuallyRevealed = new Set();
+
+    function itemState(item, sceneIdx) {
+      if (manuallyRevealed.has(item)) return { visible: true, anchor: true };
+      let anchored = false;
+      let named = false;
+      for (let i = 0; i <= sceneIdx; i++) {
+        const r = revealFor(i, item.cat);
+        if (!r) continue;
+        const isAnchor = r.anchors && r.anchors.includes(item.q);
+        const isIncluded = r.include && r.include.includes(item.q);
+        const isBareSweep = r.all && !r.anchors && !r.include; // "all" with no filter = everyone
+        anchored = !!isAnchor; // re-decided every relevant scene, not carried forward
+        if (isAnchor || isIncluded || isBareSweep) named = true;
+      }
+      return { visible: named, anchor: anchored };
+    }
+    function itemIsAnchor(item, sceneIdx) { return itemState(item, sceneIdx).anchor; }
+
+    let x = d3.scaleLinear().domain(SCENES[0].domain).range([MARGIN_LEFT, width - MARGIN_RIGHT]);
+
+    axisLayer.append("line")
+      .attr("class", "axis-line")
+      .attr("x1", 0).attr("x2", width)
+      .attr("y1", axisY).attr("y2", axisY);
+
+    const tooltip = document.getElementById("tooltip");
+    function showTooltip(event, d) {
+      tooltip.innerHTML = "";
+      const titleEl = document.createElement("div");
+      titleEl.className = "tt-title";
+      titleEl.textContent = d.t;
+      const valueEl = document.createElement("div");
+      valueEl.className = "tt-value";
+      valueEl.textContent = `${formatValue(d.v)} — ${d.p}`;
+      tooltip.appendChild(titleEl);
+      tooltip.appendChild(valueEl);
+      tooltip.style.opacity = 1;
+      tooltip.style.left = (event.clientX + 14) + "px";
+      tooltip.style.top = (event.clientY + 14) + "px";
+    }
+    function hideTooltip() { tooltip.style.opacity = 0; }
+
+    // Every item starts parked off the top of the screen -- when it first
+    // becomes visible it falls into place, rather than popping in already
+    // inside the crowd (which used to shove every other settled dot aside
+    // at once).
+    items.forEach(d => {
+      d.x = x(d.v);
+      d.y = -40;
+      d.everVisible = false;
+      d.dispR = 0;
+      d.dispOpacity = 0;
+      d.targetOpacity = 0;
+      d.targetR = 0;
+      d.falling = false;
+      d.labelUntil = 0;
+      d.isAnchorNow = false;
+      d.revealedInScene = -1;
+    });
+
+    // Dots revealed in the scene currently being entered render at full
+    // opacity; everything revealed earlier fades by 40%, so a fresh batch
+    // visibly stands out from what's already settled.
+    function freshOpacity(d, sceneIdx) {
+      const base = d.isAnchorNow ? 1 : 0.75;
+      return d.revealedInScene === sceneIdx ? base : base * 0.6;
+    }
+
+    // Manual hit-testing stands in for what SVG gave us for free (per-element
+    // pointer events) -- a plain linear scan is plenty fast for a few
+    // thousand items on a pointermove.
+    function hitTest(mx, my) {
+      let best = null, bestDist = Infinity;
+      for (const d of items) {
+        if (d.targetOpacity <= 0) continue;
+        const hitR = Math.max(d.dispR, 4) + 4;
+        const dx = d.x - mx, dy = d.y - my;
+        const dist = dx * dx + dy * dy;
+        if (dist < hitR * hitR && dist < bestDist) { bestDist = dist; best = d; }
+      }
+      return best;
+    }
+
+    canvas.addEventListener("pointermove", (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = event.clientX - rect.left, my = event.clientY - rect.top;
+      const hit = hitTest(mx, my);
+      canvas.style.cursor = hit ? "pointer" : "default";
+      if (hit) showTooltip(event, hit); else hideTooltip();
+    });
+    canvas.addEventListener("pointerleave", hideTooltip);
+    canvas.addEventListener("click", (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = event.clientX - rect.left, my = event.clientY - rect.top;
+      const hit = hitTest(mx, my);
+      if (hit) window.open(`https://www.wikidata.org/wiki/${hit.q}`, "_blank", "noopener");
+    });
+
+    // Search: type to filter every item in the dataset (any category) by
+    // name; picking a result drops it onto the line as a new, permanently
+    // labeled dot via manuallyRevealed. Only shown while the scene that
+    // declares `search: true` (see SCENES) is active.
+    const searchBoxEl = document.getElementById("search-box");
+    const searchInputEl = document.getElementById("search-input");
+    const searchSuggestionsEl = document.getElementById("search-suggestions");
+
+    function renderSuggestions(query) {
+      searchSuggestionsEl.innerHTML = "";
+      const q = query.trim().toLowerCase();
+      if (!q) return;
+      items
+        .filter(d => !manuallyRevealed.has(d) && d.t.toLowerCase().includes(q))
+        .slice(0, 8)
+        .forEach(d => {
+          const row = document.createElement("div");
+          row.className = "suggestion";
+          const name = document.createElement("span");
+          name.textContent = d.t;
+          const value = document.createElement("span");
+          value.className = "s-value";
+          value.textContent = `${formatValue(d.v)} — ${d.p}`;
+          row.appendChild(name);
+          row.appendChild(value);
+          row.addEventListener("click", () => {
+            manuallyRevealed.add(d);
+            const sceneToReenter = currentScene;
+            currentScene = -1;
+            applyScene(sceneToReenter, true);
+            searchInputEl.value = "";
+            searchSuggestionsEl.innerHTML = "";
+          });
+          searchSuggestionsEl.appendChild(row);
+        });
+    }
+    searchInputEl.addEventListener("input", () => renderSuggestions(searchInputEl.value));
+
+    // Continuous draw loop, independent of the physics simulation -- it
+    // eases each dot's displayed radius/opacity toward its current target
+    // every frame (replacing the SVG version's CSS/D3 transitions), draws a
+    // name label next to anything still falling, and redraws the whole
+    // canvas, which is cheap even for thousands of dots.
+    function render() {
+      processPendingEntries();
+      const now = performance.now();
+      ctx.clearRect(0, 0, width, height);
+      ctx.textAlign = "center";
+      ctx.font = "10px 'Open Sans', sans-serif";
+      for (const d of items) {
+        // An already-settled dot whose target moved because the scene's
+        // domain zoomed gets tweened explicitly with the exact same
+        // duration/easing as the axis ticks, instead of drifting there at
+        // whatever pace the physics spring happens to converge -- that
+        // mismatch was the source of the dot/axis desync.
+        if (d.xTweenStart !== undefined) {
+          const t = Math.min(1, (now - d.xTweenStart) / 800);
+          d.x = d.xTweenFrom + (d.xTweenTo - d.xTweenFrom) * d3.easeCubicOut(t);
+          if (t >= 1) d.xTweenStart = undefined;
+        }
+        d.dispOpacity += (d.targetOpacity - d.dispOpacity) * 0.15;
+        d.dispR += (d.targetR - d.dispR) * 0.15;
+        if (d.dispOpacity > 0.01 && d.dispR > 0.05) {
+          ctx.globalAlpha = d.dispOpacity;
+          ctx.fillStyle = CATEGORIES[d.cat].color;
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, d.dispR, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Anchors already get a persistent SVG label -- only the falling
+          // bulk dots get this transient one. Held for a minimum duration
+          // regardless of how fast it physically lands, so it's readable.
+          if (!d.isAnchorNow && performance.now() < d.labelUntil) {
+            ctx.globalAlpha = Math.min(1, d.dispOpacity + 0.25);
+            ctx.fillStyle = "#333";
+            ctx.fillText(d.t, d.x, d.y - d.dispR - 5);
+          }
+        }
+      }
+      ctx.globalAlpha = 1;
+      // Always read straight from d.x/d.y so the label tracks whichever is
+      // currently driving them (physics tick or the x-tween above).
+      anchorLabelSel.attr("transform", d => `translate(${d.x},${d.y - 23})`);
+      requestAnimationFrame(render);
+    }
+    requestAnimationFrame(render);
+
+    // Circles cluster toward their true value on the axis, but a collision
+    // force lets them drift a little (mostly vertically, a bit horizontally)
+    // to avoid overlapping once many are on screen at once. One-sided: the
+    // line is a floor circles rest on top of, never a centerline they
+    // straddle -- so a freshly-falling circle lands on top of whatever's
+    // already piled up in its column instead of sinking into the middle of
+    // it. The simulation itself is created once and kept warm; scene changes
+    // add/remove nodes from it rather than restarting it from scratch, so
+    // already-settled dots are never disturbed by a fresh batch arriving.
+    let activeNodes = [];
+    let anchorLabelSel = d3.select(null);
+
+    function wake(alphaValue) {
+      simulation.alpha(Math.max(simulation.alpha(), alphaValue)).restart();
+    }
+
+    const simulation = d3.forceSimulation([])
+      // Horizontal movement (including a dot re-homing when a scene's domain
+      // zooms) stays snappy -- velocityDecay is shared across x and y, so it
+      // has to stay moderate here rather than being slowed down to slow the
+      // fall (that used to drag horizontal repositioning down with it,
+      // desyncing dots from the axis ticks' own fixed-duration transition).
+      .force("x", d3.forceX(d => d.targetX).strength(0.9))
+      // Falling items get pulled toward the line more gently than settled
+      // ones so the descent reads as slow and deliberate -- the slowness
+      // comes from this weaker pull, not from extra global damping, so it
+      // doesn't bleed into horizontal motion. Collision still catches them
+      // early if they land on top of an existing pile before reaching the
+      // line.
+      .force("y", d3.forceY(axisY).strength(d => (d.falling ? 0.22 : 0.4)))
+      // Multiple iterations per tick so a big, dense batch (e.g. dozens of
+      // small countries landing in the same narrow x-band at once) actually
+      // resolves down to the floor instead of getting stuck jammed partway
+      // up -- but at a reduced per-iteration strength, so that resolving a
+      // crowd is a gentler, less jittery push rather than a hard shove that
+      // visibly bounces circles against each other.
+      .force("collide", d3.forceCollide(d => d.r + 0.5).strength(0.6).iterations(3))
+      .alphaDecay(0.02)
+      .velocityDecay(0.6)
+      .on("tick", () => {
+        // The line is a floor: nothing is allowed to sink below it, so the
+        // cluster only ever grows upward from it.
+        activeNodes.forEach(d => {
+          const floor = axisY - d.r;
+          if (d.y > floor) {
+            d.y = floor;
+            if (d.vy > 0) d.vy = 0;
+          }
+          if (d.falling && performance.now() - d.fallStartTime > 150 && Math.abs(d.vy) < 0.5) {
+            d.falling = false;
+            d.targetR = d.r; // shrink to its true resting size only now that it's landed
+          }
+        });
+      });
+    simulation.stop();
+
+    // A batch's first one or two items enter alone, with a real pause
+    // between them, then the rest of the batch floods in together -- a
+    // deliberate slow start rather than a continuous per-pixel trickle.
+    const INTRO_COUNT = 2;
+    const INTRO_GAP_MS = 180;
+    const REST_DELAY_MS = 120;
+    // Minimum time a falling item's label stays up, regardless of how fast
+    // it physically lands, so it's actually readable.
+    const LABEL_MIN_MS = 1100;
+    // Falling dots render at this size (matching the anchor size, easy to
+    // see and read) and only shrink to their true resting size after landing.
+    const FALL_R = 4;
+    let revealQueue = [];
+
+    function scheduleEntries(newItems) {
+      if (!newItems.length) return;
+      const now = performance.now();
+      const introCount = Math.min(INTRO_COUNT, newItems.length);
+      const restRevealTime = now + introCount * INTRO_GAP_MS + REST_DELAY_MS;
+      newItems.forEach((d, i) => {
+        d.revealTime = i < introCount ? now + i * INTRO_GAP_MS : restRevealTime;
+      });
+      revealQueue.push(...newItems);
+      revealQueue.sort((a, b) => a.revealTime - b.revealTime);
+    }
+
+    // Checked every animation frame: releases items whose scheduled time
+    // has arrived.
+    function processPendingEntries() {
+      if (!revealQueue.length) return;
+      const now = performance.now();
+      let added = false;
+      while (revealQueue.length && revealQueue[0].revealTime <= now) {
+        const d = revealQueue.shift();
+        d.x = d.targetX + (Math.random() - 0.5) * 30;
+        d.y = -(20 + Math.random() * 70);
+        d.vx = 0;
+        d.vy = 0;
+        d.falling = true;
+        d.fallStartTime = now;
+        d.labelUntil = now + LABEL_MIN_MS;
+        d.revealedInScene = currentScene;
+        d.targetOpacity = freshOpacity(d, currentScene);
+        d.targetR = FALL_R; // stays large and readable while falling, shrinks on landing
+        activeNodes.push(d);
+        added = true;
+      }
+      if (added) {
+        simulation.nodes(activeNodes);
+        wake(0.5);
+      }
+    }
+
+    function enterScene(sceneIdx, animate) {
+      const toAdd = [];
+      const toRemove = [];
+      items.forEach(d => {
+        const newTargetX = x(d.v);
+        const { visible, anchor } = itemState(d, sceneIdx);
+        d.r = anchor ? 4 : 3.2;
+        d.isAnchorNow = anchor;
+
+        const isNewlyRevealed = visible && !d.everVisible;
+        if (!isNewlyRevealed) {
+          // A newly-revealed item's opacity/radius targets are set only once
+          // it's actually released to fall (below) -- setting them here
+          // would make it fade in at its old, stale position well before its
+          // staggered turn comes up.
+          d.targetOpacity = visible ? freshOpacity(d, sceneIdx) : 0;
+          d.targetR = visible ? d.r : 0;
+        }
+
+        // An already-settled item whose x actually moves because the
+        // scene's domain zoomed gets an explicit tween (handled in the
+        // render loop) instead of being left to the physics spring.
+        if (visible && d.everVisible && !isNewlyRevealed && d.targetX !== newTargetX) {
+          d.xTweenFrom = d.x;
+          d.xTweenTo = newTargetX;
+          d.xTweenStart = performance.now();
+        }
+        d.targetX = newTargetX;
+
+        if (isNewlyRevealed) {
+          d.everVisible = true;
+          toAdd.push(d);
+        } else if (!visible && d.everVisible) {
+          d.everVisible = false;
+          toRemove.push(d);
+        }
+      });
+
+      if (toRemove.length) {
+        const removeSet = new Set(toRemove);
+        activeNodes = activeNodes.filter(d => !removeSet.has(d));
+        revealQueue = revealQueue.filter(d => !removeSet.has(d));
+        simulation.nodes(activeNodes);
+      }
+
+      if (toAdd.length) {
+        if (animate) {
+          scheduleEntries(toAdd);
+        } else {
+          // Initial load / resize: place instantly, no staggered fall.
+          toAdd.forEach(d => {
+            d.x = d.targetX;
+            d.y = axisY - d.r;
+            d.vx = 0;
+            d.vy = 0;
+            d.falling = false;
+            d.revealedInScene = sceneIdx;
+            d.targetOpacity = freshOpacity(d, sceneIdx);
+            d.targetR = d.r;
+          });
+          activeNodes.push(...toAdd);
+          simulation.nodes(activeNodes);
+        }
+      }
+
+      wake(0.4);
+    }
+
+    // Picks a "nice" (1/2/5 x a power of ten) tick step scaled to the
+    // domain's span, aiming for roughly a dozen ticks -- needed once scenes
+    // started spanning anywhere from 100M (a tight zoom) up to 60B (the
+    // final scale-out), since a single fixed step can't suit both.
+    function niceTickStep(span, targetCount) {
+      const raw = span / targetCount;
+      const magnitude = Math.pow(10, Math.floor(Math.log10(raw)));
+      const norm = raw / magnitude;
+      const niceNorm = norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10;
+      return niceNorm * magnitude;
+    }
+
+    function renderAxis(domain, animate) {
+      const [lo, hi] = domain;
+      const span = hi - lo;
+      // A narrow zoomed-in domain (e.g. scene 1's 300M-400M) gets a finer
+      // step so it isn't left with just its two boundary ticks; every
+      // domain up through the original 1.5B max keeps the plain 100M step
+      // it always has. Only a domain bigger than that (the 60B finale)
+      // needs to scale its step up too, or it'd end up with hundreds of
+      // ticks at a fixed 100M spacing.
+      const step = span <= 100e6 ? 50e6 : span <= 1500e6 ? 100e6 : niceTickStep(span, 12);
+      const tickValues = [];
+      const start = Math.floor(lo / step) * step;
+      for (let v = start; v <= hi + 1; v += step) tickValues.push(v);
+
+      const ticks = axisLayer.selectAll(".tick-group").data(tickValues, v => v);
+      // A brand-new tick slides in from the side its value implies on the
+      // (linear) number line -- smaller than the original zoomed-in range
+      // comes from the left, bigger comes from the right -- not from
+      // whichever screen half it happens to land in pixel-wise.
+      const ticksEnter = ticks.enter().append("g").attr("class", "tick-group")
+        .attr("transform", v => {
+          let fromPx;
+          if (v < 300e6) fromPx = -30;
+          else if (v > 400e6) fromPx = width + 30;
+          else fromPx = x(v) < width / 2 ? -30 : width + 30;
+          return `translate(${fromPx},0)`;
+        })
+        .style("opacity", 0);
+      ticksEnter.append("line").attr("class", "tick-line").attr("y1", axisY - 6).attr("y2", axisY + 6);
+      ticksEnter.append("text").attr("class", "tick-text").attr("y", axisY + 20).attr("text-anchor", "middle").text(formatTick);
+
+      // Cubic ease-out (fast start, decelerating) reads much closer to the
+      // physics-driven dots' spring motion than the default ease-in-out,
+      // which was the main source of the two feeling out of sync.
+      const ticksMerge = ticksEnter.merge(ticks);
+      (animate ? ticksMerge.transition().duration(800).ease(d3.easeCubicOut) : ticksMerge)
+        .attr("transform", v => `translate(${x(v)},0)`)
+        .style("opacity", 1);
+
+      ticks.exit().transition().duration(400).style("opacity", 0).remove();
+    }
+
+    // Up to 4 items ever get a permanent visible label (the anchors); each
+    // gets its own persistent <text> pair shown only while it's the anchor.
+    function renderAnchorLabels(sceneIdx, animate) {
+      const anchorItems = items.filter(d => itemIsAnchor(d, sceneIdx));
+      const sel = labelLayer.selectAll(".anchor-group").data(anchorItems, d => d.q + d.p);
+      const enter = sel.enter().append("g").attr("class", "anchor-group")
+        .attr("transform", d => `translate(${d.x},${d.y - 23})`)
+        .style("opacity", 0);
+      enter.append("text").attr("class", "anchor-label").attr("text-anchor", "middle").text(d => d.t);
+      enter.append("text").attr("class", "anchor-value").attr("y", 14).attr("text-anchor", "middle").text(d => formatValue(d.v));
+
+      // Position itself is driven every frame by the simulation's tick
+      // handler above -- only fade opacity here.
+      const merged = enter.merge(sel);
+      anchorLabelSel = merged;
+      (animate ? merged.transition().duration(400) : merged).style("opacity", 1);
+
+      sel.exit().transition().duration(400).style("opacity", 0).remove();
+    }
+
+    let currentScene = -1;
+    function applyScene(sceneIdx, animate) {
+      if (sceneIdx === currentScene) return;
+      currentScene = sceneIdx;
+
+      x.domain(SCENES[sceneIdx].domain);
+      renderAxis(SCENES[sceneIdx].domain, animate);
+      enterScene(sceneIdx, animate);
+      renderAnchorLabels(sceneIdx, animate);
+      renderSceneNav(sceneIdx);
+
+      const caption = SCENES[sceneIdx].caption;
+      document.getElementById("caption-title").textContent = caption.title;
+      document.getElementById("caption-subtitle").textContent = caption.subtitle;
+      searchBoxEl.classList.toggle("active", !!SCENES[sceneIdx].search);
+      // Dot radius/opacity targets were already set in enterScene(); the
+      // canvas render loop eases toward them every frame on its own.
+    }
+
+    const stepsContainer = document.getElementById("scroll-steps");
+    const steps = [];
+    for (let s = 1; s < NUM_SCENES; s++) {
+      const step = document.createElement("div");
+      step.className = "scroll-step";
+      step.dataset.scene = String(s);
+      stepsContainer.appendChild(step);
+      steps.push(step);
+    }
+
+    let ticking = false;
+    function updateScene() {
+      ticking = false;
+      const half = window.innerHeight / 2;
+      let activeScene = 0;
+      for (let s = 0; s < steps.length; s++) {
+        if (steps[s].getBoundingClientRect().top < half) activeScene = s + 1;
+      }
+      applyScene(activeScene, true);
+    }
+    function onScroll() {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(updateScene);
+      }
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      axisY = height * AXIS_Y_FRAC;
+      fitCanvas();
+      x.range([MARGIN_LEFT, width - MARGIN_RIGHT]);
+      axisLayer.select(".axis-line").attr("x1", 0).attr("x2", width).attr("y1", axisY).attr("y2", axisY);
+      const sceneToReapply = currentScene;
+      currentScene = -1;
+      applyScene(Math.max(0, sceneToReapply), false);
+    });
+
+    applyScene(0, false);
+  </script>
+</body>
+</html>

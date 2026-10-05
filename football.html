@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Football Fields</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.css" rel="stylesheet" />
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
+  <style>
+    html, body { height: 100%; }
+
+/* intro header, before the first map begins */
+#intro{
+  background: #fff;
+  color: #000;
+  padding: 100px 20px;
+}
+#intro-inner{
+  max-width: 700px;
+  margin: 0 auto;
+}
+#intro h1{
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 40px;
+  margin: 0 0 24px;
+}
+#intro p{
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* outro text, between the two maps */
+#outro{
+  background: #fff;
+  color: #000;
+  padding: 100px 20px;
+}
+#outro-inner{
+  max-width: 700px;
+  margin: 0 auto;
+}
+#outro p{
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* each map section sticks to the viewport while its scroll-steps play out */
+.map-scrolly{
+  position: relative;
+}
+.map-wrapper{
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+.map {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:0;
+}/* The overlay container is absolutely positioned within .map-wrapper */
+.labels{
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+
+  display: flex;
+  flex-direction: column;   /* stack text then button */
+  align-items: flex-start;
+  gap: 10px;
+
+  z-index: 20;
+  pointer-events: none;     /* map still draggable */
+}
+
+/* sentence text */
+.fields-text{
+  font-size: 16px;
+  font-weight: 300;
+  color: white;
+  font-family: 'Open Sans', sans-serif;
+  background: #000;
+}
+
+/* unit-of-measurement dropdown */
+.unit-select{
+  pointer-events: auto;
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  padding: 4px 8px;
+}
+.place-label{
+  font-size: 24px;
+  font-weight: 300;
+  color: white;
+  font-family: 'Open Sans', sans-serif;
+  background: #000;
+}
+
+/* scrolly sections: invisible spacers that drive the tour via scroll position,
+   no visible or interactive content of their own -- without pointer-events:none
+   this z-indexed layer sits above the sticky map-wrapper's buttons (show-more,
+   scroll-down, search) and silently swallows clicks meant for them. */
+.scroll-sections{
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+.scroll-step{
+  height: 100vh;
+}
+
+/* down-arrow scroll cue */
+.scroll-down-btn{
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  pointer-events: auto;
+  background: none;
+  border: none;
+  color: #fff;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 40px;
+  line-height: 1;
+  cursor: pointer;
+  text-shadow:
+    0 0 6px rgba(0,0,0,1),
+    0 0 14px rgba(0,0,0,1),
+    0 3px 6px rgba(0,0,0,1),
+    0 8px 20px rgba(0,0,0,0.7);
+  animation: bounce 1.6s infinite;
+  transition: opacity 0.4s ease;
+}
+.scroll-down-btn.hidden{
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* "show more" button, shown once the current tour runs out of stops */
+.show-more-btn{
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  pointer-events: auto;
+  padding: 10px 18px;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  text-shadow:
+    0 0 6px rgba(0,0,0,1),
+    0 0 14px rgba(0,0,0,1);
+  transition: opacity 0.3s ease;
+}
+.show-more-btn:hover{ opacity: 0.85; }
+.show-more-btn.hidden{
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes bounce{
+  0%, 100% { transform: translate(-50%, 0); }
+  50%      { transform: translate(-50%, 10px); }
+}
+
+.mapboxgl-ctrl-logo,
+.mapboxgl-ctrl-attrib { display: none !important; }
+
+/* cross-fade shown while the camera jumps between locations */
+.fade-overlay{
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 15;
+  transition: opacity 0.45s ease;
+}
+.fade-overlay.visible{ opacity: 1; }
+
+/* search: collapsed to a round icon button until toggled open */
+.search-toggle-btn{
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  z-index: 25;
+  pointer-events: auto;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  text-shadow:
+    0 0 6px rgba(0,0,0,1),
+    0 0 14px rgba(0,0,0,1);
+  transition: opacity 0.2s ease;
+}
+.search-toggle-btn.hidden{
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mapboxgl-ctrl-geocoder{
+  opacity: 0;
+  transform: scale(0.92);
+  transform-origin: bottom left;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.mapboxgl-ctrl-geocoder.search-open{
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html">Home</a>
+    <a href="football.html">Football Field</a>
+  <a href="references.html">References</a>
+  <a href="zoom.html">Zoom</a>
+  <a href="you.html">You</a>
+  <a href="infinitecontext.html">Infinite Facts</a>
+  <a href="people.html">People</a>
+    <a href="people_up.html">People, Up</a>
+</nav>
+
+<header id="intro">
+  <div id="intro-inner">
+    <h1>A Football Field</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  </div>
+</header>
+
+<div class="map-scrolly" id="map-scrolly-1">
+  <div class="map-wrapper">
+    <div class="map"></div>
+    <div class="fade-overlay"></div>
+    <div class="labels">
+      <span class="place-label">You are at Levi's Stadium in Santa Clara, California, site of the last (2025) American Super Bowl.</span>
+      <span class="fields-text"></span>
+    </div>
+    <button class="scroll-down-btn" type="button" aria-label="Scroll down">⌄</button>
+    <button class="show-more-btn hidden" type="button">Show more</button>
+    <button class="search-toggle-btn" type="button" aria-label="Search">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="10.5" cy="10.5" r="6.5"/>
+        <line x1="20" y1="20" x2="15.5" y2="15.5"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="scroll-sections">
+    <section class="scroll-step" data-index="0"></section>
+    <section class="scroll-step" data-index="1"></section>
+    <section class="scroll-step" data-index="2"></section>
+    <section class="scroll-step" data-index="3"></section>
+    <section class="scroll-step" data-index="4"></section>
+    <section class="scroll-step" data-index="5"></section>
+  </div>
+</div>
+
+<div id="outro">
+  <div id="outro-inner">
+    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+  </div>
+</div>
+
+<div class="map-scrolly" id="map-scrolly-2">
+  <div class="map-wrapper">
+    <div class="map"></div>
+    <div class="fade-overlay"></div>
+    <div class="labels">
+      <span class="place-label">You are at Levi's Stadium in Santa Clara, California, site of the last (2025) American Super Bowl.</span>
+      <span class="fields-text"></span>
+      <select class="unit-select"></select>
+    </div>
+    <button class="scroll-down-btn" type="button" aria-label="Scroll down">⌄</button>
+    <button class="show-more-btn hidden" type="button">Show more</button>
+    <button class="search-toggle-btn" type="button" aria-label="Search">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="10.5" cy="10.5" r="6.5"/>
+        <line x1="20" y1="20" x2="15.5" y2="15.5"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="scroll-sections">
+    <section class="scroll-step" data-index="0"></section>
+    <section class="scroll-step" data-index="1"></section>
+    <section class="scroll-step" data-index="2"></section>
+    <section class="scroll-step" data-index="3"></section>
+    <section class="scroll-step" data-index="4"></section>
+    <section class="scroll-step" data-index="5"></section>
+  </div>
+</div>
+
+<script>
+mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ"
+
+const STYLE = "mapbox://styles/jjjiia123/cmmb9euid00at01qr9mbfapn7";
+const INITIAL_CENTER = [-121.96979950341608, 37.403187791716775]; // Hoboken-ish; change me
+const HOME_PLACE_TEXT = "You are at Levi's Stadium in Santa Clara, California, site of the last (2025) American Super Bowl.";
+
+const ftToM = (ft) => ft * 0.3048;
+
+// Selectable comparison units (dropdown label, singular/plural wording,
+// real-world footprint, and the `place` lat/lng/zoom/bearing the map flies
+// to when picked) live in units.json, tuned with football_tester.html,
+// rather than inline here. Populated once fetched, below.
+let UNITS = [];
+
+function unitFootprintMeters(unit) {
+  return unit.widthFt != null
+    ? { widthM: ftToM(unit.widthFt), heightM: ftToM(unit.lengthFt) }
+    : { widthM: unit.widthM, heightM: unit.lengthM };
+}
+
+// The unit's own true area -- widthM*heightM only holds for a rectangle;
+// a pentagon (or any other non-rectangular shape added later) needs its
+// own formula so the "X of these fit in view" count stays correct.
+function unitAreaM2(unit) {
+  const { widthM, heightM } = unitFootprintMeters(unit);
+  if (unit.shape === "pentagon") {
+    const side = widthM; // side length, per makeFieldFeature's convention
+    return (1 / 4) * Math.sqrt(5 * (5 + 2 * Math.sqrt(5))) * side * side;
+  }
+  return widthM * heightM;
+}
+
+// Units are grouped into a small category hierarchy (squares, parks,
+// sports, buildings) -- rendered as <optgroup>s in this fixed order so the
+// dropdown reads as organized rather than one flat list.
+const CATEGORY_LABELS = { squares: "Squares", parks: "Parks", sports: "Sports", buildings: "Buildings" };
+const CATEGORY_ORDER = ["squares", "parks", "sports", "buildings"];
+
+function populateUnitSelect(selectEl, units) {
+  selectEl.innerHTML = "";
+  CATEGORY_ORDER.forEach((cat) => {
+    const inCategory = units.filter((u) => u.category === cat);
+    if (!inCategory.length) return;
+    const group = document.createElement("optgroup");
+    group.label = CATEGORY_LABELS[cat] || cat;
+    inCategory.forEach((u) => {
+      const option = document.createElement("option");
+      option.value = u.key;
+      option.textContent = u.label;
+      group.appendChild(option);
+    });
+    selectEl.appendChild(group);
+  });
+}
+
+// ---- Small-area meter<->degree helpers ----
+function metersPerDeg(lat) {
+  const rad = lat * Math.PI / 180;
+  return {
+    mPerDegLat: 111132.92,
+    mPerDegLng: 111320.0 * Math.cos(rad)
+  };
+}
+
+// Rotates local east/north-meter offsets by -bearing (so the shape stays
+// upright on screen regardless of map rotation) and projects them to
+// lng/lat around `centerLngLat`. Shared by every shape (rectangle,
+// pentagon, ...) -- each shape only needs to supply its own local corners.
+function localCornersToScreenVerticalRing(centerLngLat, localCorners, mapBearingDeg) {
+  const [lng0, lat0] = centerLngLat;
+  const { mPerDegLat, mPerDegLng } = metersPerDeg(lat0);
+
+  const theta = (-mapBearingDeg) * Math.PI / 180;
+  const cosT = Math.cos(theta);
+  const sinT = Math.sin(theta);
+
+  return localCorners.map(([x, y]) => {
+    const xr = x * cosT - y * sinT; // east (meters)
+    const yr = x * sinT + y * cosT; // north (meters)
+    return [lng0 + xr / mPerDegLng, lat0 + yr / mPerDegLat];
+  });
+}
+
+// Local EN (meters) corners of a widthM x heightM rectangle, centered at (0,0).
+function rectangleLocalCorners(widthM, heightM) {
+  const hw = widthM / 2;
+  const hh = heightM / 2;
+  return [[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh], [-hw, -hh]];
+}
+
+// Local EN (meters) corners of a regular polygon (given side count and side
+// length), point-first-vertex-north, centered at (0,0) -- used for the
+// Pentagon's actual 5-sided footprint instead of a rectangle approximation.
+function regularPolygonLocalCorners(sideM, sides) {
+  const R = sideM / (2 * Math.sin(Math.PI / sides)); // circumradius from side length
+  const corners = [];
+  for (let k = 0; k < sides; k++) {
+    const theta = Math.PI / 2 + k * (2 * Math.PI / sides);
+    corners.push([R * Math.cos(theta), R * Math.sin(theta)]);
+  }
+  corners.push(corners[0]);
+  return corners;
+}
+
+function buildScreenVerticalRectangle(centerLngLat, widthM, heightM, mapBearingDeg) {
+  return localCornersToScreenVerticalRing(centerLngLat, rectangleLocalCorners(widthM, heightM), mapBearingDeg);
+}
+
+function makeFieldFeature(map, widthM, heightM, shape) {
+  const c = map.getCenter();              // <-- viewport center in lng/lat
+  const center = [c.lng, c.lat];
+  const bearing = map.getBearing();
+
+  // Only the Pentagon unit uses "pentagon" so far -- widthM doubles as its
+  // side length there (lengthM is unused/kept equal for that shape, since a
+  // regular pentagon has only one degree of freedom).
+  const ring = shape === "pentagon"
+    ? localCornersToScreenVerticalRing(center, regularPolygonLocalCorners(widthM, 5), bearing)
+    : buildScreenVerticalRectangle(center, widthM, heightM, bearing);
+
+  // close the ring
+  ring.push(ring[0]);
+
+  return {
+    type: "Feature",
+    properties: { label: "comparison shape (screen-centered, screen-vertical)" },
+    geometry: { type: "Polygon", coordinates: [ring] }
+  };
+}
+
+/// WGS84 lon/lat -> Web Mercator meters (EPSG:3857)
+function lngLatToMercatorMeters(lng, lat) {
+  const R = 6378137;
+  const x = R * (lng * Math.PI / 180);
+  const y = R * Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI / 180) / 2));
+  return [x, y];
+}
+
+function polygonAreaMeters2(coordsXY) {
+  let area2 = 0;
+  const n = coordsXY.length;
+  for (let i = 0; i < n; i++) {
+    const [x1, y1] = coordsXY[i];
+    const [x2, y2] = coordsXY[(i + 1) % n];
+    area2 += (x1 * y2 - x2 * y1);
+  }
+  return Math.abs(area2) / 2;
+}
+
+function computeFieldsInView(map, singleUnitAreaM2) {
+  const canvas = map.getCanvas();
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+
+  const nw = map.unproject([0, 0]);
+  const ne = map.unproject([w, 0]);
+  const se = map.unproject([w, h]);
+  const sw = map.unproject([0, h]);
+
+  const ringLngLat = [nw, ne, se, sw];
+  const ringXY = ringLngLat.map(p => lngLatToMercatorMeters(p.lng, p.lat));
+
+  // Area in Web Mercator "meters²" (distorted)
+  const areaMercatorM2 = polygonAreaMeters2(ringXY);
+
+  // Convert to approx ground area using local scale factor cos²(lat)
+  const latRef = map.getCenter().lat;
+  const cosLat = Math.cos(latRef * Math.PI / 180);
+  const areaGroundM2 = areaMercatorM2 * (cosLat * cosLat);
+
+  return {
+    corners: { nw, ne, se, sw },
+    areaGroundM2,
+    fields: areaGroundM2 / singleUnitAreaM2
+  };
+}
+
+function formatNumber(n) {
+  const abs = Math.abs(n);
+
+  if (abs < 1000) return (Math.round(n*10)/10).toString();
+
+  if (abs < 1_000_000)
+    return (n / 1_000).toFixed(1) + "K";
+
+  if (abs < 1_000_000_000)
+    return (n / 1_000_000).toFixed(1) + "M";
+
+  return (n / 1_000_000_000).toFixed(1) + "B";
+}
+
+function pickRandomStops(list, n) {
+  const arr = list.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, n);
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Sets up one full map + scrolly-tour experience inside `root`
+// (a `.map-scrolly` element). Pass `showUnitSelector: true` to enable
+// the comparison-unit dropdown for that instance only.
+function initMapExperience(root, options) {
+  const mapDiv = root.querySelector(".map");
+  const fadeOverlay = root.querySelector(".fade-overlay");
+  const placeLabel = root.querySelector(".place-label");
+  const textLabel = root.querySelector(".fields-text");
+  const unitSelect = options.showUnitSelector ? root.querySelector(".unit-select") : null;
+  const DEFAULT_UNIT = UNITS.find((u) => u.key === "football-field") || UNITS[0];
+  if (unitSelect) {
+    populateUnitSelect(unitSelect, UNITS);
+    unitSelect.value = DEFAULT_UNIT.key;
+  }
+  const scrollDownBtn = root.querySelector(".scroll-down-btn");
+  const showMoreBtn = root.querySelector(".show-more-btn");
+  const searchToggleBtn = root.querySelector(".search-toggle-btn");
+  const scrollSections = root.querySelector(".scroll-sections");
+
+  let currentUnit = DEFAULT_UNIT;
+  let { widthM, heightM } = unitFootprintMeters(currentUnit);
+
+  const map = new mapboxgl.Map({
+    container: mapDiv,
+    style: options.style,
+    center: options.initialCenter,
+    zoom: options.initialZoom,
+    bearing: options.initialBearing,
+    pitch: 0,
+    bearingSnap: 0 // otherwise Mapbox silently snaps any bearing within 7° of north to exactly 0
+  });
+
+  map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "bottom-right");
+
+  // The tour is driven by page scroll, not direct map gestures —
+  // disable manual interaction so wheel/touch scroll the page instead of the map.
+  map.scrollZoom.disable();
+  map.dragPan.disable();
+  map.dragRotate.disable();
+  map.doubleClickZoom.disable();
+  map.touchZoomRotate.disable();
+  map.touchPitch.disable();
+  map.keyboard.disable();
+  map.boxZoom.disable();
+
+  // Search box
+  const geocoder = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl,
+    proximity: null,
+    limit: 6,
+    autocomplete: true,
+    placeholder: ""
+  });
+  map.addControl(geocoder, "bottom-left");
+
+  // Collapse the geocoder into a popup, opened via the magnifying-glass icon
+  const geocoderEl = geocoder.container ?? root.querySelector(".mapboxgl-ctrl-geocoder");
+
+  function openSearch() {
+    geocoderEl.classList.add("search-open");
+    searchToggleBtn.classList.add("hidden");
+    const input = geocoderEl.querySelector("input");
+    if (input) input.focus();
+  }
+
+  function closeSearch() {
+    geocoderEl.classList.remove("search-open");
+    searchToggleBtn.classList.remove("hidden");
+  }
+
+  searchToggleBtn.addEventListener("click", openSearch);
+
+  document.addEventListener("click", (e) => {
+    if (
+      geocoderEl.classList.contains("search-open") &&
+      !geocoderEl.contains(e.target) &&
+      e.target !== searchToggleBtn
+    ) {
+      closeSearch();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeSearch();
+  });
+
+  geocoder.on("result", closeSearch);
+
+  function updateFieldsText() {
+    const r = computeFieldsInView(map, unitAreaM2(currentUnit));
+    textLabel.innerHTML =
+      "This white shape is a " + currentUnit.singular + ". This map is about " +
+      formatNumber(r.fields) + " " + currentUnit.plural + ".";
+  }
+
+  map.on("load", () => {
+
+    map.addSource("field", {
+      type: "geojson",
+      data: { type: "FeatureCollection", features: [makeFieldFeature(map, widthM, heightM, currentUnit.shape)] }
+    });
+
+    map.addLayer({
+      id: "field-shadow",
+      type: "line",
+      source: "field",
+      paint: {
+        "line-color": "#000",
+        "line-width": 14,
+        "line-opacity": 0.4,
+        "line-blur": 6
+      }
+    });
+
+    map.addLayer({
+      id: "field-fill",
+      type: "fill",
+      source: "field",
+      paint: { "fill-color": "#ffcf01", "fill-opacity": 0 }
+    });
+
+    map.addLayer({
+      id: "field-outline",
+      type: "line",
+      source: "field",
+      paint: { "line-color": "#fff", "line-width": 4 }
+    });
+
+    // --- Update on any camera change (pan/zoom/rotate/pitch) ---
+    let raf = null;
+    function update() {
+      raf = null;
+      const src = map.getSource("field");
+      if (!src) return;
+      src.setData({
+        type: "FeatureCollection",
+        features: [makeFieldFeature(map, widthM, heightM, currentUnit.shape)]
+      });
+    }
+
+    const FADE_MS = 450;
+    const ZOOM_IN_MS = 1400;
+
+    // Shared fade-out/jump/fade-in camera move, used both by the scrolly
+    // tour below and by the unit-select dropdown, so picking a unit moves
+    // the map the same way scrolling to a new stop does.
+    async function flyToPlace(target, label) {
+      // Hold at whatever zoom the last place left us at -- the zoom change
+      // itself only happens once we've arrived, not during the pan.
+      const holdZoom = map.getZoom();
+
+      fadeOverlay.classList.add("visible");
+      await wait(FADE_MS);
+
+      // hidden behind the overlay: jump straight to the new spot, still at the old zoom
+      map.jumpTo({ center: target.center, bearing: target.bearing, zoom: holdZoom });
+      placeLabel.textContent = label;
+
+      // fade back in, then ease from the old zoom to this place's own (in or out)
+      fadeOverlay.classList.remove("visible");
+      map.easeTo({ zoom: target.zoom, duration: ZOOM_IN_MS, essential: true });
+    }
+
+    if (unitSelect) {
+      unitSelect.addEventListener("change", () => {
+        currentUnit = UNITS.find((u) => u.key === unitSelect.value) || UNITS[0];
+        ({ widthM, heightM } = unitFootprintMeters(currentUnit));
+        const p = currentUnit.place;
+        const target = p
+          ? { center: [p.lng, p.lat], zoom: p.zoom, bearing: p.bearing || 0 }
+          : { center: options.initialCenter, zoom: options.initialZoom, bearing: options.initialBearing };
+        flyToPlace(target, p ? "You are at " + currentUnit.label : options.homeText);
+      });
+    }
+
+    // --- Scrolly tour: index 0 is always the starting view; ---
+    // --- indices 1-5 are 5 randomly chosen places from `options.pois`. ---
+    const tour = [null, ...pickRandomStops(options.pois, 5)];
+
+    let currentStep = 0;
+
+    function updateEndControls() {
+      const atEnd = currentStep >= tour.length - 1;
+      scrollDownBtn.classList.toggle("hidden", atEnd);
+      showMoreBtn.classList.toggle("hidden", !atEnd);
+    }
+
+    async function goToStep(index) {
+      if (index === currentStep) return;
+      currentStep = index;
+      const poi = tour[index];
+
+      const target = poi
+        ? { center: [poi.lng, poi.lat], zoom: poi.zoom ?? 15, bearing: poi.bearing || 0 }
+        : { center: options.initialCenter, zoom: options.initialZoom, bearing: options.initialBearing };
+
+      await flyToPlace(target, poi ? "You are at " + poi.name : options.homeText);
+
+      updateEndControls();
+    }
+
+    const stepObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          goToStep(Number(entry.target.dataset.index));
+        }
+      });
+    }, { threshold: [0.5] });
+
+    scrollSections.querySelectorAll(".scroll-step").forEach((section) => {
+      stepObserver.observe(section);
+    });
+
+    scrollDownBtn.addEventListener("click", () => {
+      const next = Math.min(currentStep + 1, tour.length - 1);
+      scrollSections
+        .querySelector(`.scroll-step[data-index="${next}"]`)
+        .scrollIntoView({ behavior: "smooth" });
+    });
+
+    // Ran out of stops — pick 5 more (avoiding repeats where possible) and
+    // append new scroll-step sections so the visitor can keep scrolling.
+    function addMoreStops() {
+      const alreadyShown = new Set(tour.filter(Boolean).map((p) => p.name));
+      const remaining = options.pois.filter((p) => !alreadyShown.has(p.name));
+      const pool = remaining.length >= 5 ? remaining : options.pois;
+      const newStops = pickRandomStops(pool, 5);
+      const startIndex = tour.length;
+      tour.push(...newStops);
+
+      newStops.forEach((_, i) => {
+        const section = document.createElement("section");
+        section.className = "scroll-step";
+        section.dataset.index = String(startIndex + i);
+        scrollSections.appendChild(section);
+        stepObserver.observe(section);
+      });
+
+      showMoreBtn.classList.add("hidden");
+      scrollDownBtn.classList.remove("hidden");
+
+      scrollSections
+        .querySelector(`.scroll-step[data-index="${startIndex}"]`)
+        .scrollIntoView({ behavior: "smooth" });
+    }
+
+    showMoreBtn.addEventListener("click", addMoreStops);
+
+    // 'move' fires for pan/zoom/rotate/pitch continuously
+    map.on("move", () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    });
+  });
+
+  map.on("load", updateFieldsText);
+  map.on("moveend", updateFieldsText);
+}
+
+// Place and unit data (name/lat/lng/zoom/bearing) lives in places.json and
+// units.json, both tuned with football_tester.html, rather than inline
+// here -- only `active: true` places are used as tour stops.
+Promise.all([
+  fetch("places.json").then((r) => r.json()),
+  fetch("units.json").then((r) => r.json())
+]).then(([places, units]) => {
+    const pois = places.filter((p) => p.active !== false);
+    UNITS = units;
+
+    initMapExperience(document.getElementById("map-scrolly-1"), {
+      style: STYLE,
+      initialCenter: INITIAL_CENTER,
+      initialZoom: 17,
+      initialBearing: -29,
+      homeText: HOME_PLACE_TEXT,
+      pois: pois,
+      showUnitSelector: false
+    });
+
+    initMapExperience(document.getElementById("map-scrolly-2"), {
+      style: STYLE,
+      initialCenter: INITIAL_CENTER,
+      initialZoom: 17,
+      initialBearing: -29,
+      homeText: HOME_PLACE_TEXT,
+      pois: pois,
+      showUnitSelector: true
+    });
+  });
+</script>
+</body>
+</html>

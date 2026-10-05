@@ -1,0 +1,8 @@
+[
+  { "key": "tiananmen-square", "category": "squares", "label": "Tiananmen Square", "singular": "Tiananmen Square", "plural": "Tiananmen Squares", "widthM": 290, "lengthM": 793, "place": { "lat": 39.902463, "lng": 116.391462, "zoom": 15.5, "bearing": -1.6 } },
+  { "key": "washington-square-park", "category": "parks", "label": "Washington Square Park", "singular": "Washington Square Park", "plural": "Washington Square Parks", "widthM": 146, "lengthM": 287, "place": { "lat": 40.730918, "lng": -73.997597, "zoom": 17, "bearing": -58 } },
+  { "key": "central-park", "category": "parks", "label": "Central Park", "singular": "Central Park", "plural": "Central Parks", "widthM": 800, "lengthM": 4100, "place": { "lat": 40.782335, "lng": -73.96584, "zoom": 13.2, "bearing": 28.8 } },
+  { "key": "football-field", "category": "sports", "label": "Football field", "singular": "football field", "plural": "football fields", "widthFt": 160, "lengthFt": 360 },
+  { "key": "great-pyramid", "category": "buildings", "label": "Great Pyramid of Giza", "singular": "Great Pyramid of Giza", "plural": "Great Pyramids of Giza", "widthM": 230, "lengthM": 230, "place": { "lat": 29.979156, "lng": 31.134194, "zoom": 16.3, "bearing": 0 } },
+  { "key": "the-pentagon", "category": "buildings", "shape": "pentagon", "label": "The Pentagon", "singular": "the Pentagon", "plural": "Pentagons", "widthM": 281, "lengthM": 281, "place": { "lat": 38.8719, "lng": -77.0563, "zoom": 15.5, "bearing": 0 } }
+]
