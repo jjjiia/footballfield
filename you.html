@@ -113,32 +113,35 @@
       opacity: 0.75;
     }
     .spin-arrows button:hover{ opacity: 1; }
-    /* when a slide comes into view, its numbers bob up and down and the arrows flash: "you can spin these" */
-    .spin-box.hint .blank-input{ animation: spin-hint 1.1s ease-in-out both; animation-delay: inherit; }
+    /* when a slide comes into view, each number spins like a wheel (a reel of neighboring values rolls up,
+       then down, then settles — see spinHint) while the matching arrow flashes: "you can spin these" */
+    .spin-box{ position: relative; overflow: hidden; }
+    .spin-reel{
+      position: absolute;
+      left: 0;
+      top: 0;
+      pointer-events: none;
+      color: var(--blank-ink);
+      font-weight: 700;
+      text-align: center;
+    }
+    .spin-reel div{ display: flex; align-items: center; justify-content: center; }
     .spin-box.hint .spin-arrows{ animation-delay: inherit; }
-    .spin-box.hint .spin-up{ animation: arrow-up-hint 1.1s ease-in-out both; animation-delay: inherit; }
-    .spin-box.hint .spin-down{ animation: arrow-down-hint 1.1s ease-in-out both; animation-delay: inherit; }
-    @keyframes spin-hint{
-      0%, 100%{ transform: translateY(0); }
-      20%{ transform: translateY(-0.22em); }
-      45%{ transform: translateY(0.18em); }
-      70%{ transform: translateY(-0.08em); }
-    }
+    .spin-box.hint .spin-up{ animation: arrow-up-hint 1s ease-in-out both; animation-delay: inherit; }
+    /* the up arrow ticks once per notch as the number rolls up */
     @keyframes arrow-up-hint{
-      0%, 100%{ transform: translateY(0); opacity: 0.75; }
-      20%{ transform: translateY(-3px); opacity: 1; }
-    }
-    @keyframes arrow-down-hint{
-      0%, 40%, 100%{ transform: translateY(0); opacity: 0.75; }
-      55%{ transform: translateY(3px); opacity: 1; }
+      0%, 25%, 50%, 100%{ transform: translateY(0); opacity: 0.75; }
+      12%, 37%, 70%{ transform: translateY(-3px); opacity: 1; }
     }
     @media (prefers-reduced-motion: reduce){
-      .spin-box.hint .blank-input, .spin-box.hint .spin-arrows button{ animation: none; }
+      .spin-box.hint .spin-arrows button{ animation: none; }
     }
     #activityInput{ width: 140px; max-width: 100%; }
     #hoursPerDayInput, #yearsInput{ width: 60px; }
     #dailySavingsInput{ width: 80px; }
     #savingsYearsInput{ width: 60px; }
+    #rentInput{ width: 110px; }
+    #homeSqftInput{ width: 90px; }
     #wordsPerDayInput, #coffeeShopsPerDayInput, #restaurantsPerDayInput{ width: 60px; }
     #talkAmountInput{ width: 60px; }
     #parkActivityInput{ width: 160px; max-width: 100%; }
@@ -265,6 +268,27 @@
 
     <section class="slide pal-2">
       <p class="madlib">
+        If you drink <input type="number" id="glassesInput" class="blank-input" value="8" min="1" step="1"> <span id="glassesNoun">glasses</span> of water a day<sup class="sn">18</sup><span class="sidenote"><b>18.</b> An 8-oz glass; eight glasses is half a gallon a day.</span>, you will drink a bathtub<sup class="sn">19</sup><span class="sidenote"><b>19.</b> ~40 gallons; <a href="https://www.hunker.com/13416360/how-many-gallons-of-water-does-the-average-house-bathtub-contain/" target="_blank" rel="noopener">household tubs hold 30–60</a>.</span> in <span class="result" id="bathtubTime">–</span>, an Olympic pool<sup class="sn">20</sup><span class="sidenote"><b>20.</b> 50 m × 25 m × 2 m deep, <a href="https://www.nbc.com/nbc-insider/olympic-swimming-pool-size-gallons-meters-depth" target="_blank" rel="noopener">~660,000 gallons</a>.</span> in <span class="result" id="poolTime">–</span>, and the Central Park Reservoir<sup class="sn">21</sup><span class="sidenote"><b>21.</b> The reservoir's earthen embankment has a <a href="https://www.enr.com/articles/62606-nyc-to-replace-160-plus-year-old-equipment-from-central-park-reservoir" target="_blank" rel="noopener">storage capacity of 1,040 million gallons</a>.</span> in <span class="result" id="reservoirTime">–</span>. If every New Yorker<sup class="sn">22</sup><span class="sidenote"><b>22.</b> 8,584,629 people, the Census Bureau's <a href="https://www.census.gov/quickfacts/fact/table/newyorkcitynewyork/PST045225" target="_blank" rel="noopener">July 2025 estimate</a> for New York City.</span> drank <span id="glassesMirror">8</span> <span id="glassesMirrorNoun">glasses</span> a day, they would drink the Reservoir in <span class="result" id="nycReservoirTime">–</span>.
+      </p>
+    </section>
+
+    <section class="slide pal-3">
+      <p class="madlib">
+        If you eat dinner with your kid <input type="number" id="dinnerNightsInput" class="blank-input" value="5" min="1" max="7" step="1"> <span id="dinnerNightsNoun">nights</span> a <select id="dinnerPeriodSelect" class="inline-select">
+          <option value="week" selected>week</option>
+          <option value="month">month</option>
+        </select>, you will have <span class="result" id="dinnersLeft">–</span> dinners together before they turn 18<sup class="sn">16</sup><span class="sidenote"><b>16.</b> Assumes 52 weeks (12 months) per year, counted from birth to their 18th birthday.</span>. If your kid is <input type="number" id="kidAgeInput" class="blank-input" value="8" min="0" max="17" step="1">, you've already had about <span class="result" id="dinnersHad">–</span> of them.
+      </p>
+    </section>
+
+    <section class="slide pal-4">
+      <p class="madlib">
+        If you pay $<input type="number" id="rentInput" class="blank-input" value="3000" min="0" step="100"> in rent per month, an hour costs $<span class="result" id="rentPerHour">–</span> and a second costs <span class="result" id="rentPerSecond">–</span><sup class="sn">23</sup><span class="sidenote"><b>23.</b> Assumes 12 months, 365 days and 8,760 hours per year.</span>. If your home is <input type="number" id="homeSqftInput" class="blank-input" value="700" min="1" step="50"> square feet, every square foot costs $<span class="result" id="rentPerSqftMonth">–</span> per month, or <span class="result" id="rentPerSqftDay">–</span> per day.
+      </p>
+    </section>
+
+    <section class="slide pal-5">
+      <p class="madlib">
         If you climb <input type="number" id="climbAmountInput" class="blank-input" value="5" min="1" step="1"> <select id="climbUnitSelect" class="inline-select">
           <option value="flights" selected>flights of stairs</option>
           <option value="stairs">stairs</option>
@@ -272,14 +296,7 @@
       </p>
     </section>
 
-    <section class="slide pal-3">
-      <p class="madlib">
-        If you drink <input type="number" id="glassesInput" class="blank-input" value="8" min="1" step="1"> <span id="glassesNoun">glasses</span> of water a day<sup class="sn">18</sup><span class="sidenote"><b>18.</b> An 8-oz glass; eight glasses is half a gallon a day.</span>, you will drink a bathtub<sup class="sn">19</sup><span class="sidenote"><b>19.</b> ~40 gallons; <a href="https://www.hunker.com/13416360/how-many-gallons-of-water-does-the-average-house-bathtub-contain/" target="_blank" rel="noopener">household tubs hold 30–60</a>.</span> in <span class="result" id="bathtubTime">–</span>, an Olympic pool<sup class="sn">20</sup><span class="sidenote"><b>20.</b> 50 m × 25 m × 2 m deep, <a href="https://www.nbc.com/nbc-insider/olympic-swimming-pool-size-gallons-meters-depth" target="_blank" rel="noopener">~660,000 gallons</a>.</span> in <span class="result" id="poolTime">–</span>, and the Central Park Reservoir<sup class="sn">21</sup><span class="sidenote"><b>21.</b> The reservoir's earthen embankment has a <a href="https://www.enr.com/articles/62606-nyc-to-replace-160-plus-year-old-equipment-from-central-park-reservoir" target="_blank" rel="noopener">storage capacity of 1,040 million gallons</a>.</span> in <span class="result" id="reservoirTime">–</span>. If every New Yorker<sup class="sn">22</sup><span class="sidenote"><b>22.</b> 8,584,629 people, the Census Bureau's <a href="https://www.census.gov/quickfacts/fact/table/newyorkcitynewyork/PST045225" target="_blank" rel="noopener">July 2025 estimate</a> for New York City.</span> drank <span id="glassesMirror">8</span> <span id="glassesMirrorNoun">glasses</span> a day, they would drink the Reservoir in <span class="result" id="nycReservoirTime">–</span>.
-      </p>
-    </section>
-
-
-    <section class="slide pal-4">
+    <section class="slide pal-1">
       <p class="madlib madlib-spaced">
         If you <input type="text" id="activityInput" class="blank-input" value="sleep"> <input type="number" id="hoursPerDayInput" class="blank-input" value="8" min="0" step="0.5"> <select id="hoursUnitSelect" class="inline-select">
           <option value="seconds">seconds</option>
@@ -299,7 +316,7 @@
       </p>
     </section>
 
-    <section class="slide pal-5">
+    <section class="slide pal-2">
       <p class="madlib">
         If you <input type="text" id="parkActivityInput" class="blank-input" value="go to the park"> <input type="number" id="parkFrequencyInput" class="blank-input" value="2" min="0" step="1">x a <select id="parkPeriodSelect" class="inline-select">
           <option value="day">day</option>
@@ -310,7 +327,7 @@
       </p>
     </section>
 
-    <section class="slide pal-1">
+    <section class="slide pal-3">
       <p class="madlib">
         If you talk to your <select id="talkRelationshipSelect" class="inline-select">
           <option value="mom" selected>mom</option>
@@ -338,7 +355,7 @@
       </p>
     </section>
 
-    <section class="slide pal-2">
+    <section class="slide pal-4">
       <p class="madlib">
         If you talk to a new person a <select id="peoplePeriodSelect" class="inline-select">
           <option value="second">second</option>
@@ -368,17 +385,7 @@
       </p>
     </section>
 
-    <section class="slide pal-3">
-      <p class="madlib">
-        If you eat dinner with your kid <input type="number" id="dinnerNightsInput" class="blank-input" value="5" min="1" max="7" step="1"> <span id="dinnerNightsNoun">nights</span> a <select id="dinnerPeriodSelect" class="inline-select">
-          <option value="week" selected>week</option>
-          <option value="month">month</option>
-        </select>, you will have <span class="result" id="dinnersLeft">–</span> dinners together before they turn 18<sup class="sn">16</sup><span class="sidenote"><b>16.</b> Assumes 52 weeks (12 months) per year, counted from birth to their 18th birthday.</span>. If your kid is <input type="number" id="kidAgeInput" class="blank-input" value="8" min="0" max="17" step="1">, you've already had about <span class="result" id="dinnersHad">–</span> of them.
-      </p>
-    </section>
-
-
-    <section class="slide pal-4">
+    <section class="slide pal-5">
       <p class="madlib madlib-spaced">
         If you buy <input type="number" id="spendQuantityInput" class="blank-input" value="1" min="0" step="1"> <select id="spendFoodSelect" class="inline-select">
           <option value="coffee" selected>small black coffee from Starbucks</option>
@@ -396,7 +403,7 @@
       </p>
     </section>
 
-    <section class="slide pal-5">
+    <section class="slide pal-1">
       <p class="madlib">
         If you learn <input type="number" id="wordsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="wordsNoun">word</span> a <select id="wordsPeriodSelect" class="inline-select">
           <option value="day" selected>day</option>
@@ -407,7 +414,7 @@
       </p>
     </section>
 
-    <section class="slide pal-1">
+    <section class="slide pal-2">
       <p class="madlib">
         If you go to <input type="number" id="coffeeShopsPerDayInput" class="blank-input" value="1" min="0" step="1"> new <span id="coffeeShopNoun">coffee shop</span> a <select id="coffeeShopsPeriodSelect" class="inline-select">
           <option value="day" selected>day</option>
@@ -418,7 +425,7 @@
       </p>
     </section>
 
-    <section class="slide pal-2">
+    <section class="slide pal-3">
       <p class="madlib">
         If you go to <input type="number" id="restaurantsPerDayInput" class="blank-input" value="1" min="0" step="1"> new <span id="restaurantNoun">restaurant</span> a <select id="restaurantsPeriodSelect" class="inline-select">
           <option value="day" selected>day</option>
@@ -429,7 +436,7 @@
       </p>
     </section>
 
-    <section class="slide pal-3">
+    <section class="slide pal-4">
       <p class="madlib">
         If you stand at <input type="number" id="intersectionsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="intersectionNoun">traffic light</span> a <select id="intersectionsPeriodSelect" class="inline-select">
           <option value="day" selected>day</option>
@@ -440,8 +447,7 @@
       </p>
     </section>
 
-
-    <section class="slide pal-4">
+    <section class="slide pal-5">
       <p class="madlib madlib-spaced">
         If you save $<input type="number" id="dailySavingsInput" class="blank-input" value="1" min="0" step="0.5"> a <select id="savingsPeriodSelect" class="inline-select">
           <option value="minute">minute</option>
@@ -1023,6 +1029,70 @@
       arrows.querySelector(".spin-up").addEventListener("click", () => setValue((parseFloat(input.value) || 0) + step));
       arrows.querySelector(".spin-down").addEventListener("click", () => setValue((parseFloat(input.value) || 0) - step));
 
+      // the "spin me" hint: the value starts a few steps low and rolls upward into place, one notch at a time,
+      // like a wheel turning in one direction; each notch is a real value change, so the results recount along with it
+      const HINT_STEPS = 3;
+      let hintRun = null;
+      const stopReel = () => { if (hintRun) hintRun.finish(); };
+      box.spinHint = (delayMs) => {
+        stopReel();
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const target = parseFloat(input.value) || 0;
+        const fmt = (x) => String(Number(x.toFixed(decimals)));
+        let value = Math.max(min, target - HINT_STEPS * step);
+        const notches = Math.round((target - value) / step);
+        if (notches <= 0) return;
+
+        const h = input.offsetHeight;
+        const reel = document.createElement("div");
+        reel.className = "spin-reel";
+        reel.style.width = input.offsetWidth + "px";
+        reel.style.font = getComputedStyle(input).font;
+        let timer = null, anim = null, done = false;
+
+        const run = hintRun = {
+          finish() {
+            if (done) return;
+            done = true;
+            clearTimeout(timer);
+            if (anim) anim.cancel();
+            reel.remove();
+            input.style.color = "";
+            if (hintRun === run) hintRun = null;
+            setValue(target);
+          },
+        };
+
+        // one notch: the current number rolls up and out, the next one rolls up from below
+        const turn = (i) => {
+          if (done) return;
+          if (i === notches) return run.finish();
+          const next = value + step;
+          reel.innerHTML = `<div style="height:${h}px">${fmt(value)}</div><div style="height:${h}px">${fmt(next)}</div>`;
+          const last = i === notches - 1;
+          anim = reel.animate(
+            [{ transform: "translateY(0)" }, { transform: `translateY(${-h}px)` }],
+            { duration: last ? 420 : 200, easing: last ? "cubic-bezier(.2,.8,.3,1.15)" : "linear", fill: "forwards" }
+          );
+          anim.onfinish = () => {
+            value = next;
+            setValue(value);
+            turn(i + 1);
+          };
+        };
+
+        timer = setTimeout(() => {
+          setValue(value);
+          input.style.color = "transparent";
+          box.appendChild(reel);
+          turn(0);
+        }, delayMs);
+      };
+      // touching or focusing the box ends the hint immediately
+      box.addEventListener("pointerdown", stopReel);
+      box.addEventListener("wheel", stopReel, { passive: true });
+      input.addEventListener("focus", stopReel);
+
       // wheel anywhere over the box: scroll up = bigger number
       let wheelAccum = 0;
       box.addEventListener("wheel", (e) => {
@@ -1143,6 +1213,33 @@
     glassesInput.addEventListener("input", updateWater);
     updateWater();
 
+    // ---- "if you pay $3,000 in rent per month..." ----
+    const rentInput = document.getElementById("rentInput");
+    const homeSqftInput = document.getElementById("homeSqftInput");
+
+    // small amounts read better in cents: 0.0011 -> "0.11¢", 0.43 -> "43¢"
+    function formatMoneyOrCents(n) {
+      if (n >= 1) return "$" + formatDollars(n);
+      const cents = n * 100;
+      const digits = cents >= 10 ? 0 : cents >= 1 ? 1 : cents >= 0.1 ? 2 : 3;
+      return cents.toFixed(digits) + "¢";
+    }
+
+    function updateRent() {
+      const rent = Number(rentInput.value) || 0;
+      const sqft = Number(homeSqftInput.value) || 0;
+      const perYear = rent * 12;
+
+      document.getElementById("rentPerHour").textContent = formatDollars(perYear / (DAYS_PER_YEAR * 24));
+      document.getElementById("rentPerSecond").textContent = formatMoneyOrCents(perYear / (DAYS_PER_YEAR * 24 * 3600));
+      document.getElementById("rentPerSqftMonth").textContent = sqft ? formatDollars(rent / sqft) : "–";
+      document.getElementById("rentPerSqftDay").textContent = sqft ? formatMoneyOrCents(perYear / DAYS_PER_YEAR / sqft) : "–";
+    }
+
+    rentInput.addEventListener("input", updateRent);
+    homeSqftInput.addEventListener("input", updateRent);
+    updateRent();
+
     // ---- text blanks grow/shrink to fit what's typed ----
     const sizer = document.createElement("span");
     sizer.style.cssText = "position:absolute;visibility:hidden;white-space:pre;left:-9999px;top:0";
@@ -1214,22 +1311,24 @@
 
     document.querySelectorAll('input.blank-input[type="number"]').forEach(enableScrollAdjust);
 
-    // ---- each time a slide comes into view, its number boxes do a little "spin me" bob, one after another ----
+    // ---- each time a slide comes into view, its number boxes spin like wheels, one after another ----
     const hintObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         entry.target.querySelectorAll(".spin-box").forEach((box, i) => {
           box.classList.remove("hint");
           void box.offsetWidth; // restart the animation
-          box.style.animationDelay = (0.35 + i * 0.25) + "s";
+          const delay = 350 + i * 250;
+          box.style.animationDelay = delay + "ms";
           box.classList.add("hint");
+          if (box.spinHint) box.spinHint(delay);
         });
       });
     }, { threshold: 0.6 });
     slides.forEach((slide) => hintObserver.observe(slide));
     document.addEventListener("animationend", (e) => {
       const box = e.target.closest && e.target.closest(".spin-box.hint");
-      if (box && e.target.classList.contains("blank-input")) box.classList.remove("hint");
+      if (box && e.target.classList.contains("spin-up")) box.classList.remove("hint");
     });
   </script>
 </body>
