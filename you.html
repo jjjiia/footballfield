@@ -6,7 +6,7 @@
   <title>You</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="site.css">
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
@@ -15,6 +15,8 @@
   <style>
     /* scrolly: each sentence is a full-screen slide that snaps into place, one at a time */
     html{ scroll-snap-type: y mandatory; }
+    /* Inter — the open-source base of Guggenheim Sans */
+    body{ font-family: 'Inter', Arial, sans-serif; }
     .inner{
       max-width: none;
       padding: 0;
@@ -62,7 +64,7 @@
     /* every part of the sentence you can change, in the tile's blank color */
     .blank-input{
       width: 100px;
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Inter', Arial, sans-serif;
       font-size: 28px;
       font-weight: 700;
       text-align: center;
@@ -81,8 +83,58 @@
     }
     input.blank-input[type="number"]::-webkit-inner-spin-button,
     input.blank-input[type="number"]::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
-    input.blank-input[type="number"]:hover,
-    input.blank-input[type="number"].spinning{ filter: brightness(0.9); }
+    /* number blanks sit in a .spin-box with little up/down arrows; the box carries the fill + underline */
+    .spin-box{
+      display: inline-flex;
+      align-items: center;
+      background: var(--blank);
+      border-bottom: 2px solid var(--rule);
+      touch-action: none;
+      cursor: ns-resize;
+    }
+    .spin-box:hover,
+    .spin-box.spinning{ filter: brightness(0.92); }
+    .spin-box .blank-input{
+      background: transparent;
+      border-bottom: none;
+    }
+    .spin-arrows{
+      display: inline-flex;
+      flex-direction: column;
+      padding-right: 6px;
+    }
+    .spin-arrows button{
+      all: unset;
+      cursor: pointer;
+      color: var(--blank-ink);
+      font-size: 11px;
+      line-height: 1;
+      padding: 2px 3px;
+      opacity: 0.75;
+    }
+    .spin-arrows button:hover{ opacity: 1; }
+    /* when a slide comes into view, its numbers bob up and down and the arrows flash: "you can spin these" */
+    .spin-box.hint .blank-input{ animation: spin-hint 1.1s ease-in-out both; animation-delay: inherit; }
+    .spin-box.hint .spin-arrows{ animation-delay: inherit; }
+    .spin-box.hint .spin-up{ animation: arrow-up-hint 1.1s ease-in-out both; animation-delay: inherit; }
+    .spin-box.hint .spin-down{ animation: arrow-down-hint 1.1s ease-in-out both; animation-delay: inherit; }
+    @keyframes spin-hint{
+      0%, 100%{ transform: translateY(0); }
+      20%{ transform: translateY(-0.22em); }
+      45%{ transform: translateY(0.18em); }
+      70%{ transform: translateY(-0.08em); }
+    }
+    @keyframes arrow-up-hint{
+      0%, 100%{ transform: translateY(0); opacity: 0.75; }
+      20%{ transform: translateY(-3px); opacity: 1; }
+    }
+    @keyframes arrow-down-hint{
+      0%, 40%, 100%{ transform: translateY(0); opacity: 0.75; }
+      55%{ transform: translateY(3px); opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .spin-box.hint .blank-input, .spin-box.hint .spin-arrows button{ animation: none; }
+    }
     #activityInput{ width: 140px; max-width: 100%; }
     #hoursPerDayInput, #yearsInput{ width: 60px; }
     #dailySavingsInput{ width: 80px; }
@@ -109,7 +161,7 @@
     #citySearchInput::-webkit-calendar-picker-indicator{ display: none; }
     #wordsYearsInput, #peopleYearsInput{ width: 60px; }
     .inline-select{
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Inter', Arial, sans-serif;
       font-size: 28px;
       font-weight: 700;
       color: var(--blank-ink);
@@ -183,7 +235,7 @@
     .geocoder-box .mapboxgl-ctrl-geocoder{
       width: 100%;
       max-width: none;
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'Inter', Arial, sans-serif;
       font-size: 18px;
       background: var(--blank);
       box-shadow: none;
@@ -959,9 +1011,21 @@
         }
       }
 
-      // wheel: scroll up = bigger number
+      // wrap the input in a box with up/down arrows inside it
+      const box = document.createElement("span");
+      box.className = "spin-box";
+      input.before(box);
+      box.appendChild(input);
+      const arrows = document.createElement("span");
+      arrows.className = "spin-arrows";
+      arrows.innerHTML = '<button type="button" class="spin-up" aria-label="Increase">▲</button><button type="button" class="spin-down" aria-label="Decrease">▼</button>';
+      box.appendChild(arrows);
+      arrows.querySelector(".spin-up").addEventListener("click", () => setValue((parseFloat(input.value) || 0) + step));
+      arrows.querySelector(".spin-down").addEventListener("click", () => setValue((parseFloat(input.value) || 0) - step));
+
+      // wheel anywhere over the box: scroll up = bigger number
       let wheelAccum = 0;
-      input.addEventListener("wheel", (e) => {
+      box.addEventListener("wheel", (e) => {
         e.preventDefault();
         const delta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY; // lines -> pixels
         wheelAccum -= delta;
@@ -971,7 +1035,7 @@
           setValue((parseFloat(input.value) || 0) + steps * step);
         }
       }, { passive: false });
-      input.addEventListener("mouseleave", () => { wheelAccum = 0; });
+      box.addEventListener("mouseleave", () => { wheelAccum = 0; });
 
       // touch: drag up = bigger number
       let startY = 0;
@@ -992,7 +1056,7 @@
           if (Math.abs(deltaY) < 8) return;
           dragging = true;
           input.blur(); // dragging to adjust, not typing — dismiss/skip the keyboard
-          input.classList.add("spinning");
+          box.classList.add("spinning");
         }
 
         setValue(startValue + Math.round(deltaY / PIXELS_PER_STEP) * step);
@@ -1000,7 +1064,7 @@
 
       const endDrag = () => {
         dragging = false;
-        input.classList.remove("spinning");
+        box.classList.remove("spinning");
       };
       input.addEventListener("touchend", endDrag, { passive: true });
       input.addEventListener("touchcancel", endDrag, { passive: true });
@@ -1124,7 +1188,7 @@
       const target = slides[Math.max(0, Math.min(slides.length - 1, i))];
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    const isFormField = (el) => el && el.closest && el.closest("input, select, textarea, .geocoder-box");
+    const isFormField = (el) => el && el.closest && el.closest("input, select, textarea, button, .spin-box, .geocoder-box");
 
     document.addEventListener("keydown", (e) => {
       if (isFormField(e.target)) return;
@@ -1149,6 +1213,24 @@
     }, { passive: true });
 
     document.querySelectorAll('input.blank-input[type="number"]').forEach(enableScrollAdjust);
+
+    // ---- each time a slide comes into view, its number boxes do a little "spin me" bob, one after another ----
+    const hintObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.querySelectorAll(".spin-box").forEach((box, i) => {
+          box.classList.remove("hint");
+          void box.offsetWidth; // restart the animation
+          box.style.animationDelay = (0.35 + i * 0.25) + "s";
+          box.classList.add("hint");
+        });
+      });
+    }, { threshold: 0.6 });
+    slides.forEach((slide) => hintObserver.observe(slide));
+    document.addEventListener("animationend", (e) => {
+      const box = e.target.closest && e.target.closest(".spin-box.hint");
+      if (box && e.target.classList.contains("blank-input")) box.classList.remove("hint");
+    });
   </script>
 </body>
 </html>
