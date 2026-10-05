@@ -13,37 +13,63 @@
   <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
   <style>
-    /* this page needs a right margin column for sidenotes, so it's wider than the shared .inner */
+    /* scrolly: each sentence is a full-screen slide that snaps into place, one at a time */
+    html{ scroll-snap-type: y mandatory; }
     .inner{
-      max-width: 960px;
+      max-width: none;
+      padding: 0;
     }
+    /* each slide rotates through five palettes (.pal-1 … .pal-5):
+       --bg slide, --ink sentence text, --blank/--blank-ink the parts you can change,
+       --rule the underline on those parts, --result the computed numbers, --note-bg/--note-ink the footnote panel.
+       On desktop the sentence sits on the left and the footnote panel fills the right;
+       --side centers the ~980px layout on wide screens, --notes is the footnote column plus its gutter */
+    .slide{
+      --bg: #fff; --ink: #000; --blank: #FFFF00; --blank-ink: #000; --rule: #000; --result: #000;
+      --note-bg: #eee; --note-ink: #000;
+      --side: max(24px, calc((100vw - 980px) / 2));
+      --notes: 340px;
+      box-sizing: border-box;
+      /* exactly one window tall, so every snap lands flush with the window;
+         a sentence too long for the window scrolls inside its own slide */
+      height: 100vh;
+      height: 100dvh;
+      overflow-y: auto;
+      scroll-snap-align: start;
+      scroll-snap-stop: always; /* a fast flick still stops at the next slide */
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(to left, var(--note-bg) calc(var(--side) + var(--notes) - 20px), var(--bg) 0);
+    }
+    .pal-1{ --bg: #DFC0B0; --ink: #791608; --blank: #F7BE6C; --blank-ink: #791608; --rule: #914D2E; --result: #914D2E; --note-bg: #791608; --note-ink: #F7BE6C; }
+    .pal-2{ --bg: #D0D6B9; --ink: #415621; --blank: #78492E; --blank-ink: #D0D6B9; --rule: #469B9A; --result: #78492E; --note-bg: #415621; --note-ink: #D0D6B9; }
+    /* #2E2139 is a darkened #6C4D84 — nothing in this set is dark enough to read on the sky blue */
+    .pal-3{ --bg: #49A4C6; --ink: #2E2139; --blank: #D6A85A; --blank-ink: #2E2139; --rule: #9F4437; --result: #2E2139; --note-bg: #6C4D84; --note-ink: #F4E3C4; }
+    .pal-4{ --bg: #E2DBC5; --ink: #BE3019; --blank: #AAC7D8; --blank-ink: #BE3019; --rule: #DD6143; --result: #BE3019; --note-bg: #DD6143; --note-ink: #2B0A04; }
+    /* #6E0F13 is a darkened #B91A20, for the same reason on the jade */
+    .pal-5{ --bg: #42BE98; --ink: #6E0F13; --blank: #D8B56C; --blank-ink: #6E0F13; --rule: #B91A20; --result: #6E0F13; --note-bg: #D69EA0; --note-ink: #6E0F13; }
     .madlib{
-      max-width: 620px;
+      display: flow-root; /* grow to contain the floated footnotes */
+      box-sizing: border-box;
+      width: 100%;
+      padding: 48px calc(var(--side) + var(--notes)) 48px var(--side);
       font-size: 28px;
       font-weight: 400;
       line-height: 1.7;
-      margin: 0 0 32px;
+      margin: auto 0; /* centers vertically, but never cuts off the top of a slide that overflows */
+      color: var(--ink);
     }
-    .madlib-spaced{
-      margin-top: 64px;
-    }
-    .divider{
-      max-width: 620px;
-      margin: 48px 0 0;
-      border: none;
-      border-top: 1px solid #ccc;
-    }
-    /* process yellow, matches the site nav — marks every part of the sentence you can change */
+    /* every part of the sentence you can change, in the tile's blank color */
     .blank-input{
       width: 100px;
       font-family: 'Open Sans', sans-serif;
       font-size: 28px;
       font-weight: 700;
       text-align: center;
-      color: #000;
-      background: #f0f0f0;
+      color: var(--blank-ink);
+      background: var(--blank);
       border: none;
-      border-bottom: 2px solid #000;
+      border-bottom: 2px solid var(--rule);
     }
     .blank-input:focus{ outline: none; }
     /* number blanks spin: wheel over them or drag up/down on touch */
@@ -56,18 +82,21 @@
     input.blank-input[type="number"]::-webkit-inner-spin-button,
     input.blank-input[type="number"]::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
     input.blank-input[type="number"]:hover,
-    input.blank-input[type="number"].spinning{ background: #e2e2e2; }
-    #activityInput{ width: 140px; }
+    input.blank-input[type="number"].spinning{ filter: brightness(0.9); }
+    #activityInput{ width: 140px; max-width: 100%; }
     #hoursPerDayInput, #yearsInput{ width: 60px; }
     #dailySavingsInput{ width: 80px; }
     #savingsYearsInput{ width: 60px; }
     #wordsPerDayInput, #coffeeShopsPerDayInput, #restaurantsPerDayInput{ width: 60px; }
     #talkAmountInput{ width: 60px; }
-    #parkActivityInput{ width: 160px; }
+    #parkActivityInput{ width: 160px; max-width: 100%; }
     #parkFrequencyInput, #parkYearsInput{ width: 60px; }
     #spendQuantityInput{ width: 50px; }
     #spendYearsInput{ width: 60px; }
     #intersectionsPerDayInput{ width: 60px; }
+    #dinnerNightsInput, #kidAgeInput{ width: 60px; }
+    #climbAmountInput{ width: 80px; }
+    #glassesInput{ width: 60px; }
     #citySearchInput{
       width: 170px;
       padding-right: 26px;
@@ -83,38 +112,68 @@
       font-family: 'Open Sans', sans-serif;
       font-size: 28px;
       font-weight: 700;
-      color: #000;
-      background: #f0f0f0;
+      color: var(--blank-ink);
+      background: var(--blank);
       border: none;
-      border-bottom: 2px solid #000;
+      border-bottom: 2px solid var(--rule);
     }
     .inline-select:focus{ outline: none; }
     .madlib .result{
       font-weight: 700;
+      color: var(--result);
     }
 
     /* footnote-style sidenotes, floated into the right margin next to where they occur */
     .sn{
-      font-size: 13px;
+      font-size: 9px;
       font-weight: 700;
       vertical-align: super;
       line-height: 0;
-      color: #000;
+      color: var(--ink);
     }
     .sidenote{
       float: right;
       clear: right;
       width: 280px;
-      margin-right: -300px;
+      margin-right: calc(-1 * var(--notes)); /* out into the footnote panel */
       margin-top: 0.2em;
       margin-bottom: 1em;
       font-size: 12px;
-      font-weight: 300;
+      font-weight: 400;
       line-height: 1.4;
-      color: #000;
+      color: var(--note-ink);
       text-align: left;
     }
-    .sidenote a{ color: #000; }
+    .sidenote a{ color: var(--note-ink); }
+    .madlib-notes{ display: none; background: var(--note-bg); color: var(--note-ink); } /* phone-only copy of a slide's footnotes */
+    /* phones: no room for a side column — footnotes drop in as small blocks in the panel color */
+    @media (max-width: 760px){
+      .slide{
+        --notes: 0px;
+        background: var(--bg);
+      }
+      .madlib{
+        margin: 0;
+        font-size: 22px;
+        padding: 32px 16px;
+      }
+      .blank-input, .inline-select{ font-size: 22px; }
+      /* footnotes move out of the sentence into their own box stacked underneath (see stackFootnotes) */
+      .madlib .sidenote{ display: none; }
+      .madlib-notes{
+        display: block;
+        padding: 20px 16px;
+        margin-top: auto; /* sit at the bottom of the slide, under the sentence */
+      }
+      .madlib-notes .sidenote{
+        display: block;
+        float: none;
+        width: auto;
+        margin: 0 0 10px;
+        font-size: 13px;
+      }
+      .madlib-notes .sidenote:last-child{ margin-bottom: 0; }
+    }
 
     .geocoder-box{
       display: inline-block;
@@ -126,186 +185,222 @@
       max-width: none;
       font-family: 'Open Sans', sans-serif;
       font-size: 18px;
-      background: #f0f0f0;
+      background: var(--blank);
       box-shadow: none;
-      border-bottom: 2px solid #000;
+      border-bottom: 2px solid var(--rule);
       border-radius: 0;
     }
     .geocoder-box .mapboxgl-ctrl-geocoder input{
       width: 100%;
       box-sizing: border-box;
-      color: #000;
+      color: var(--blank-ink);
       font-weight: 700;
     }
     .geocoder-box .suggestions-wrapper{ z-index: 30; }
   </style>
 </head>
 <body>
-  <nav class="site-nav">
-    <a href="index.html">Index</a>
-    <a href="scrolly.html">Scrolly</a>
-    <a href="references.html">References</a>
-    <a href="zoom.html">Zoom</a>
-    <a href="you.html">You</a>
-  </nav>
   <div class="inner">
-    <p class="madlib">
-      If you walk <input type="number" id="stepsInput" class="blank-input" value="10000" min="1" step="500"> <span id="stepsNoun">steps</span> a day<sup class="sn">1</sup><span class="sidenote"><b>1.</b> Assumes ~2,000 steps per mile.</span>...<br>you will walk from Boston to New York<sup class="sn">2</sup><span class="sidenote"><b>2.</b> Straight-line distance, ~190 miles.</span> in <span class="result" id="bostonNyDays">–</span>, walk the entire length of the Great Wall of China<sup class="sn">3</sup><span class="sidenote"><b>3.</b> <a href="https://www.chinadiscovery.com/great-wall/facts/how-long-is-the-great-wall-of-china.html" target="_blank" rel="noopener">Full Ming-era length</a>, ~13,171 miles.</span> in <span class="result" id="wallDays">–</span>, walk around the world at the equator<sup class="sn">4</sup><span class="sidenote"><b>4.</b> <a href="https://en.wikipedia.org/wiki/Earth%27s_circumference" target="_blank" rel="noopener">Equatorial circumference</a>, ~24,901 miles.</span> in <span class="result" id="equatorDays">–</span>, reach the Moon<sup class="sn">5</sup><span class="sidenote">Average <a href="https://spaceplace.nasa.gov/moon-distance/en/" target="_blank" rel="noopener">Earth–Moon distance</a>, ~238,855 miles.</span> in <span class="result" id="moonDays">–</span>, and walk from
-      <span class="geocoder-box" id="fromBox"></span>
-      to
-      <span class="geocoder-box" id="toBox"></span><sup class="sn">6</sup><span class="sidenote"><b>6.</b> Straight-line distance between the two points, at the same ~2,000 steps per mile.</span>
-      in <span class="result" id="routeDuration">–</span>.
-    </p>
+    <section class="slide pal-1">
+      <p class="madlib">
+        If you walk <input type="number" id="stepsInput" class="blank-input" value="10000" min="1" step="500"> <span id="stepsNoun">steps</span> a day<sup class="sn">1</sup><span class="sidenote"><b>1.</b> Assumes ~2,000 steps per mile.</span>...<br>you will walk from Boston to New York<sup class="sn">2</sup><span class="sidenote"><b>2.</b> Straight-line distance, ~190 miles.</span> in <span class="result" id="bostonNyDays">–</span>, walk the entire length of the Great Wall of China<sup class="sn">3</sup><span class="sidenote"><b>3.</b> <a href="https://www.chinadiscovery.com/great-wall/facts/how-long-is-the-great-wall-of-china.html" target="_blank" rel="noopener">Full Ming-era length</a>, ~13,171 miles.</span> in <span class="result" id="wallDays">–</span>, walk around the world at the equator<sup class="sn">4</sup><span class="sidenote"><b>4.</b> <a href="https://en.wikipedia.org/wiki/Earth%27s_circumference" target="_blank" rel="noopener">Equatorial circumference</a>, ~24,901 miles.</span> in <span class="result" id="equatorDays">–</span>, reach the Moon<sup class="sn">5</sup><span class="sidenote">Average <a href="https://spaceplace.nasa.gov/moon-distance/en/" target="_blank" rel="noopener">Earth–Moon distance</a>, ~238,855 miles.</span> in <span class="result" id="moonDays">–</span>, and walk from
+        <span class="geocoder-box" id="fromBox"></span>
+        to
+        <span class="geocoder-box" id="toBox"></span><sup class="sn">6</sup><span class="sidenote"><b>6.</b> Straight-line distance between the two points, at the same ~2,000 steps per mile.</span>
+        in <span class="result" id="routeDuration">–</span>.
+      </p>
+    </section>
 
-    <hr class="divider">
+    <section class="slide pal-2">
+      <p class="madlib">
+        If you climb <input type="number" id="climbAmountInput" class="blank-input" value="5" min="1" step="1"> <select id="climbUnitSelect" class="inline-select">
+          <option value="flights" selected>flights of stairs</option>
+          <option value="stairs">stairs</option>
+        </select> a day, you will climb the Empire State Building<sup class="sn">17</sup><span class="sidenote"><b>17.</b> To the <a href="https://www.esbnyc.com/blog/what-difference-between-esbs-86th-102nd-floor-observation-decks" target="_blank" rel="noopener">86th-floor observatory</a>, ~1,050 ft up. Counting flights, that's ~105 at the <a href="https://support.google.com/fitbit/answer/14237111" target="_blank" rel="noopener">fitness-tracker convention</a> of ~10 ft per flight. Counting stairs, it's the 1,576 steps of the annual <a href="https://www.esbnyc.com/2026-esb-run-up" target="_blank" rel="noopener">Empire State Building Run-Up</a>.</span> <span id="esbResult"><span class="result" id="esbTimes">–</span> times in a year</span>.
+      </p>
+    </section>
 
-    <p class="madlib madlib-spaced">
-      If you <input type="text" id="activityInput" class="blank-input" value="sleep"> <input type="number" id="hoursPerDayInput" class="blank-input" value="8" min="0" step="0.5"> <select id="hoursUnitSelect" class="inline-select">
-        <option value="seconds">seconds</option>
-        <option value="minutes">minutes</option>
-        <option value="hours" selected>hours</option>
-      </select> a <select id="periodUnitSelect" class="inline-select">
-        <option value="hour">hour</option>
-        <option value="day" selected>day</option>
-        <option value="month">month</option>
-        <option value="year">year</option>
-      </select>, in the next <input type="number" id="yearsInput" class="blank-input" value="20" min="1" step="1"> <select id="durationUnitSelect" class="inline-select">
-        <option value="hours">hours</option>
-        <option value="days">days</option>
-        <option value="months">months</option>
-        <option value="years" selected>years</option>
-      </select><sup class="sn">7</sup><span class="sidenote"><b>7.</b> A month is calculated as 30 days.</span>...<br>you will <span id="activityMirror">sleep</span> for <span class="result" id="totalHours">–</span>.
-    </p>
+    <section class="slide pal-3">
+      <p class="madlib">
+        If you drink <input type="number" id="glassesInput" class="blank-input" value="8" min="1" step="1"> <span id="glassesNoun">glasses</span> of water a day<sup class="sn">18</sup><span class="sidenote"><b>18.</b> An 8-oz glass; eight glasses is half a gallon a day.</span>, you will drink a bathtub<sup class="sn">19</sup><span class="sidenote"><b>19.</b> ~40 gallons; <a href="https://www.hunker.com/13416360/how-many-gallons-of-water-does-the-average-house-bathtub-contain/" target="_blank" rel="noopener">household tubs hold 30–60</a>.</span> in <span class="result" id="bathtubTime">–</span>, an Olympic pool<sup class="sn">20</sup><span class="sidenote"><b>20.</b> 50 m × 25 m × 2 m deep, <a href="https://www.nbc.com/nbc-insider/olympic-swimming-pool-size-gallons-meters-depth" target="_blank" rel="noopener">~660,000 gallons</a>.</span> in <span class="result" id="poolTime">–</span>, and the Central Park Reservoir<sup class="sn">21</sup><span class="sidenote"><b>21.</b> The reservoir's earthen embankment has a <a href="https://www.enr.com/articles/62606-nyc-to-replace-160-plus-year-old-equipment-from-central-park-reservoir" target="_blank" rel="noopener">storage capacity of 1,040 million gallons</a>.</span> in <span class="result" id="reservoirTime">–</span>. If every New Yorker<sup class="sn">22</sup><span class="sidenote"><b>22.</b> 8,584,629 people, the Census Bureau's <a href="https://www.census.gov/quickfacts/fact/table/newyorkcitynewyork/PST045225" target="_blank" rel="noopener">July 2025 estimate</a> for New York City.</span> drank <span id="glassesMirror">8</span> <span id="glassesMirrorNoun">glasses</span> a day, they would drink the Reservoir in <span class="result" id="nycReservoirTime">–</span>.
+      </p>
+    </section>
 
-    <p class="madlib">
-      If you <input type="text" id="parkActivityInput" class="blank-input" value="go to the park"> <input type="number" id="parkFrequencyInput" class="blank-input" value="2" min="0" step="1">x a <select id="parkPeriodSelect" class="inline-select">
-        <option value="day">day</option>
-        <option value="week" selected>week</option>
-        <option value="month">month</option>
-        <option value="year">year</option>
-      </select>, in the next <input type="number" id="parkYearsInput" class="blank-input" value="20" min="1" step="1"> years, you will <span id="parkActivityMirror">go to the park</span> <span class="result" id="parkTimes">–</span> times.
-    </p>
 
-    <p class="madlib">
-      If you talk to your <select id="talkRelationshipSelect" class="inline-select">
-        <option value="mom" selected>mom</option>
-        <option value="dad">dad</option>
-        <option value="partner">partner</option>
-        <option value="best friend">best friend</option>
-        <option value="sibling">sibling</option>
-      </select> for <input type="number" id="talkAmountInput" class="blank-input" value="5" min="0" step="1"> <select id="talkTimeUnitSelect" class="inline-select">
-        <option value="seconds">seconds</option>
-        <option value="minutes" selected>minutes</option>
-        <option value="hours">hours</option>
-      </select> a <select id="talkPeriodSelect" class="inline-select">
-        <option value="day" selected>day</option>
-        <option value="week">week</option>
-        <option value="month">month</option>
-        <option value="year">year</option>
-      </select>, in the next <select id="talkYearsSelect" class="inline-select">
-        <option value="1">1</option>
-        <option value="5" selected>5</option>
-        <option value="10">10</option>
-        <option value="20">20</option>
-        <option value="30">30</option>
-        <option value="50">50</option>
-      </select> years, you will talk to them for <span class="result" id="talkDuration">–</span>.
-    </p>
+    <section class="slide pal-4">
+      <p class="madlib madlib-spaced">
+        If you <input type="text" id="activityInput" class="blank-input" value="sleep"> <input type="number" id="hoursPerDayInput" class="blank-input" value="8" min="0" step="0.5"> <select id="hoursUnitSelect" class="inline-select">
+          <option value="seconds">seconds</option>
+          <option value="minutes">minutes</option>
+          <option value="hours" selected>hours</option>
+        </select> a <select id="periodUnitSelect" class="inline-select">
+          <option value="hour">hour</option>
+          <option value="day" selected>day</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, in the next <input type="number" id="yearsInput" class="blank-input" value="20" min="1" step="1"> <select id="durationUnitSelect" class="inline-select">
+          <option value="hours">hours</option>
+          <option value="days">days</option>
+          <option value="months">months</option>
+          <option value="years" selected>years</option>
+        </select><sup class="sn">7</sup><span class="sidenote"><b>7.</b> A month is calculated as 30 days.</span>...<br>you will <span id="activityMirror">sleep</span> for <span class="result" id="totalHours">–</span>.
+      </p>
+    </section>
 
-    <p class="madlib">
-      If you talk to a new person a <select id="peoplePeriodSelect" class="inline-select">
-        <option value="second">second</option>
-        <option value="minute">minute</option>
-        <option value="hour">hour</option>
-        <option value="day">day</option>
-        <option value="week" selected>week</option>
-        <option value="month">month</option>
-        <option value="year">year</option>
-      </select><sup class="sn">9</sup><span class="sidenote"><b>9.</b> Assumes 60 seconds/minute, 60 minutes/hour, 7 days/week, 30 days/month, 365 days/year.</span>, in the next <input type="number" id="peopleYearsInput" class="blank-input" value="20" min="1" step="1"> years, you will talk to <span class="result" id="peopleMet">–</span> strangers, and you will talk to everyone in <input type="text" id="citySearchInput" class="blank-input" list="cityDatalist" value="New York City" autocomplete="off"><datalist id="cityDatalist">
-        <option value="New York City">
-        <option value="Los Angeles">
-        <option value="Chicago">
-        <option value="Toronto">
-        <option value="Mexico City">
-        <option value="São Paulo">
-        <option value="London">
-        <option value="Paris">
-        <option value="Moscow">
-        <option value="Cairo">
-        <option value="Mumbai">
-        <option value="Delhi">
-        <option value="Beijing">
-        <option value="Shanghai">
-        <option value="Tokyo">
-      </datalist><sup class="sn">14</sup><span class="sidenote"><b>14.</b> City-proper populations from Wikipedia's <a href="https://en.wikipedia.org/wiki/List_of_largest_cities_by_population_in_2026" target="_blank" rel="noopener">List of largest cities by population in 2026</a>.</span> in <span class="result" id="cityYears">–</span>.
-    </p>
+    <section class="slide pal-5">
+      <p class="madlib">
+        If you <input type="text" id="parkActivityInput" class="blank-input" value="go to the park"> <input type="number" id="parkFrequencyInput" class="blank-input" value="2" min="0" step="1">x a <select id="parkPeriodSelect" class="inline-select">
+          <option value="day">day</option>
+          <option value="week" selected>week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, in the next <input type="number" id="parkYearsInput" class="blank-input" value="20" min="1" step="1"> years, you will <span id="parkActivityMirror">go to the park</span> <span class="result" id="parkTimes">–</span> times.
+      </p>
+    </section>
 
-    <hr class="divider">
+    <section class="slide pal-1">
+      <p class="madlib">
+        If you talk to your <select id="talkRelationshipSelect" class="inline-select">
+          <option value="mom" selected>mom</option>
+          <option value="dad">dad</option>
+          <option value="partner">partner</option>
+          <option value="best friend">best friend</option>
+          <option value="sibling">sibling</option>
+        </select> for <input type="number" id="talkAmountInput" class="blank-input" value="5" min="0" step="1"> <select id="talkTimeUnitSelect" class="inline-select">
+          <option value="seconds">seconds</option>
+          <option value="minutes" selected>minutes</option>
+          <option value="hours">hours</option>
+        </select> a <select id="talkPeriodSelect" class="inline-select">
+          <option value="day" selected>day</option>
+          <option value="week">week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, in the next <select id="talkYearsSelect" class="inline-select">
+          <option value="1">1</option>
+          <option value="5" selected>5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="30">30</option>
+          <option value="50">50</option>
+        </select> years, you will talk to them for <span class="result" id="talkDuration">–</span>.
+      </p>
+    </section>
 
-    <p class="madlib madlib-spaced">
-      If you buy <input type="number" id="spendQuantityInput" class="blank-input" value="1" min="0" step="1"> <select id="spendFoodSelect" class="inline-select">
-        <option value="coffee" selected>small black coffee from Starbucks</option>
-        <option value="happymeal">Happy Meal from McDonald's</option>
-        <option value="taco">taco from Taco Bell</option>
-        <option value="chickfila">chicken sandwich from Chick-fil-A</option>
-        <option value="dunkin">donut from Dunkin'</option>
-        <option value="chipotle">chicken burrito from Chipotle</option>
-        <option value="wendys">small Frosty from Wendy's</option>
-      </select> a <select id="spendPeriodSelect" class="inline-select">
-        <option value="day" selected>day</option>
-        <option value="week">week</option>
-        <option value="month">month</option>
-      </select>, in the next <input type="number" id="spendYearsInput" class="blank-input" value="10" min="1" step="1"> years, you will spend $<span class="result" id="spendTotal">–</span><sup class="sn">12</sup><span class="sidenote"><b>12.</b> Assumes ~$2.45 per <a href="https://starbucksmenu.us/brewed-coffee-menu/" target="_blank" rel="noopener">Starbucks short coffee</a>, ~$5.99 per <a href="https://www.mac-menus.com/happy-meal/" target="_blank" rel="noopener">McDonald's Happy Meal</a>, ~$1.99 per <a href="https://tacobellmenus.net/tacos/crunchy-taco-2/" target="_blank" rel="noopener">Taco Bell Crunchy Taco</a>, ~$5.25 per <a href="https://fastfoodmenuprices.com/chick-fil-a-prices/" target="_blank" rel="noopener">Chick-fil-A Original Chicken Sandwich</a>, ~$1.09 per <a href="https://dunkinmenu.org/" target="_blank" rel="noopener">Dunkin' classic donut</a>, ~$9.79 per <a href="https://usafoodjournal.com/chipotle-menu-with-prices" target="_blank" rel="noopener">Chipotle chicken burrito</a>, and ~$2.49 per <a href="https://hackthemenu.com/wendys/menu-prices/frosty/" target="_blank" rel="noopener">Wendy's small Frosty</a>.</span> at today's prices, or $<span class="result" id="spendTotalInflated">–</span> accounting for fast-food inflation<sup class="sn">13</sup><span class="sidenote"><b>13.</b> Assumes ~5.2%/year fast-food price inflation, compounded annually — the 2020–2025 average of the BLS <a href="https://fred.stlouisfed.org/series/IPUTN72251AT050000000" target="_blank" rel="noopener">Sectoral Output Price Deflator for Limited-Service Eating Places</a> (NAICS 72251A): 4.3%, 6.6%, 7.2%, 7.0%, 4.4%, 3.3%.</span>.
-    </p>
+    <section class="slide pal-2">
+      <p class="madlib">
+        If you talk to a new person a <select id="peoplePeriodSelect" class="inline-select">
+          <option value="second">second</option>
+          <option value="minute">minute</option>
+          <option value="hour">hour</option>
+          <option value="day">day</option>
+          <option value="week" selected>week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select><sup class="sn">9</sup><span class="sidenote"><b>9.</b> Assumes 60 seconds/minute, 60 minutes/hour, 7 days/week, 30 days/month, 365 days/year.</span>, in the next <input type="number" id="peopleYearsInput" class="blank-input" value="20" min="1" step="1"> years, you will talk to <span class="result" id="peopleMet">–</span> strangers, and you will talk to everyone in <input type="text" id="citySearchInput" class="blank-input" list="cityDatalist" value="New York City" autocomplete="off"><datalist id="cityDatalist">
+          <option value="New York City">
+          <option value="Los Angeles">
+          <option value="Chicago">
+          <option value="Toronto">
+          <option value="Mexico City">
+          <option value="São Paulo">
+          <option value="London">
+          <option value="Paris">
+          <option value="Moscow">
+          <option value="Cairo">
+          <option value="Mumbai">
+          <option value="Delhi">
+          <option value="Beijing">
+          <option value="Shanghai">
+          <option value="Tokyo">
+        </datalist><sup class="sn">14</sup><span class="sidenote"><b>14.</b> City-proper populations from Wikipedia's <a href="https://en.wikipedia.org/wiki/List_of_largest_cities_by_population_in_2026" target="_blank" rel="noopener">List of largest cities by population in 2026</a>.</span> in <span class="result" id="cityYears">–</span>.
+      </p>
+    </section>
 
-    <p class="madlib">
-      If you learn <input type="number" id="wordsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="wordsNoun">word</span> a <select id="wordsPeriodSelect" class="inline-select">
-        <option value="day" selected>day</option>
-        <option value="week">week</option>
-        <option value="month">month</option>
-        <option value="year">year</option>
-      </select>, in the next <input type="number" id="wordsYearsInput" class="blank-input" value="1" min="1" step="1"> years, you will learn <span class="result" id="wordsLearned">–</span> words.
-    </p>
+    <section class="slide pal-3">
+      <p class="madlib">
+        If you eat dinner with your kid <input type="number" id="dinnerNightsInput" class="blank-input" value="5" min="1" max="7" step="1"> <span id="dinnerNightsNoun">nights</span> a <select id="dinnerPeriodSelect" class="inline-select">
+          <option value="week" selected>week</option>
+          <option value="month">month</option>
+        </select>, you will have <span class="result" id="dinnersLeft">–</span> dinners together before they turn 18<sup class="sn">16</sup><span class="sidenote"><b>16.</b> Assumes 52 weeks (12 months) per year, counted from birth to their 18th birthday.</span>. If your kid is <input type="number" id="kidAgeInput" class="blank-input" value="8" min="0" max="17" step="1">, you've already had about <span class="result" id="dinnersHad">–</span> of them.
+      </p>
+    </section>
 
-    <p class="madlib">
-      If you go to <input type="number" id="coffeeShopsPerDayInput" class="blank-input" value="1" min="0" step="1"> new <span id="coffeeShopNoun">coffee shop</span> a <select id="coffeeShopsPeriodSelect" class="inline-select">
-        <option value="day" selected>day</option>
-        <option value="week">week</option>
-        <option value="month">month</option>
-        <option value="year">year</option>
-      </select>, you will go to all the coffee shops in Manhattan<sup class="sn">10</sup><span class="sidenote"><b>10.</b> 1,113 Coffee/Tea establishments in Manhattan, per <a href="https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Inspection-Results/43nn-pn8j" target="_blank" rel="noopener">NYC DOHMH restaurant inspection data</a>.</span> in <span class="result" id="coffeeShopYears">–</span>.
-    </p>
 
-    <p class="madlib">
-      If you go to <input type="number" id="restaurantsPerDayInput" class="blank-input" value="1" min="0" step="1"> new <span id="restaurantNoun">restaurant</span> a <select id="restaurantsPeriodSelect" class="inline-select">
-        <option value="day" selected>day</option>
-        <option value="week">week</option>
-        <option value="month">month</option>
-        <option value="year">year</option>
-      </select>, you will go to all the restaurants in Manhattan<sup class="sn">11</sup><span class="sidenote"><b>11.</b> 12,526 food establishments in Manhattan, per <a href="https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Inspection-Results/43nn-pn8j" target="_blank" rel="noopener">NYC DOHMH restaurant inspection data</a>.</span> in <span class="result" id="restaurantYears">–</span>.
-    </p>
+    <section class="slide pal-4">
+      <p class="madlib madlib-spaced">
+        If you buy <input type="number" id="spendQuantityInput" class="blank-input" value="1" min="0" step="1"> <select id="spendFoodSelect" class="inline-select">
+          <option value="coffee" selected>small black coffee from Starbucks</option>
+          <option value="happymeal">Happy Meal from McDonald's</option>
+          <option value="taco">taco from Taco Bell</option>
+          <option value="chickfila">chicken sandwich from Chick-fil-A</option>
+          <option value="dunkin">donut from Dunkin'</option>
+          <option value="chipotle">chicken burrito from Chipotle</option>
+          <option value="wendys">small Frosty from Wendy's</option>
+        </select> a <select id="spendPeriodSelect" class="inline-select">
+          <option value="day" selected>day</option>
+          <option value="week">week</option>
+          <option value="month">month</option>
+        </select>, in the next <input type="number" id="spendYearsInput" class="blank-input" value="10" min="1" step="1"> years, you will spend $<span class="result" id="spendTotal">–</span><sup class="sn">12</sup><span class="sidenote"><b>12.</b> Assumes ~$2.45 per <a href="https://starbucksmenu.us/brewed-coffee-menu/" target="_blank" rel="noopener">Starbucks short coffee</a>, ~$5.99 per <a href="https://www.mac-menus.com/happy-meal/" target="_blank" rel="noopener">McDonald's Happy Meal</a>, ~$1.99 per <a href="https://tacobellmenus.net/tacos/crunchy-taco-2/" target="_blank" rel="noopener">Taco Bell Crunchy Taco</a>, ~$5.25 per <a href="https://fastfoodmenuprices.com/chick-fil-a-prices/" target="_blank" rel="noopener">Chick-fil-A Original Chicken Sandwich</a>, ~$1.09 per <a href="https://dunkinmenu.org/" target="_blank" rel="noopener">Dunkin' classic donut</a>, ~$9.79 per <a href="https://usafoodjournal.com/chipotle-menu-with-prices" target="_blank" rel="noopener">Chipotle chicken burrito</a>, and ~$2.49 per <a href="https://hackthemenu.com/wendys/menu-prices/frosty/" target="_blank" rel="noopener">Wendy's small Frosty</a>.</span> at today's prices, or $<span class="result" id="spendTotalInflated">–</span> accounting for fast-food inflation<sup class="sn">13</sup><span class="sidenote"><b>13.</b> Assumes ~5.2%/year fast-food price inflation, compounded annually — the 2020–2025 average of the BLS <a href="https://fred.stlouisfed.org/series/IPUTN72251AT050000000" target="_blank" rel="noopener">Sectoral Output Price Deflator for Limited-Service Eating Places</a> (NAICS 72251A): 4.3%, 6.6%, 7.2%, 7.0%, 4.4%, 3.3%.</span>.
+      </p>
+    </section>
 
-    <p class="madlib">
-      If you stand at <input type="number" id="intersectionsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="intersectionNoun">traffic light</span> a <select id="intersectionsPeriodSelect" class="inline-select">
-        <option value="day" selected>day</option>
-        <option value="week">week</option>
-        <option value="month">month</option>
-        <option value="year">year</option>
-      </select>, you will stand at every traffic light in New York City<sup class="sn">15</sup><span class="sidenote"><b>15.</b> 13,543 signalized intersections citywide, per <a href="https://www.nyc.gov/html/dot/html/infrastructure/signals.shtml" target="_blank" rel="noopener">NYC DOT</a> (March 2022).</span> in <span class="result" id="intersectionYears">–</span>.
-    </p>
+    <section class="slide pal-5">
+      <p class="madlib">
+        If you learn <input type="number" id="wordsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="wordsNoun">word</span> a <select id="wordsPeriodSelect" class="inline-select">
+          <option value="day" selected>day</option>
+          <option value="week">week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, in the next <input type="number" id="wordsYearsInput" class="blank-input" value="1" min="1" step="1"> years, you will learn <span class="result" id="wordsLearned">–</span> words.
+      </p>
+    </section>
 
-    <hr class="divider">
+    <section class="slide pal-1">
+      <p class="madlib">
+        If you go to <input type="number" id="coffeeShopsPerDayInput" class="blank-input" value="1" min="0" step="1"> new <span id="coffeeShopNoun">coffee shop</span> a <select id="coffeeShopsPeriodSelect" class="inline-select">
+          <option value="day" selected>day</option>
+          <option value="week">week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, you will go to all the coffee shops in Manhattan<sup class="sn">10</sup><span class="sidenote"><b>10.</b> 1,113 Coffee/Tea establishments in Manhattan, per <a href="https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Inspection-Results/43nn-pn8j" target="_blank" rel="noopener">NYC DOHMH restaurant inspection data</a>.</span> in <span class="result" id="coffeeShopYears">–</span>.
+      </p>
+    </section>
 
-    <p class="madlib madlib-spaced">
-      If you save $<input type="number" id="dailySavingsInput" class="blank-input" value="1" min="0" step="0.5"> a <select id="savingsPeriodSelect" class="inline-select">
-        <option value="minute">minute</option>
-        <option value="hour">hour</option>
-        <option value="day" selected>day</option>
-        <option value="week">week</option>
-        <option value="month">month</option>
-        <option value="year">year</option>
-      </select>, you will save $<span class="result" id="simpleSavings">–</span> in the next <input type="number" id="savingsYearsInput" class="blank-input" value="20" min="1" step="1"> years (assuming 5% interest<sup class="sn">8</sup><span class="sidenote"><b>8.</b> Compounded annually; treats each year's daily savings as one annual deposit.</span> compounded annually, it will be $<span class="result" id="compoundSavings">–</span>).
-    </p>
+    <section class="slide pal-2">
+      <p class="madlib">
+        If you go to <input type="number" id="restaurantsPerDayInput" class="blank-input" value="1" min="0" step="1"> new <span id="restaurantNoun">restaurant</span> a <select id="restaurantsPeriodSelect" class="inline-select">
+          <option value="day" selected>day</option>
+          <option value="week">week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, you will go to all the restaurants in Manhattan<sup class="sn">11</sup><span class="sidenote"><b>11.</b> 12,526 food establishments in Manhattan, per <a href="https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Inspection-Results/43nn-pn8j" target="_blank" rel="noopener">NYC DOHMH restaurant inspection data</a>.</span> in <span class="result" id="restaurantYears">–</span>.
+      </p>
+    </section>
+
+    <section class="slide pal-3">
+      <p class="madlib">
+        If you stand at <input type="number" id="intersectionsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="intersectionNoun">traffic light</span> a <select id="intersectionsPeriodSelect" class="inline-select">
+          <option value="day" selected>day</option>
+          <option value="week">week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, you will stand at every traffic light in New York City<sup class="sn">15</sup><span class="sidenote"><b>15.</b> 13,543 signalized intersections citywide, per <a href="https://www.nyc.gov/html/dot/html/infrastructure/signals.shtml" target="_blank" rel="noopener">NYC DOT</a> (March 2022).</span> in <span class="result" id="intersectionYears">–</span>.
+      </p>
+    </section>
+
+
+    <section class="slide pal-4">
+      <p class="madlib madlib-spaced">
+        If you save $<input type="number" id="dailySavingsInput" class="blank-input" value="1" min="0" step="0.5"> a <select id="savingsPeriodSelect" class="inline-select">
+          <option value="minute">minute</option>
+          <option value="hour">hour</option>
+          <option value="day" selected>day</option>
+          <option value="week">week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, you will save $<span class="result" id="simpleSavings">–</span> in the next <input type="number" id="savingsYearsInput" class="blank-input" value="20" min="1" step="1"> years (assuming 5% interest<sup class="sn">8</sup><span class="sidenote"><b>8.</b> Compounded annually; treats each year's daily savings as one annual deposit.</span> compounded annually, it will be $<span class="result" id="compoundSavings">–</span>).
+      </p>
+    </section>
 
 
   </div>
@@ -767,6 +862,37 @@
     parkYearsInput.addEventListener("input", updatePark);
     updatePark();
 
+    // ---- "if you eat dinner with your kid 5 nights a week..." ----
+    const dinnerNightsInput = document.getElementById("dinnerNightsInput");
+    const dinnerNightsNoun = document.getElementById("dinnerNightsNoun");
+    const dinnerPeriodSelect = document.getElementById("dinnerPeriodSelect");
+    const kidAgeInput = document.getElementById("kidAgeInput");
+    const dinnersLeft = document.getElementById("dinnersLeft");
+    const dinnersHad = document.getElementById("dinnersHad");
+
+    const DINNER_PERIODS_PER_YEAR = { week: 52, month: 12 };
+
+    // "about" — round to the nearest 100 once it's in the thousands, else the nearest 10
+    function roughly(n) {
+      const unit = n >= 1000 ? 100 : 10;
+      return (Math.round(n / unit) * unit).toLocaleString();
+    }
+
+    function updateDinners() {
+      const nights = Number(dinnerNightsInput.value) || 0;
+      dinnerNightsNoun.textContent = nights === 1 ? "night" : "nights";
+      const perYear = nights * (DINNER_PERIODS_PER_YEAR[dinnerPeriodSelect.value] || 52);
+      const age = Math.min(18, Math.max(0, Number(kidAgeInput.value) || 0));
+
+      dinnersLeft.textContent = Math.round(perYear * 18).toLocaleString();
+      dinnersHad.textContent = roughly(perYear * age);
+    }
+
+    dinnerNightsInput.addEventListener("input", updateDinners);
+    dinnerPeriodSelect.addEventListener("change", updateDinners);
+    kidAgeInput.addEventListener("input", updateDinners);
+    updateDinners();
+
     // ---- "if you buy 1 small black coffee from Starbucks a day..." ----
     const FOOD_PRICES = {
       coffee: 2.45,
@@ -879,6 +1005,148 @@
       input.addEventListener("touchend", endDrag, { passive: true });
       input.addEventListener("touchcancel", endDrag, { passive: true });
     }
+
+    // ---- "if you climb 5 flights of stairs a day..." ----
+    const climbAmountInput = document.getElementById("climbAmountInput");
+    const climbUnitSelect = document.getElementById("climbUnitSelect");
+    const esbResult = document.getElementById("esbResult");
+
+    // one Empire State Building, to the 86th-floor observatory
+    const ESB_UNITS = { flights: 105, stairs: 1576 };
+
+    function updateEsb() {
+      const perDay = Number(climbAmountInput.value) || 0;
+      const perYear = perDay * DAYS_PER_YEAR / (ESB_UNITS[climbUnitSelect.value] || 105);
+
+      if (perYear <= 0) {
+        esbResult.innerHTML = '<span class="result">–</span>';
+      } else if (perYear >= 1) {
+        const times = Math.round(perYear);
+        esbResult.innerHTML = '<span class="result">' + times.toLocaleString() + "</span> " + (times === 1 ? "time" : "times") + " in a year";
+      } else {
+        const years = 1 / perYear;
+        esbResult.innerHTML = 'in <span class="result">' + (years < 10 ? years.toFixed(1) : Math.round(years).toLocaleString()) + "</span> years";
+      }
+    }
+
+    climbAmountInput.addEventListener("input", updateEsb);
+    climbUnitSelect.addEventListener("change", updateEsb);
+    updateEsb();
+
+    // ---- "if you drink 8 glasses of water a day..." ----
+    const glassesInput = document.getElementById("glassesInput");
+    const glassesNoun = document.getElementById("glassesNoun");
+    const glassesMirror = document.getElementById("glassesMirror");
+    const glassesMirrorNoun = document.getElementById("glassesMirrorNoun");
+
+    const GALLONS_PER_GLASS = 8 / 128; // 8 oz
+    const BATHTUB_GALLONS = 40;
+    const OLYMPIC_POOL_GALLONS = 660000;
+    const RESERVOIR_GALLONS = 1040e6;
+    const NYC_POPULATION = 8584629;
+
+    // days -> "80 days", "3,600 years", "5.7 million years", "6 hours"
+    function formatWaterTime(days) {
+      if (!isFinite(days)) return "–";
+      if (days < 1) {
+        const hours = Math.max(1, Math.round(days * 24));
+        return hours + (hours === 1 ? " hour" : " hours");
+      }
+      if (days < 2 * DAYS_PER_YEAR) {
+        const d = Math.round(days);
+        return d.toLocaleString() + (d === 1 ? " day" : " days");
+      }
+      const years = days / DAYS_PER_YEAR;
+      if (years >= 1e6) return (years / 1e6).toFixed(1) + " million years";
+      const rounded = years < 10 ? Number(years.toFixed(1)) : years < 1000 ? Math.round(years) : Math.round(years / 100) * 100;
+      return rounded.toLocaleString() + " years";
+    }
+
+    function updateWater() {
+      const glasses = Number(glassesInput.value) || 0;
+      const noun = glasses === 1 ? "glass" : "glasses";
+      glassesNoun.textContent = noun;
+      glassesMirror.textContent = glasses.toLocaleString();
+      glassesMirrorNoun.textContent = noun;
+
+      const gallonsPerDay = glasses * GALLONS_PER_GLASS;
+      document.getElementById("bathtubTime").textContent = formatWaterTime(BATHTUB_GALLONS / gallonsPerDay);
+      document.getElementById("poolTime").textContent = formatWaterTime(OLYMPIC_POOL_GALLONS / gallonsPerDay);
+      document.getElementById("reservoirTime").textContent = formatWaterTime(RESERVOIR_GALLONS / gallonsPerDay);
+      document.getElementById("nycReservoirTime").textContent = formatWaterTime(RESERVOIR_GALLONS / (gallonsPerDay * NYC_POPULATION));
+    }
+
+    glassesInput.addEventListener("input", updateWater);
+    updateWater();
+
+    // ---- text blanks grow/shrink to fit what's typed ----
+    const sizer = document.createElement("span");
+    sizer.style.cssText = "position:absolute;visibility:hidden;white-space:pre;left:-9999px;top:0";
+    document.body.appendChild(sizer);
+
+    function fitTextInput(input) {
+      const cs = getComputedStyle(input);
+      sizer.style.font = cs.font;
+      sizer.style.letterSpacing = cs.letterSpacing;
+      sizer.textContent = input.value || input.placeholder || " ";
+      input.style.width = Math.ceil(sizer.getBoundingClientRect().width) + 24 + "px";
+    }
+
+    document.querySelectorAll('input.blank-input[type="text"]').forEach((input) => {
+      fitTextInput(input);
+      input.addEventListener("input", () => fitTextInput(input));
+    });
+    // re-measure once the web font has loaded
+    if (document.fonts) document.fonts.ready.then(() => document.querySelectorAll('input.blank-input[type="text"]').forEach(fitTextInput));
+
+    // ---- phones: a copy of each tile's footnotes, stacked under the sentence in the panel color ----
+    function stackFootnotes() {
+      document.querySelectorAll("p.madlib").forEach((para) => {
+        const notes = para.querySelectorAll(".sidenote");
+        if (!notes.length) return;
+        const box = document.createElement("div");
+        box.className = "madlib-notes";
+        notes.forEach((note) => box.appendChild(note.cloneNode(true)));
+        para.after(box);
+      });
+    }
+    stackFootnotes();
+
+    // ---- scrolly: arrow keys step between slides; on touch, a sideways swipe does too ----
+    const slides = Array.from(document.querySelectorAll(".slide"));
+
+    function currentSlideIndex() {
+      const mid = window.innerHeight / 2;
+      const i = slides.findIndex((el) => el.getBoundingClientRect().bottom > mid);
+      return i === -1 ? slides.length - 1 : i;
+    }
+    function goToSlide(i) {
+      const target = slides[Math.max(0, Math.min(slides.length - 1, i))];
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    const isFormField = (el) => el && el.closest && el.closest("input, select, textarea, .geocoder-box");
+
+    document.addEventListener("keydown", (e) => {
+      if (isFormField(e.target)) return;
+      if (e.key === "ArrowRight") { e.preventDefault(); goToSlide(currentSlideIndex() + 1); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); goToSlide(currentSlideIndex() - 1); }
+    });
+
+    // swipe left = next, swipe right = previous (vertical swipes just scroll and snap)
+    let swipeX = 0, swipeY = 0, swipeTracking = false;
+    document.addEventListener("touchstart", (e) => {
+      swipeTracking = !isFormField(e.target) && e.touches.length === 1;
+      swipeX = e.touches[0].clientX;
+      swipeY = e.touches[0].clientY;
+    }, { passive: true });
+    document.addEventListener("touchend", (e) => {
+      if (!swipeTracking) return;
+      const dx = e.changedTouches[0].clientX - swipeX;
+      const dy = e.changedTouches[0].clientY - swipeY;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        goToSlide(currentSlideIndex() + (dx < 0 ? 1 : -1));
+      }
+    }, { passive: true });
 
     document.querySelectorAll('input.blank-input[type="number"]').forEach(enableScrollAdjust);
   </script>
