@@ -46,6 +46,17 @@
       border-bottom: 2px solid #000;
     }
     .blank-input:focus{ outline: none; }
+    /* number blanks spin: wheel over them or drag up/down on touch */
+    input.blank-input[type="number"]{
+      cursor: ns-resize;
+      touch-action: none;           /* touching the box never scrolls the page */
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+    input.blank-input[type="number"]::-webkit-inner-spin-button,
+    input.blank-input[type="number"]::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
+    input.blank-input[type="number"]:hover,
+    input.blank-input[type="number"].spinning{ background: #e2e2e2; }
     #activityInput{ width: 140px; }
     #hoursPerDayInput, #yearsInput{ width: 60px; }
     #dailySavingsInput{ width: 80px; }
@@ -131,7 +142,8 @@
 </head>
 <body>
   <nav class="site-nav">
-    <a href="index.html">Football</a>
+    <a href="index.html">Index</a>
+    <a href="scrolly.html">Scrolly</a>
     <a href="references.html">References</a>
     <a href="zoom.html">Zoom</a>
     <a href="you.html">You</a>
@@ -801,15 +813,41 @@
     spendYearsInput.addEventListener("input", updateSpend);
     updateSpend();
 
-    // ---- on touch devices, drag up/down on a number blank to change it ----
-    // (a plain tap still opens the keyboard, for anyone who'd rather type)
+    // ---- spin a number blank: mouse wheel / trackpad while hovering, or drag up/down on touch ----
+    // the page only stops scrolling while the pointer is over (or the finger is on) the box;
+    // a plain tap/click still lets you type
     function enableScrollAdjust(input) {
       const step = parseFloat(input.step) || 1;
       const min = input.min !== "" ? parseFloat(input.min) : -Infinity;
       const max = input.max !== "" ? parseFloat(input.max) : Infinity;
       const decimals = (String(step).split(".")[1] || "").length;
-      const PIXELS_PER_STEP = 12;
+      const PIXELS_PER_STEP = 12;   // touch drag distance per step
+      const WHEEL_PER_STEP = 40;    // wheel/trackpad delta per step
 
+      function setValue(next) {
+        next = Math.min(max, Math.max(min, next));
+        next = Number(next.toFixed(decimals));
+        if (next !== parseFloat(input.value)) {
+          input.value = next;
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      }
+
+      // wheel: scroll up = bigger number
+      let wheelAccum = 0;
+      input.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        const delta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY; // lines -> pixels
+        wheelAccum -= delta;
+        const steps = wheelAccum > 0 ? Math.floor(wheelAccum / WHEEL_PER_STEP) : Math.ceil(wheelAccum / WHEEL_PER_STEP);
+        if (steps !== 0) {
+          wheelAccum -= steps * WHEEL_PER_STEP;
+          setValue((parseFloat(input.value) || 0) + steps * step);
+        }
+      }, { passive: false });
+      input.addEventListener("mouseleave", () => { wheelAccum = 0; });
+
+      // touch: drag up = bigger number
       let startY = 0;
       let startValue = 0;
       let dragging = false;
@@ -821,29 +859,25 @@
       }, { passive: true });
 
       input.addEventListener("touchmove", (e) => {
+        e.preventDefault(); // finger is on the box — spin the number, don't scroll the page
         const deltaY = startY - e.touches[0].clientY; // positive = dragged up
 
         if (!dragging) {
           if (Math.abs(deltaY) < 8) return;
           dragging = true;
           input.blur(); // dragging to adjust, not typing — dismiss/skip the keyboard
+          input.classList.add("spinning");
         }
 
-        e.preventDefault();
-
-        let next = startValue + Math.round(deltaY / PIXELS_PER_STEP) * step;
-        next = Math.min(max, Math.max(min, next));
-        next = Number(next.toFixed(decimals));
-
-        if (next !== parseFloat(input.value)) {
-          input.value = next;
-          input.dispatchEvent(new Event("input", { bubbles: true }));
-        }
+        setValue(startValue + Math.round(deltaY / PIXELS_PER_STEP) * step);
       }, { passive: false });
 
-      input.addEventListener("touchend", () => {
+      const endDrag = () => {
         dragging = false;
-      }, { passive: true });
+        input.classList.remove("spinning");
+      };
+      input.addEventListener("touchend", endDrag, { passive: true });
+      input.addEventListener("touchcancel", endDrag, { passive: true });
     }
 
     document.querySelectorAll('input.blank-input[type="number"]').forEach(enableScrollAdjust);
