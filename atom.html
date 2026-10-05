@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Atom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+  <style>
+    /* Inter — the open-source base of Guggenheim Sans, same as you.html */
+    body{ font-family: 'Inter', Arial, sans-serif; }
+
+    /* scroll distance: 80% of a window per cut, 62 cuts, plus one more step for the atom and a window to rest on */
+    .scroller{ height: calc(63 * 80vh + 100vh); }
+
+    /* the stage stays pinned while you scroll; colors come from the same five palettes as you.html,
+       blended from one set to the next as each cut zooms in (set by JS as CSS variables) */
+    .stage{
+      --bg: #DFC0B0; --ink: #791608; --blank: #F7BE6C; --rule: #914D2E; --note-bg: #791608; --note-ink: #F7BE6C;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      background: var(--bg);
+      color: var(--ink);
+      overflow: hidden;
+    }
+    .view{
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+    }
+    .view svg{
+      width: min(78vh, 86%);
+      height: auto;
+      overflow: visible;
+    }
+    .grain-fill{ fill: var(--blank); }
+    .grain-speck{ fill: var(--rule); }
+    .grain-edge{ stroke: var(--ink); stroke-width: 2.5; fill: none; }
+    #cutLine{ stroke: var(--ink); stroke-width: 1.2; stroke-linecap: round; }
+    .atom-orbit{ fill: none; stroke: var(--ink); stroke-width: 1.2; }
+    .atom-nucleus{ fill: var(--rule); }
+    .atom-electron{ fill: var(--ink); }
+
+    .counter{
+      position: absolute;
+      top: 32px;
+      left: 32px;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .counter small{
+      display: block;
+      font-size: 15px;
+      font-weight: 400;
+      margin-top: 4px;
+    }
+    .hint{
+      position: absolute;
+      bottom: 32px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 15px;
+      transition: opacity 0.3s;
+    }
+
+    /* right-hand panel, like the footnote panel on you.html */
+    .panel{
+      width: 340px;
+      box-sizing: border-box;
+      padding: 48px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--note-bg);
+      color: var(--note-ink);
+      transition: background-color 0.35s, color 0.35s;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    .panel .label{
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 28px 0 4px;
+    }
+    .panel .label:first-child{ margin-top: 0; }
+    .panel .big{
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .panel .sci{ font-size: 13px; margin-top: 2px; }
+    .panel .compare{ margin-top: 8px; }
+    .panel .assume{
+      font-size: 12px;
+      line-height: 1.4;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 760px){
+      .stage{ flex-direction: column; }
+      .view svg{ width: min(80vw, 52vh); }
+      .counter{ top: 20px; left: 16px; font-size: 22px; }
+      .hint{ bottom: 12px; }
+      .panel{
+        width: auto;
+        padding: 16px;
+        font-size: 13px;
+      }
+      .panel .label{ margin-top: 12px; }
+      .panel .big{ font-size: 20px; }
+      .panel .assume{ display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scroller">
+    <div class="stage" id="stage">
+      <div class="view">
+        <div class="counter" id="counter">A grain of sand</div>
+        <svg viewBox="-110 -110 220 220" aria-label="A grain of sand being cut in half, again and again">
+          <defs>
+            <clipPath id="clipA"><path id="clipAPath" /></clipPath>
+            <clipPath id="clipB"><path id="clipBPath" /></clipPath>
+            <clipPath id="clipM"><path id="clipMPath" /></clipPath>
+            <clipPath id="clipW"><path id="clipWPath" /></clipPath>
+          </defs>
+          <!-- the piece in one piece, before it splits -->
+          <g id="whole">
+            <path class="grain-fill" id="wholeFill" />
+            <g clip-path="url(#clipW)"><g class="specks" id="specksW"></g></g>
+          </g>
+          <!-- the piece being cut: the half that drifts away (B) and the half we follow (A) -->
+          <g id="halfB">
+            <path class="grain-fill" id="halfBFill" />
+            <g clip-path="url(#clipB)"><g class="specks" id="specksB"></g><line class="grain-edge" id="edgeB" /></g>
+          </g>
+          <g id="halfA">
+            <path class="grain-fill" id="halfAFill" />
+            <g clip-path="url(#clipA)"><g class="specks" id="specksA"></g><line class="grain-edge" id="edgeA" /></g>
+          </g>
+          <!-- once the kept half fills the frame, its flat cut face bulges out into the next potato -->
+          <g id="morph" style="display:none">
+            <path class="grain-fill" id="morphFill" />
+            <g clip-path="url(#clipM)">
+              <g class="specks" id="specksOld"></g>
+              <g class="specks" id="specksNew"></g>
+            </g>
+          </g>
+          <line id="cutLine" opacity="0" />
+          <!-- after the last cut -->
+          <g id="atom" opacity="0">
+            <ellipse class="atom-orbit" rx="70" ry="24" />
+            <ellipse class="atom-orbit" rx="70" ry="24" transform="rotate(60)" />
+            <ellipse class="atom-orbit" rx="70" ry="24" transform="rotate(-60)" />
+            <circle class="atom-nucleus" r="14" />
+            <circle class="atom-electron" cx="70" cy="0" r="4.5" />
+            <circle class="atom-electron" cx="-35" cy="60.6" r="4.5" />
+            <circle class="atom-electron" cx="-35" cy="-60.6" r="4.5" />
+          </g>
+        </svg>
+        <div class="hint" id="hint">Scroll to cut it in half ↓</div>
+      </div>
+      <aside class="panel">
+        <div class="label">Atoms left</div>
+        <div class="big" id="atomsText">–</div>
+        <div class="sci" id="atomsSci"></div>
+        <div class="label">Size</div>
+        <div class="big" id="sizeText">–</div>
+        <div class="compare" id="compareText"></div>
+        <div class="assume">
+          A medium grain of quartz sand (SiO₂) about 0.5 mm across: a 0.065 mm³ sphere at 2.65 g/cm³ weighs
+          about 0.17 mg, or about 5.2 × 10¹⁸ atoms. Each cut halves the atoms, so the piece shrinks by the
+          cube root of 2 (about 21%) per cut, and 62 cuts take you down to about one atom.
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const TOTAL_CUTS = 62;
+    const START_ATOMS = 5.21e18;     // 0.5 mm quartz grain, see the note in the panel
+    const START_SIZE_M = 0.5e-3;
+    const SCROLL_PER_CUT = 0.8;      // fraction of the window height
+
+    // same five palettes as you.html (.pal-1 … .pal-5)
+    const PALETTES = [
+      { bg: "#DFC0B0", ink: "#791608", blank: "#F7BE6C", rule: "#914D2E", noteBg: "#791608", noteInk: "#F7BE6C" },
+      { bg: "#D0D6B9", ink: "#415621", blank: "#78492E", rule: "#469B9A", noteBg: "#415621", noteInk: "#D0D6B9" },
+      { bg: "#49A4C6", ink: "#2E2139", blank: "#D6A85A", rule: "#9F4437", noteBg: "#6C4D84", noteInk: "#F4E3C4" },
+      { bg: "#E2DBC5", ink: "#BE3019", blank: "#AAC7D8", rule: "#DD6143", noteBg: "#DD6143", noteInk: "#2B0A04" },
+      { bg: "#42BE98", ink: "#6E0F13", blank: "#D8B56C", rule: "#B91A20", noteBg: "#D69EA0", noteInk: "#6E0F13" },
+    ];
+
+    // things to compare the piece to as it shrinks (rough typical widths, in meters)
+    const COMPARISONS = [
+      ["a human hair", 70e-6],
+      ["a grain of pollen", 25e-6],
+      ["a red blood cell", 7.5e-6],
+      ["an E. coli bacterium", 2e-6],
+      ["a wavelength of green light", 530e-9],
+      ["a flu virus", 100e-9],
+      ["a ribosome", 25e-9],
+      ["the DNA double helix", 2e-9],
+      ["a glucose molecule", 1e-9],
+    ];
+
+    // ---------- shapes ----------
+    // every piece is stored as a radius at each of N evenly spaced angles around its middle.
+    // piece n+1 is grown from the half of piece n that we keep: scaled back up to full size,
+    // then its flat cut face is smoothed and given a little wobble so it reads as a new potato.
+    const N = 120;
+    const ANGLES = Array.from({ length: N }, (_, i) => (i / N) * Math.PI * 2);
+
+    // small seeded random number generator, so the pieces are the same every time
+    function mulberry32(seed) {
+      return function () {
+        seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    const toPoints = (radii) => radii.map((r, i) => [Math.cos(ANGLES[i]) * r, Math.sin(ANGLES[i]) * r]);
+
+    // area and centroid of a polygon
+    function polygonStats(poly) {
+      let a = 0, cx = 0, cy = 0;
+      for (let i = 0; i < poly.length; i++) {
+        const [x1, y1] = poly[i], [x2, y2] = poly[(i + 1) % poly.length];
+        const cross = x1 * y2 - x2 * y1;
+        a += cross; cx += (x1 + x2) * cross; cy += (y1 + y2) * cross;
+      }
+      a /= 2;
+      return { area: Math.abs(a), cx: cx / (6 * a), cy: cy / (6 * a) };
+    }
+
+    // keep the part of a polygon where dot(p, normal) * side >= 0 (the cut line runs through the origin)
+    function clipHalf(poly, normal, side) {
+      const inside = (p) => (p[0] * normal[0] + p[1] * normal[1]) * side >= 0;
+      const out = [];
+      for (let i = 0; i < poly.length; i++) {
+        const cur = poly[i], prev = poly[(i - 1 + poly.length) % poly.length];
+        const curIn = inside(cur), prevIn = inside(prev);
+        if (curIn !== prevIn) {
+          const dp = prev[0] * normal[0] + prev[1] * normal[1];
+          const dc = cur[0] * normal[0] + cur[1] * normal[1];
+          const t = dp / (dp - dc);
+          out.push([prev[0] + (cur[0] - prev[0]) * t, prev[1] + (cur[1] - prev[1]) * t]);
+        }
+        if (curIn) out.push(cur);
+      }
+      return out;
+    }
+
+    // how far a ray from the origin at each angle reaches before leaving the polygon
+    function radialSample(poly) {
+      return ANGLES.map((a) => {
+        const dx = Math.cos(a), dy = Math.sin(a);
+        let best = 0;
+        for (let i = 0; i < poly.length; i++) {
+          const [px, py] = poly[i], [qx, qy] = poly[(i + 1) % poly.length];
+          const ex = qx - px, ey = qy - py;
+          const den = dx * ey - dy * ex;
+          if (Math.abs(den) < 1e-9) continue;
+          const t = (px * ey - py * ex) / den;
+          const s = (px * dy - py * dx) / den;
+          if (t > 0 && s >= 0 && s <= 1) best = Math.max(best, t);
+        }
+        return best;
+      });
+    }
+
+    function wobble(rand) {
+      return [2, 3, 4, 5].map((k) => ({ k, amp: (0.025 + rand() * 0.05) / (k - 1), phase: rand() * Math.PI * 2 }));
+    }
+    const wobbleAt = (waves, a) => 1 + waves.reduce((sum, w) => sum + w.amp * Math.sin(w.k * a + w.phase), 0);
+
+    function scaleToArea(radii, area) {
+      const k = Math.sqrt(area / polygonStats(toPoints(radii)).area);
+      return radii.map((r) => r * k);
+    }
+
+    // the first grain: a stretched, wobbly circle
+    function firstGrain() {
+      const rand = mulberry32(17);
+      const stretch = 1.3, rot = -0.6, waves = wobble(rand);
+      const poly = ANGLES.map((a) => {
+        const r = 70 * wobbleAt(waves, a);
+        const x = Math.cos(a) * r * stretch, y = Math.sin(a) * r / stretch;
+        return [x * Math.cos(rot) - y * Math.sin(rot), x * Math.sin(rot) + y * Math.cos(rot)];
+      });
+      return radialSample(poly);
+    }
+
+    // smooth the radii around the loop (rounds off the corners where the cut face meets the skin)
+    function smoothLoop(radii, passes, width) {
+      let r = radii.slice();
+      for (let p = 0; p < passes; p++) {
+        r = r.map((_, i) => {
+          let sum = 0;
+          for (let j = -width; j <= width; j++) sum += r[(i + j + N) % N];
+          return sum / (2 * width + 1);
+        });
+      }
+      return r;
+    }
+
+    function speckle(radii, rand) {
+      const specks = [];
+      for (let j = 0; j < 90; j++) {
+        const i = Math.floor(rand() * N);
+        const r = radii[i] * Math.sqrt(rand()) * 0.95;
+        specks.push([Math.cos(ANGLES[i]) * r, Math.sin(ANGLES[i]) * r, 0.5 + rand() * 1.3]);
+      }
+      return specks;
+    }
+
+    // build all 63 pieces (the grain, then one per cut) up front
+    const pieces = [];
+    (function buildPieces() {
+      let radii = firstGrain();
+      const AREA = polygonStats(toPoints(radii)).area;
+      for (let n = 0; n <= TOTAL_CUTS; n++) {
+        const rand = mulberry32(n * 7919 + 3);
+        const poly = toPoints(radii);
+        // cut across the long way: find the long axis, then cut roughly perpendicular to it
+        let sxx = 0, syy = 0, sxy = 0;
+        poly.forEach(([x, y]) => { sxx += x * x; syy += y * y; sxy += x * y; });
+        const longAxis = 0.5 * Math.atan2(2 * sxy, sxx - syy);
+        const cutAngle = longAxis + Math.PI / 2 + (rand() - 0.5) * 0.6;
+        const u = [Math.cos(cutAngle), Math.sin(cutAngle)];
+        const normal = [-u[1], u[0]];
+        const keepSide = rand() < 0.5 ? -1 : 1;
+        const kept = clipHalf(poly, normal, keepSide);
+        const dropped = clipHalf(poly, normal, -keepSide);
+        const keptStats = polygonStats(kept);
+        const zoom = Math.sqrt(AREA / keptStats.area);
+        // the kept half after zooming: centered, back to full size
+        const keptZoomed = kept.map(([x, y]) => [(x - keptStats.cx) * zoom, (y - keptStats.cy) * zoom]);
+        const halfRadii = radialSample(keptZoomed);
+        const specks = speckle(radii, rand);
+        pieces.push({ radii, poly, u, normal, keepSide, kept, dropped, keptCenter: [keptStats.cx, keptStats.cy], zoom, halfRadii, specks });
+
+        // the next piece: round off the cut face a little and add a fresh wobble
+        // (pulled partway toward an oval along its long axis, so repeated cuts don't wear it into a triangle)
+        const waves = wobble(rand);
+        let hx = 0, hy = 0, hxy = 0;
+        toPoints(halfRadii).forEach(([x, y]) => { hx += x * x; hy += y * y; hxy += x * y; });
+        const phi = 0.5 * Math.atan2(2 * hxy, hx - hy);
+        const meanR = halfRadii.reduce((a, b) => a + b, 0) / N;
+        const smooth = smoothLoop(halfRadii, 4, 6);
+        const rounded = smooth.map((r, i) => {
+          const c = Math.cos(ANGLES[i] - phi), sn = Math.sin(ANGLES[i] - phi);
+          const oval = meanR / Math.sqrt((c / 1.25) ** 2 + (sn * 1.25) ** 2);
+          return (0.15 * halfRadii[i] + 0.55 * r + 0.3 * oval) * wobbleAt(waves, ANGLES[i]);
+        });
+        radii = scaleToArea(rounded, AREA);
+      }
+    })();
+
+    // closed Catmull-Rom curve through the points, as SVG cubic beziers
+    function smoothPath(pts) {
+      const n = pts.length;
+      let d = `M${pts[0][0].toFixed(2)},${pts[0][1].toFixed(2)}`;
+      for (let i = 0; i < n; i++) {
+        const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+        const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+        const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+        d += ` C${c1[0].toFixed(2)},${c1[1].toFixed(2)} ${c2[0].toFixed(2)},${c2[1].toFixed(2)} ${p2[0].toFixed(2)},${p2[1].toFixed(2)}`;
+      }
+      return d + "Z";
+    }
+    const linePath = (pts) => "M" + pts.map((p) => p[0].toFixed(2) + "," + p[1].toFixed(2)).join("L") + "Z";
+
+    // ---------- drawing ----------
+    const $ = (id) => document.getElementById(id);
+    const speckMarkup = (specks) => specks.map(([x, y, r]) => `<circle class="grain-speck" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(2)}" />`).join("");
+
+    // set up the drawing for cut n
+    let builtFor = -1;
+    function build(n) {
+      if (builtFor === n) return;
+      builtFor = n;
+      const piece = pieces[n], next = pieces[n + 1];
+      const keptPath = linePath(piece.kept), droppedPath = linePath(piece.dropped);
+      $("halfAFill").setAttribute("d", keptPath);
+      $("clipAPath").setAttribute("d", keptPath);
+      $("halfBFill").setAttribute("d", droppedPath);
+      $("clipBPath").setAttribute("d", droppedPath);
+      $("specksA").innerHTML = $("specksB").innerHTML = $("specksW").innerHTML = speckMarkup(piece.specks);
+      const wholePath = smoothPath(toPoints(piece.radii));
+      $("wholeFill").setAttribute("d", wholePath);
+      $("clipWPath").setAttribute("d", wholePath);
+      // the cut face: a dark line along the cut, half of it showing on each piece's flat side
+      ["edgeA", "edgeB"].forEach((id) => {
+        $(id).setAttribute("x1", -piece.u[0] * 200); $(id).setAttribute("y1", -piece.u[1] * 200);
+        $(id).setAttribute("x2", piece.u[0] * 200); $(id).setAttribute("y2", piece.u[1] * 200);
+      });
+      // in the morph, the old specks ride along with the zoomed half, the new piece's specks fade in
+      const [cx, cy] = piece.keptCenter;
+      $("specksOld").innerHTML = speckMarkup(piece.specks.map(([x, y, r]) => [(x - cx) * piece.zoom, (y - cy) * piece.zoom, r * piece.zoom]));
+      $("specksNew").innerHTML = speckMarkup(next.specks);
+      $("cutLine").setAttribute("x1", -piece.u[0] * 100);
+      $("cutLine").setAttribute("y1", -piece.u[1] * 100);
+    }
+
+    // ---------- colors ----------
+    const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const mix = (a, b, t) => {
+      const A = hex(a), B = hex(b);
+      return `rgb(${A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(",")})`;
+    };
+    function setColors(n, t) {
+      const a = PALETTES[n % 5], b = PALETTES[(n + 1) % 5];
+      const stage = $("stage");
+      stage.style.setProperty("--bg", mix(a.bg, b.bg, t));
+      stage.style.setProperty("--ink", mix(a.ink, b.ink, t));
+      stage.style.setProperty("--blank", mix(a.blank, b.blank, t));
+      stage.style.setProperty("--rule", mix(a.rule, b.rule, t));
+      // the panel flips light-on-dark / dark-on-light between some sets, so it switches halfway (with a short CSS fade)
+      // instead of blending through an unreadable middle
+      const panel = t < 0.5 ? a : b;
+      stage.style.setProperty("--note-bg", panel.noteBg);
+      stage.style.setProperty("--note-ink", panel.noteInk);
+    }
+
+    // ---------- words ----------
+    const NAMES = [[1e18, "quintillion"], [1e15, "quadrillion"], [1e12, "trillion"], [1e9, "billion"], [1e6, "million"]];
+    function atomsWords(n) {
+      if (n < 1.5) return "about 1";
+      for (const [v, name] of NAMES) if (n >= v) return (n / v).toFixed(n / v < 10 ? 1 : 0) + " " + name;
+      return Math.round(n).toLocaleString();
+    }
+    const SUPERSCRIPT = { "-": "⁻", 0: "⁰", 1: "¹", 2: "²", 3: "³", 4: "⁴", 5: "⁵", 6: "⁶", 7: "⁷", 8: "⁸", 9: "⁹" };
+    function sci(n) {
+      if (n < 1000) return "";
+      const e = Math.floor(Math.log10(n));
+      return (n / 10 ** e).toFixed(1) + " × 10" + String(e).split("").map((c) => SUPERSCRIPT[c]).join("");
+    }
+    function sizeWords(m) {
+      const fmt = (v) => (v >= 10 ? String(Math.round(v)) : String(Number(v.toFixed(1))));
+      if (m >= 1e-3) return fmt(m * 1e3) + " mm";
+      if (m >= 1e-6) return fmt(m * 1e6) + " µm";
+      return fmt(m * 1e9) + " nm";
+    }
+    function compareWords(m, cuts) {
+      if (cuts >= TOTAL_CUTS) return "About the size of a single atom. Cut again and it stops being sand.";
+      const close = COMPARISONS.find(([, s]) => Math.abs(Math.log(m / s)) < Math.log(2) / 6);
+      if (close) return `About the width of ${close[0]}.`;
+      const passed = COMPARISONS.filter(([, s]) => s > m).pop();
+      if (passed) return `Already smaller than ${passed[0]} (${sizeWords(passed[1])}).`;
+      return "Still big enough to see with the naked eye.";
+    }
+
+    // ---------- scroll ----------
+    const ease = (t) => t * t * (3 - 2 * t);
+    const clamp01 = (t) => Math.max(0, Math.min(1, t));
+    const phase = (f, a, b) => ease(clamp01((f - a) / (b - a)));
+
+    let lastCuts = -1;
+    function render() {
+      const p = Math.max(0, window.scrollY / (window.innerHeight * SCROLL_PER_CUT));
+      const n = Math.min(TOTAL_CUTS - 1, Math.floor(p));
+      const f = p >= TOTAL_CUTS ? 1 : p - n;
+      build(n);
+      const piece = pieces[n], next = pieces[n + 1];
+      const { u, normal, keepSide, keptCenter, zoom } = piece;
+      const away = [normal[0] * keepSide, normal[1] * keepSide]; // from the cut toward the kept half
+
+      // 1. the cut line draws across
+      const draw = phase(f, 0.1, 0.35);
+      const line = $("cutLine");
+      line.setAttribute("x2", -u[0] * 100 + u[0] * 200 * draw);
+      line.setAttribute("y2", -u[1] * 100 + u[1] * 200 * draw);
+      line.setAttribute("opacity", draw > 0 ? 1 - phase(f, 0.45, 0.55) : 0);
+
+      // 2. the halves part, showing their darker cut faces
+      const gap = 7 * phase(f, 0.35, 0.58);
+      const edge = phase(f, 0.35, 0.45).toFixed(3);
+      $("edgeA").setAttribute("opacity", edge);
+      $("edgeB").setAttribute("opacity", edge);
+
+      // 3. the dropped half drifts off; the kept half zooms up to fill the frame
+      const z = phase(f, 0.58, 0.85);
+      const k = 1 + (zoom - 1) * z;
+      const ax = away[0] * gap * (1 - z) - keptCenter[0] * k * z;
+      const ay = away[1] * gap * (1 - z) - keptCenter[1] * k * z;
+      $("halfA").setAttribute("transform", `translate(${ax.toFixed(2)},${ay.toFixed(2)}) scale(${k.toFixed(4)})`);
+      const drift = gap + 60 * z;
+      $("halfB").setAttribute("transform", `translate(${(-away[0] * drift).toFixed(2)},${(-away[1] * drift).toFixed(2)})`);
+      $("halfB").setAttribute("opacity", (1 - z).toFixed(3));
+
+      // 4. its flat cut face bulges out into the next potato
+      const m = phase(f, 0.85, 1);
+      const morphing = f > 0.85 || p >= TOTAL_CUTS;
+      const split = f >= 0.35 && !morphing;
+      $("whole").style.display = split || morphing ? "none" : "";
+      $("halfA").style.display = split ? "" : "none";
+      $("halfB").style.display = split ? "" : "none";
+      $("morph").style.display = morphing ? "" : "none";
+      if (morphing) {
+        const radii = piece.halfRadii.map((r, i) => r + (next.radii[i] - r) * m);
+        const d = m === 0 ? linePath(toPoints(piece.halfRadii)) : smoothPath(toPoints(radii));
+        $("morphFill").setAttribute("d", d);
+        $("clipMPath").setAttribute("d", d);
+        $("specksOld").setAttribute("opacity", (1 - m).toFixed(3));
+        $("specksNew").setAttribute("opacity", m.toFixed(3));
+      }
+
+      // the very last piece turns into an atom
+      const atomT = p >= TOTAL_CUTS ? phase(p - TOTAL_CUTS, 0, 0.6) : 0;
+      $("morph").setAttribute("opacity", (1 - atomT).toFixed(3));
+      $("atom").setAttribute("opacity", atomT.toFixed(3));
+
+      setColors(n, z);
+
+      // words: the count ticks over as the halves part
+      const cuts = p >= TOTAL_CUTS ? TOTAL_CUTS : n + (f >= 0.45 ? 1 : 0);
+      if (cuts !== lastCuts) {
+        lastCuts = cuts;
+        const atoms = START_ATOMS / 2 ** cuts;
+        const size = START_SIZE_M * 2 ** (-cuts / 3);
+        $("counter").innerHTML = cuts === 0
+          ? "A grain of sand"
+          : cuts >= TOTAL_CUTS
+            ? `Cut ${cuts} of ${TOTAL_CUTS}<small>One atom.</small>`
+            : `Cut ${cuts} of ${TOTAL_CUTS}<small>${cuts === 1 ? "Half" : "1/" + atomsWords(2 ** cuts)} of the grain</small>`;
+        $("atomsText").textContent = atomsWords(atoms);
+        $("atomsSci").textContent = sci(atoms);
+        $("sizeText").textContent = (cuts >= TOTAL_CUTS ? "~" : "") + sizeWords(size);
+        $("compareText").textContent = compareWords(size, cuts);
+      }
+      $("hint").style.opacity = p < 0.1 ? 1 : 0;
+    }
+
+    let ticking = false;
+    window.addEventListener("scroll", () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { ticking = false; render(); });
+    }, { passive: true });
+    window.addEventListener("resize", render);
+    render();
+  </script>
+</body>
+</html>
