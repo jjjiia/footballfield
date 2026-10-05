@@ -9,6 +9,7 @@ body{ font-family: 'Open Sans', sans-serif; }
 
 /* top site nav */
 .site-nav{
+  display: none; /* hidden for now — delete this line to bring the menu back */
   height: 24px;
   background: #FFEF00; /* process yellow */
   display: flex;

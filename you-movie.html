@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>You</title>
+  <title>You (movie)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
@@ -116,6 +116,8 @@
     /* when a slide comes into view, each number spins like a wheel (a reel of neighboring values rolls up,
        then down, then settles — see spinHint) while the matching arrow flashes: "you can spin these" */
     .spin-box{ position: relative; overflow: hidden; }
+    .select-box{ position: relative; }
+    .spin-reel{ overflow: hidden; }
     .spin-reel{
       position: absolute;
       left: 0;
@@ -125,9 +127,9 @@
       font-weight: 700;
       text-align: center;
     }
-    .spin-reel div{ display: flex; align-items: center; justify-content: center; }
+    .spin-reel > div > div{ display: flex; align-items: center; justify-content: center; }
     .spin-box.hint .spin-arrows{ animation-delay: inherit; }
-    .spin-box.hint .spin-up{ animation: arrow-up-hint 1s ease-in-out both; animation-delay: inherit; }
+    .spin-box.hint .spin-up{ animation: arrow-up-hint 1s ease-in-out 3 both; }
     /* the up arrow ticks once per notch as the number rolls up */
     @keyframes arrow-up-hint{
       0%, 25%, 50%, 100%{ transform: translateY(0); opacity: 0.75; }
@@ -1029,64 +1031,25 @@
       arrows.querySelector(".spin-up").addEventListener("click", () => setValue((parseFloat(input.value) || 0) + step));
       arrows.querySelector(".spin-down").addEventListener("click", () => setValue((parseFloat(input.value) || 0) - step));
 
-      // the "spin me" hint: the value starts a few steps low and rolls upward into place, one notch at a time,
-      // like a wheel turning in one direction; each notch is a real value change, so the results recount along with it
-      const HINT_STEPS = 3;
+      // movie version: the value starts far below and spins up a long way before settling,
+      // each notch a real value change so the results count along with it
+      const HINT_STEPS = 30;
       let hintRun = null;
       const stopReel = () => { if (hintRun) hintRun.finish(); };
-      box.spinHint = (delayMs) => {
+      box.spinHint = () => {
         stopReel();
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
         const target = parseFloat(input.value) || 0;
         const fmt = (x) => String(Number(x.toFixed(decimals)));
-        let value = Math.max(min, target - HINT_STEPS * step);
-        const notches = Math.round((target - value) / step);
-        if (notches <= 0) return;
-
-        const h = input.offsetHeight;
-        const reel = document.createElement("div");
-        reel.className = "spin-reel";
-        reel.style.width = input.offsetWidth + "px";
-        reel.style.font = getComputedStyle(input).font;
-        let timer = null, anim = null, done = false;
-
-        const run = hintRun = {
-          finish() {
-            if (done) return;
-            done = true;
-            clearTimeout(timer);
-            if (anim) anim.cancel();
-            reel.remove();
-            input.style.color = "";
-            if (hintRun === run) hintRun = null;
-            setValue(target);
-          },
-        };
-
-        // one notch: the current number rolls up and out, the next one rolls up from below
-        const turn = (i) => {
-          if (done) return;
-          if (i === notches) return run.finish();
-          const next = value + step;
-          reel.innerHTML = `<div style="height:${h}px">${fmt(value)}</div><div style="height:${h}px">${fmt(next)}</div>`;
-          const last = i === notches - 1;
-          anim = reel.animate(
-            [{ transform: "translateY(0)" }, { transform: `translateY(${-h}px)` }],
-            { duration: last ? 420 : 200, easing: last ? "cubic-bezier(.2,.8,.3,1.15)" : "linear", fill: "forwards" }
-          );
-          anim.onfinish = () => {
-            value = next;
-            setValue(value);
-            turn(i + 1);
-          };
-        };
-
-        timer = setTimeout(() => {
-          setValue(value);
-          input.style.color = "transparent";
-          box.appendChild(reel);
-          turn(0);
-        }, delayMs);
+        const startValue = Math.max(min, target - HINT_STEPS * step);
+        const notches = Math.round((target - startValue) / step);
+        if (notches <= 0) return Promise.resolve();
+        const labels = [];
+        for (let i = 0; i <= notches; i++) labels.push(fmt(startValue + i * step));
+        hintRun = rollReel({
+          box, el: input, labels, align: "center",
+          apply: (i) => setValue(i === notches ? target : startValue + i * step),
+        });
+        return hintRun.done.then(() => { hintRun = null; });
       };
       // touching or focusing the box ends the hint immediately
       box.addEventListener("pointerdown", stopReel);
@@ -1311,18 +1274,115 @@
 
     document.querySelectorAll('input.blank-input[type="number"]').forEach(enableScrollAdjust);
 
-    // ---- each time a slide comes into view, its number boxes spin like wheels, one after another ----
+    // ---- movie: a reel that rolls a control through a list of labels, fast at first and slowing to a stop.
+    // labels[i] is what the control shows at notch i; apply(i) sets the real value so the sentence recalculates ----
+    function rollReel({ box, el, labels, apply, align }) {
+      const notches = labels.length - 1;
+      const h = el.offsetHeight;
+      const cs = getComputedStyle(el);
+      // the reel is a window exactly over the control; the strip inside it is what rolls
+      const reel = document.createElement("div");
+      reel.className = "spin-reel";
+      reel.style.left = el.offsetLeft + "px";
+      reel.style.top = el.offsetTop + "px";
+      reel.style.width = el.offsetWidth + "px";
+      reel.style.height = h + "px";
+      reel.style.font = cs.font;
+      reel.style.textAlign = align;
+      reel.style.boxSizing = "border-box";
+      if (align === "left") reel.style.paddingLeft = (parseFloat(cs.paddingLeft) + 4) + "px";
+      const strip = document.createElement("div");
+      reel.appendChild(strip);
+      let anim = null, finished = false, resolveDone;
+      const done = new Promise((r) => { resolveDone = r; });
+
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+        if (anim) anim.cancel();
+        reel.remove();
+        el.style.color = "";
+        apply(notches);
+        resolveDone();
+      };
+      const row = (text) => `<div style="height:${h}px;justify-content:${align === "left" ? "flex-start" : "center"}">${text}</div>`;
+
+      const turn = (i) => {
+        if (finished) return;
+        if (i === notches) return finish();
+        strip.innerHTML = row(labels[i]) + row(labels[i + 1]);
+        const t = notches > 1 ? i / (notches - 1) : 1;
+        const last = i === notches - 1;
+        anim = strip.animate(
+          [{ transform: "translateY(0)" }, { transform: `translateY(${-h}px)` }],
+          { duration: last ? 520 : 40 + 300 * t * t * t, easing: last ? "cubic-bezier(.2,.8,.3,1.15)" : "linear", fill: "forwards" }
+        );
+        anim.onfinish = () => { apply(i + 1); turn(i + 1); };
+      };
+
+      apply(0);
+      el.style.color = "transparent";
+      box.appendChild(reel);
+      turn(0);
+      return { finish, done };
+    }
+
+    // dropdowns get a box too, so the reel can roll inside them
+    document.querySelectorAll("select.inline-select").forEach((select) => {
+      const box = document.createElement("span");
+      box.className = "select-box";
+      select.before(box);
+      box.appendChild(select);
+      let run = null;
+      // roll through every option (twice for short lists) and land back on the selected one
+      box.spinHint = () => {
+        if (run) run.finish();
+        const n = select.options.length;
+        const target = select.selectedIndex;
+        if (n < 2) return Promise.resolve();
+        const turns = n < 4 ? 2 : 1;
+        const order = [];
+        for (let k = 0; k <= n * turns; k++) order.push((target + 1 + k) % n);
+        // order ends one past target after the full loop; end exactly on target
+        order.splice(order.lastIndexOf(target) + 1);
+        const labels = order.map((idx) => select.options[idx].text);
+        run = rollReel({
+          box, el: select, labels, align: "left",
+          apply: (i) => {
+            if (select.selectedIndex !== order[i]) {
+              select.selectedIndex = order[i];
+              select.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+          },
+        });
+        const stop = () => run && run.finish();
+        box.addEventListener("pointerdown", stop, { once: true });
+        return run.done.then(() => { run = null; box.removeEventListener("pointerdown", stop); });
+      };
+    });
+
+    // ---- each time a slide comes into view, its numbers and dropdowns spin one after another, in reading order ----
+    const slideRuns = new WeakMap();
+    const pause = (ms) => new Promise((r) => setTimeout(r, ms));
+    async function playSlide(slide) {
+      const token = {};
+      slideRuns.set(slide, token);
+      await pause(400);
+      for (const box of slide.querySelectorAll(".spin-box, .select-box")) {
+        if (slideRuns.get(slide) !== token) return; // slide left and came back — a newer run took over
+        if (box.classList.contains("spin-box")) {
+          box.classList.remove("hint");
+          void box.offsetWidth;
+          box.classList.add("hint");
+        }
+        await box.spinHint();
+        await pause(250);
+      }
+    }
     const hintObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.querySelectorAll(".spin-box").forEach((box, i) => {
-          box.classList.remove("hint");
-          void box.offsetWidth; // restart the animation
-          const delay = 350 + i * 250;
-          box.style.animationDelay = delay + "ms";
-          box.classList.add("hint");
-          if (box.spinHint) box.spinHint(delay);
-        });
+        if (entry.isIntersecting) playSlide(entry.target);
+        else slideRuns.delete(entry.target);
       });
     }, { threshold: 0.6 });
     slides.forEach((slide) => hintObserver.observe(slide));

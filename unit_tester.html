@@ -125,7 +125,7 @@
     const ftToM = (ft) => ft * 0.3048;
     const mToFt = (m) => m / 0.3048;
 
-    // Same screen-vertical-rectangle math football.html uses to draw its
+    // Same screen-vertical-rectangle math scrolly.html uses to draw its
     // comparison shape, reused here so the outline you tune looks exactly
     // like it will on the real page.
     function metersPerDeg(lat) {
@@ -153,7 +153,7 @@
     }
 
     // Regular polygon (e.g. the Pentagon's real 5-sided footprint) from a
-    // side length -- same formula as football.html.
+    // side length -- same formula as scrolly.html.
     function regularPolygonLocalCorners(sideM, sides) {
       const R = sideM / (2 * Math.sin(Math.PI / sides));
       const corners = [];
