@@ -317,12 +317,36 @@
       .geocoder-box .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--input{ height: 1.6em; }
       .slide-arrow{ padding: 0 28px 16px; font-size: clamp(22px, 6.5vw, 34px); }
     }
+    /* progress: one outlined dot per slide down the left edge, filled in black up to the current slide */
+    .progress-dots{
+      position: fixed;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .progress-dots span{
+      width: 8px;
+      height: 8px;
+      box-sizing: border-box;
+      border: 1.5px solid #000;
+      border-radius: 50%;
+    }
+    .progress-dots span.done{ background: #000; }
+    @media (max-width: 760px){
+      .progress-dots{ left: 8px; gap: 6px; }
+      .progress-dots span{ width: 6px; height: 6px; }
+    }
     .geocoder-box .mapboxgl-ctrl-geocoder--icon{ fill: var(--ink); } /* search and clear icons match the text */
   </style>
 </head>
 <body>
   <div class="inner">
-    <section class="slide pal-1">
+    <section class="slide pal-3">
       <p class="madlib">
         If you walk <input type="number" id="stepsInput" class="blank-input" value="10000" min="1" step="500"> <span id="stepsNoun">steps</span> a day<sup class="sn">1</sup><span class="sidenote"><b>1.</b> Assumes ~2,000 steps per mile.</span>...<br>you will walk the distance between Boston and New York<sup class="sn">2</sup><span class="sidenote"><b>2.</b> Straight-line distance, ~190 miles.</span> in <span class="result" id="bostonNyDays">–</span>, walk the entire length of the Great Wall of China<sup class="sn">3</sup><span class="sidenote"><b>3.</b> <a href="https://www.chinadiscovery.com/great-wall/facts/how-long-is-the-great-wall-of-china.html" target="_blank" rel="noopener">Full Ming-era length</a>, ~13,171 miles.</span> in <span class="result" id="wallDays">–</span>, walk the length of the equator<sup class="sn">4</sup><span class="sidenote"><b>4.</b> <a href="https://en.wikipedia.org/wiki/Earth%27s_circumference" target="_blank" rel="noopener">Equatorial circumference</a>, ~24,901 miles.</span> in <span class="result" id="equatorDays">–</span>, walk the distance between the surface of the Earth and the Moon<sup class="sn">5</sup><span class="sidenote">Average <a href="https://spaceplace.nasa.gov/moon-distance/en/" target="_blank" rel="noopener">Earth–Moon distance</a>, ~238,855 miles.</span> in <span class="result" id="moonDays">–</span>, and walk the distance between
         <span class="geocoder-box" id="fromBox"></span>
@@ -332,13 +356,13 @@
       </p>
     </section>
 
-    <section class="slide pal-2">
+    <section class="slide pal-4">
       <p class="madlib">
         If you drink <input type="number" id="glassesInput" class="blank-input" value="8" min="1" step="1"> <span id="glassesNoun">glasses</span> of water a day<sup class="sn">18</sup><span class="sidenote"><b>18.</b> An 8-oz glass; eight glasses is half a gallon a day.</span>, you will drink a bathtub<sup class="sn">19</sup><span class="sidenote"><b>19.</b> ~40 gallons; <a href="https://www.hunker.com/13416360/how-many-gallons-of-water-does-the-average-house-bathtub-contain/" target="_blank" rel="noopener">household tubs hold 30–60</a>.</span> in <span class="result" id="bathtubTime">–</span>, an Olympic pool<sup class="sn">20</sup><span class="sidenote"><b>20.</b> 50 m × 25 m × 2 m deep, <a href="https://www.nbc.com/nbc-insider/olympic-swimming-pool-size-gallons-meters-depth" target="_blank" rel="noopener">~660,000 gallons</a>.</span> in <span class="result" id="poolTime">–</span>, and the Central Park Reservoir<sup class="sn">21</sup><span class="sidenote"><b>21.</b> The reservoir's earthen embankment has a <a href="https://www.enr.com/articles/62606-nyc-to-replace-160-plus-year-old-equipment-from-central-park-reservoir" target="_blank" rel="noopener">storage capacity of 1,040 million gallons</a>.</span> in <span class="result" id="reservoirTime">–</span>. If every New Yorker<sup class="sn">22</sup><span class="sidenote"><b>22.</b> 8,584,629 people, the Census Bureau's <a href="https://www.census.gov/quickfacts/fact/table/newyorkcitynewyork/PST045225" target="_blank" rel="noopener">July 2025 estimate</a> for New York City.</span> drank <span id="glassesMirror">8</span> <span id="glassesMirrorNoun">glasses</span> a day, they would drink the Reservoir in <span class="result" id="nycReservoirTime">–</span>.
       </p>
     </section>
 
-    <section class="slide pal-3">
+    <section class="slide pal-5">
       <p class="madlib">
         If you eat dinner with your kid <input type="number" id="dinnerNightsInput" class="blank-input" value="5" min="1" max="7" step="1"> <span id="dinnerNightsNoun">nights</span> a <select id="dinnerPeriodSelect" class="inline-select">
           <option value="week" selected>week</option>
@@ -347,13 +371,13 @@
       </p>
     </section>
 
-    <section class="slide pal-4">
+    <section class="slide pal-1">
       <p class="madlib">
         If you pay $<input type="number" id="rentInput" class="blank-input" value="3000" min="0" step="100"> in rent per month, an hour costs $<span class="result" id="rentPerHour">–</span> and a second costs <span class="result" id="rentPerSecond">–</span><sup class="sn">23</sup><span class="sidenote"><b>23.</b> Assumes 12 months, 365 days and 8,760 hours per year.</span>. If your home is <input type="number" id="homeSqftInput" class="blank-input" value="700" min="1" step="50"> square feet, every square foot costs $<span class="result" id="rentPerSqftMonth">–</span> per month, or <span class="result" id="rentPerSqftDay">–</span> per day.
       </p>
     </section>
 
-    <section class="slide pal-5">
+    <section class="slide pal-2">
       <p class="madlib">
         If you climb <input type="number" id="climbAmountInput" class="blank-input" value="5" min="1" step="1"> <select id="climbUnitSelect" class="inline-select">
           <option value="flights" selected>flights of stairs</option>
@@ -362,7 +386,7 @@
       </p>
     </section>
 
-    <section class="slide pal-1">
+    <section class="slide pal-3">
       <p class="madlib madlib-spaced">
         If you <input type="text" id="activityInput" class="blank-input" value="sleep"> <input type="number" id="hoursPerDayInput" class="blank-input" value="8" min="0" step="0.5"> <select id="hoursUnitSelect" class="inline-select">
           <option value="seconds">seconds</option>
@@ -382,9 +406,9 @@
       </p>
     </section>
 
-    <section class="slide pal-2">
+    <section class="slide pal-4">
       <p class="madlib">
-        If you <input type="text" id="parkActivityInput" class="blank-input" value="go to the park"> <input type="number" id="parkFrequencyInput" class="blank-input" value="2" min="0" step="1">x a <select id="parkPeriodSelect" class="inline-select">
+        If you <input type="text" id="parkActivityInput" class="blank-input" value="go to the park"> <input type="number" id="parkFrequencyInput" class="blank-input" value="2" min="0" step="1"> times a <select id="parkPeriodSelect" class="inline-select">
           <option value="day">day</option>
           <option value="week" selected>week</option>
           <option value="month">month</option>
@@ -393,7 +417,7 @@
       </p>
     </section>
 
-    <section class="slide pal-3">
+    <section class="slide pal-5">
       <p class="madlib">
         If you talk to your <select id="talkRelationshipSelect" class="inline-select">
           <option value="mom" selected>mom</option>
@@ -421,7 +445,7 @@
       </p>
     </section>
 
-    <section class="slide pal-4">
+    <section class="slide pal-1">
       <p class="madlib">
         If you talk to a new person a <select id="peoplePeriodSelect" class="inline-select">
           <option value="second">second</option>
@@ -451,7 +475,7 @@
       </p>
     </section>
 
-    <section class="slide pal-5">
+    <section class="slide pal-2">
       <p class="madlib madlib-spaced">
         If you buy <input type="number" id="spendQuantityInput" class="blank-input" value="1" min="0" step="1"> <select id="spendFoodSelect" class="inline-select">
           <option value="coffee" selected>small black coffee from Starbucks</option>
@@ -469,7 +493,7 @@
       </p>
     </section>
 
-    <section class="slide pal-1">
+    <section class="slide pal-3">
       <p class="madlib">
         If you learn <input type="number" id="wordsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="wordsNoun">word</span> a <select id="wordsPeriodSelect" class="inline-select">
           <option value="day" selected>day</option>
@@ -480,7 +504,7 @@
       </p>
     </section>
 
-    <section class="slide pal-2">
+    <section class="slide pal-4">
       <p class="madlib">
         If you go to <input type="number" id="coffeeShopsPerDayInput" class="blank-input" value="1" min="0" step="1"> new <span id="coffeeShopNoun">coffee shop</span> a <select id="coffeeShopsPeriodSelect" class="inline-select">
           <option value="day" selected>day</option>
@@ -491,7 +515,7 @@
       </p>
     </section>
 
-    <section class="slide pal-3">
+    <section class="slide pal-5">
       <p class="madlib">
         If you go to <input type="number" id="restaurantsPerDayInput" class="blank-input" value="1" min="0" step="1"> new <span id="restaurantNoun">restaurant</span> a <select id="restaurantsPeriodSelect" class="inline-select">
           <option value="day" selected>day</option>
@@ -502,7 +526,7 @@
       </p>
     </section>
 
-    <section class="slide pal-4">
+    <section class="slide pal-1">
       <p class="madlib">
         If you stand at <input type="number" id="intersectionsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="intersectionNoun">traffic light</span> a <select id="intersectionsPeriodSelect" class="inline-select">
           <option value="day" selected>day</option>
@@ -513,7 +537,7 @@
       </p>
     </section>
 
-    <section class="slide pal-5">
+    <section class="slide pal-2">
       <p class="madlib madlib-spaced">
         If you save $<input type="number" id="dailySavingsInput" class="blank-input" value="1" min="0" step="0.5"> a <select id="savingsPeriodSelect" class="inline-select">
           <option value="minute">minute</option>
@@ -1324,6 +1348,9 @@
       sizer.style.letterSpacing = cs.letterSpacing;
       sizer.textContent = input.value || input.placeholder || " ";
       input.style.width = Math.ceil(sizer.getBoundingClientRect().width) + 24 + "px";
+      // some boxes (the city search, with its icon and suggestion list) need more room than the text alone; widen by what still overflows
+      const overflow = input.scrollWidth - input.clientWidth;
+      if (overflow > 0) input.style.width = parseFloat(input.style.width) + overflow + "px";
     }
 
     document.querySelectorAll('input.blank-input[type="text"]').forEach((input) => {
@@ -1367,7 +1394,11 @@
     // answers change length as people edit, so re-fit after every edit
     document.addEventListener("input", queueFit);
     document.addEventListener("change", queueFit);
-    if (document.fonts) document.fonts.ready.then(queueFit);
+    if (document.fonts) {
+      document.fonts.ready.then(queueFit);
+      // Inter's bold can arrive after fonts.ready; re-measure the boxes whenever a font finishes loading
+      document.fonts.addEventListener("loadingdone", queueFit);
+    }
 
     // ---- phones: a copy of each tile's footnotes, stacked under the sentence in the panel color ----
     function stackFootnotes() {
@@ -1405,6 +1436,18 @@
       const target = slides[Math.max(0, Math.min(slides.length - 1, i))];
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+    const progressDots = document.createElement("div");
+    progressDots.className = "progress-dots";
+    progressDots.setAttribute("aria-hidden", "true");
+    slides.forEach(() => progressDots.appendChild(document.createElement("span")));
+    document.body.appendChild(progressDots);
+    const updateProgress = () => {
+      const current = currentSlideIndex();
+      progressDots.querySelectorAll("span").forEach((dot, i) => dot.classList.toggle("done", i <= current));
+    };
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    updateProgress();
+
     const isFormField = (el) => el && el.closest && el.closest("input, select, textarea, button, .spin-box, .geocoder-box");
 
     document.addEventListener("keydown", (e) => {
