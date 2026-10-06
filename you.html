@@ -21,15 +21,12 @@
       max-width: none;
       padding: 0;
     }
-    /* each slide rotates through five palettes (.pal-1 … .pal-5):
-       --bg slide, --ink sentence text, --blank/--blank-ink the parts you can change,
-       --rule the underline on those parts, --result the computed numbers, --note-bg/--note-ink the footnote panel.
-       On desktop the sentence sits on the left and the footnote panel fills the right;
-       --side is the page gutter (the sentence fills the width up to the footnote panel), --notes is the footnote column plus its gutter,
+    /* every slide is black text on white;
+       --side is the page gutter (the sentence fills the width up to the footnote column), --notes is the footnote column plus its gutter,
        --pad the extra breathing room inside the sentence panel on both sides */
     .slide{
-      --bg: #fff; --ink: #000; --blank: #FFFF00; --blank-ink: #000; --rule: #000; --result: #000;
-      --note-bg: #eee; --note-ink: #000;
+      --bg: #fff; --ink: #000; --blank: #fff; --blank-ink: #000; --rule: #000; --result: #000;
+      --note-bg: #fff; --note-ink: #000;
       --side: 48px;
       --notes: 340px;
       --pad: 64px;
@@ -43,27 +40,10 @@
       scroll-snap-stop: always; /* a fast flick still stops at the next slide */
       display: flex;
       flex-direction: column;
-      /* sentence side stays white for its first half, then eases (smoothstep: slow start, slow finish) into
-         --note-bg where it meets the footnote panel; footnote panel fades --bg → white toward the edge */
-      --fade-end: calc(var(--side) + var(--notes) - 20px); /* footnote panel width */
-      background:
-        linear-gradient(to right, var(--bg), #fff) right / var(--fade-end) 100% no-repeat,
-        linear-gradient(to right,
-          #fff 45%,
-          color-mix(in srgb, var(--note-bg) 4.3%, #fff) calc(45% + 0.125 * (55% - var(--fade-end))),
-          color-mix(in srgb, var(--note-bg) 15.6%, #fff) calc(45% + 0.250 * (55% - var(--fade-end))),
-          color-mix(in srgb, var(--note-bg) 31.6%, #fff) calc(45% + 0.375 * (55% - var(--fade-end))),
-          color-mix(in srgb, var(--note-bg) 50.0%, #fff) calc(45% + 0.500 * (55% - var(--fade-end))),
-          color-mix(in srgb, var(--note-bg) 68.4%, #fff) calc(45% + 0.625 * (55% - var(--fade-end))),
-          color-mix(in srgb, var(--note-bg) 84.4%, #fff) calc(45% + 0.750 * (55% - var(--fade-end))),
-          color-mix(in srgb, var(--note-bg) 95.7%, #fff) calc(45% + 0.875 * (55% - var(--fade-end))),
-          var(--note-bg) calc(100% - var(--fade-end)));
+      /* a full-height black line halfway between the sentence and the footnote column */
+      background: linear-gradient(#000, #000) right calc(var(--side) + (280px + var(--notes) + var(--pad)) / 2) top / 1px 100% no-repeat, #FAF8F3;
+      color: #000;
     }
-    .pal-1{ --bg: #DFC0B0; --ink: #000; --blank: #F7BE6C; --blank-ink: #791608; --rule: #000; --result: #914D2E; --note-bg: #791608; --note-ink: #F7BE6C; }
-    .pal-2{ --bg: #D0D6B9; --ink: #000; --blank: #78492E; --blank-ink: #D0D6B9; --rule: #000; --result: #78492E; --note-bg: #415621; --note-ink: #D0D6B9; }
-    .pal-3{ --bg: #49A4C6; --ink: #000; --blank: #D6A85A; --blank-ink: #2E2139; --rule: #000; --result: #2E2139; --note-bg: #6C4D84; --note-ink: #F4E3C4; }
-    .pal-4{ --bg: #E2DBC5; --ink: #000; --blank: #AAC7D8; --blank-ink: #BE3019; --rule: #000; --result: #BE3019; --note-bg: #DD6143; --note-ink: #2B0A04; }
-    .pal-5{ --bg: #42BE98; --ink: #000; --blank: #D8B56C; --blank-ink: #6E0F13; --rule: #000; --result: #6E0F13; --note-bg: #D69EA0; --note-ink: #6E0F13; }
     .madlib{
       display: flow-root; /* grow to contain the floated footnotes */
       box-sizing: border-box;
@@ -72,10 +52,10 @@
       font-size: 28px;
       font-weight: 300;
       line-height: 1.7;
-      margin: auto 0; /* centers vertically, but never cuts off the top of a slide that overflows */
+      margin: 15vh 0 auto; /* anchored near the top, so a sentence that gains a line grows downward instead of shifting */
       color: var(--ink);
     }
-    /* every part of the sentence you can change: an outlined box over the slide's gradient,
+    /* every part of the sentence you can change: an outlined box on the white slide,
        in the sentence's ink (--blank-ink was picked for the old solid fill and can vanish without it) */
     .blank-input{
       width: 3.6em;
@@ -111,6 +91,9 @@
     .spin-box .blank-input{
       border: none;
     }
+    /* a "$" inside the box, in the same weight as the number, which then lines up against it */
+    .spin-prefix{ font-weight: 700; }
+    .spin-prefix + .blank-input{ text-align: left; }
     /* − and + buttons on either side of the number, drawn with the same thin black strokes as the dropdown
        chevron, sized in em so they shrink with the sentence */
     .spin-btn{
@@ -139,13 +122,10 @@
     #savingsYearsInput{ width: 2.14em; }
     #rentInput{ width: 3.93em; }
     #homeSqftInput{ width: 3.21em; }
-    #wordsPerDayInput, #coffeeShopsPerDayInput, #restaurantsPerDayInput{ width: 2.14em; }
+    #wordsPerDayInput, #restaurantsPerDayInput{ width: 2.14em; }
     #talkAmountInput{ width: 2.14em; }
     #parkActivityInput{ width: 5.71em; max-width: 100%; }
     #parkFrequencyInput, #parkYearsInput{ width: 2.14em; }
-    #spendQuantityInput{ width: 1.79em; }
-    #spendYearsInput{ width: 2.14em; }
-    #intersectionsPerDayInput{ width: 2.14em; }
     #dinnerNightsInput, #kidAgeInput{ width: 2.14em; }
     #climbAmountInput{ width: 2.86em; }
     #glassesInput{ width: 2.14em; }
@@ -183,6 +163,7 @@
     .madlib .result{
       font-weight: 700;
       color: var(--ink); /* same color as the sentence, set apart only by weight */
+      font-variant-numeric: tabular-nums; /* every digit the same width, so changing numbers reflow less */
     }
 
     /* footnote-style sidenotes, floated into the right margin next to where they occur */
@@ -195,6 +176,8 @@
     }
     /* a footnote marker right after a box gets a little room so it doesn't touch the border */
     .blank-input + .sn, .spin-box + .sn, .inline-select + .sn, .geocoder-box + .sn, datalist + .sn{ margin-left: 4px; }
+    /* two footnote markers in a row read as "12,13" rather than "1213" */
+    .sidenote + .sn::before{ content: ","; }
     .sidenote{
       float: right;
       clear: right;
@@ -214,11 +197,11 @@
     @media (max-width: 760px){
       .slide{
         --notes: 0px;
-        --fade-end: 0px; /* no side panel: the desktop white → --note-bg curve runs across the whole width */
+        background: #FAF8F3; /* no side column, so no vertical line; the footnote box gets a top rule instead */
       }
-      /* the sentence grows with the screen width and centers in the space above the footnotes */
+      /* the sentence grows with the screen width, anchored near the top above the footnotes */
       .madlib{
-        margin: auto 0;
+        margin: 8vh 0 auto;
         font-size: clamp(22px, 6.5vw, 34px);
         padding: 40px 28px;
       }
@@ -226,8 +209,9 @@
       .madlib .sidenote{ display: none; }
       .madlib-notes{
         display: block;
-        background: linear-gradient(to right, var(--bg), #fff); /* same as the widescreen footnote panel */
+        background: #FAF8F3;
         color: #000;
+        border-top: 1px solid #000;
         padding: 20px 28px;
         margin-top: 0; /* sits at the bottom of the slide; the sentence's auto margins take up the space above */
       }
@@ -333,13 +317,13 @@
   <div class="inner">
     <section class="slide pal-3">
       <p class="madlib">
-        If your hair grew <input type="number" id="hairAmountInput" class="blank-input" value="1" min="0" step="0.25"> <span id="hairAmountNoun">inch</span> in the last <input type="number" id="hairMonthsInput" class="blank-input" value="3" min="1" step="1"> <span id="hairMonthsNoun">months</span>, at the same rate, in the next <input type="number" id="hairYearsInput" class="blank-input" value="40" min="1" step="1"> years your hair will grow <span class="result" id="hairGrowth">–</span>.<span class="sentence-gap"></span>If your nails grew <input type="number" id="nailAmountInput" class="blank-input" value="0.1" min="0" step="0.05"> <span id="nailAmountNoun">inches</span> in the last month, at the same rate, in the next <input type="number" id="nailYearsInput" class="blank-input" value="40" min="1" step="1"> years your nails will grow <span class="result" id="nailGrowth">–</span>.
+        If your hair grew <input type="number" id="hairAmountInput" class="blank-input" value="1" min="0" step="0.25"> <span id="hairAmountNoun">inch</span> in the last <input type="number" id="hairMonthsInput" class="blank-input" value="3" min="1" step="1"> <span id="hairMonthsNoun">months</span>, at the same rate, in the next <input type="number" id="hairYearsInput" class="blank-input" value="40" min="1" step="1"> years, your hair will grow <span class="result" id="hairGrowth">–</span>.<span class="sentence-gap"></span>If your nails grew <input type="number" id="nailAmountInput" class="blank-input" value="0.1" min="0" step="0.05"> <span id="nailAmountNoun">inches</span> in the last month, at the same rate, in the next <input type="number" id="nailYearsInput" class="blank-input" value="40" min="1" step="1"> years, your nails will grow <span class="result" id="nailGrowth">–</span>.
       </p>
     </section>
 
     <section class="slide pal-4">
       <p class="madlib">
-        If you walk <input type="number" id="stepsInput" class="blank-input" value="10000" min="1" step="500"> <span id="stepsNoun">steps</span> a day<sup class="sn">1</sup><span class="sidenote"><b>1.</b> Assumes ~2,000 steps per mile.</span>...<br>you will walk the distance between Boston and New York<sup class="sn">2</sup><span class="sidenote"><b>2.</b> Straight-line distance, ~190 miles.</span> in <span class="result" id="bostonNyDays">–</span>, walk the entire length of the Great Wall of China<sup class="sn">3</sup><span class="sidenote"><b>3.</b> <a href="https://www.chinadiscovery.com/great-wall/facts/how-long-is-the-great-wall-of-china.html" target="_blank" rel="noopener">Full Ming-era length</a>, ~13,171 miles.</span> in <span class="result" id="wallDays">–</span>, walk the length of the equator<sup class="sn">4</sup><span class="sidenote"><b>4.</b> <a href="https://en.wikipedia.org/wiki/Earth%27s_circumference" target="_blank" rel="noopener">Equatorial circumference</a>, ~24,901 miles.</span> in <span class="result" id="equatorDays">–</span>, walk the distance between the surface of the Earth and the Moon<sup class="sn">5</sup><span class="sidenote">Average <a href="https://spaceplace.nasa.gov/moon-distance/en/" target="_blank" rel="noopener">Earth–Moon distance</a>, ~238,855 miles.</span> in <span class="result" id="moonDays">–</span>, and walk the distance between
+        If you walk <input type="number" id="stepsInput" class="blank-input" value="10000" min="1" step="500"> <span id="stepsNoun">steps</span> a day<sup class="sn">1</sup><span class="sidenote"><b>1.</b> Assumes ~2,000 steps per mile.</span>, you will walk every street in New York City<sup class="sn">2</sup><span class="sidenote"><b>2.</b> <a href="https://www.nyc.gov/html/dot/html/about/about.shtml" target="_blank" rel="noopener">~6,300 miles of streets</a>, per NYC DOT.</span> in <span class="result" id="nycStreetsDays">–</span>, walk the entire length of the Great Wall of China<sup class="sn">3</sup><span class="sidenote"><b>3.</b> <a href="https://www.chinadiscovery.com/great-wall/facts/how-long-is-the-great-wall-of-china.html" target="_blank" rel="noopener">Full Ming-era length</a>, ~13,171 miles.</span> in <span class="result" id="wallDays">–</span>, walk the length of the equator<sup class="sn">4</sup><span class="sidenote"><b>4.</b> <a href="https://en.wikipedia.org/wiki/Earth%27s_circumference" target="_blank" rel="noopener">Equatorial circumference</a>, ~24,901 miles.</span> in <span class="result" id="equatorDays">–</span>, walk the distance between the surface of the Earth and the Moon<sup class="sn">5</sup><span class="sidenote">Average <a href="https://spaceplace.nasa.gov/moon-distance/en/" target="_blank" rel="noopener">Earth–Moon distance</a>, ~238,855 miles.</span> in <span class="result" id="moonDays">–</span>, and walk the distance between
         <span class="geocoder-box" id="fromBox"></span>
         and
         <span class="geocoder-box" id="toBox"></span><sup class="sn">6</sup><span class="sidenote"><b>6.</b> Straight-line distance between the two points, at the same ~2,000 steps per mile.</span>
@@ -364,7 +348,18 @@
 
     <section class="slide pal-2">
       <p class="madlib">
-        If you pay $<input type="number" id="rentInput" class="blank-input" value="3000" min="0" step="100"> in rent per month, an hour costs $<span class="result" id="rentPerHour">–</span> and a second costs <span class="result" id="rentPerSecond">–</span><sup class="sn">23</sup><span class="sidenote"><b>23.</b> Assumes 12 months, 365 days and 8,760 hours per year.</span>. If your home is <input type="number" id="homeSqftInput" class="blank-input" value="700" min="1" step="50"> square feet, every square foot costs $<span class="result" id="rentPerSqftMonth">–</span> per month, or <span class="result" id="rentPerSqftDay">–</span> per day.
+        If you pay <input type="number" id="rentInput" class="blank-input" data-prefix="$" value="3000" min="0" step="100"> in rent per month, an hour costs $<span class="result" id="rentPerHour">–</span> and a second costs <span class="result" id="rentPerSecond">–</span><sup class="sn">23</sup><span class="sidenote"><b>23.</b> Assumes 12 months, 365 days and 8,760 hours per year.</span>. If your home is <input type="number" id="homeSqftInput" class="blank-input" value="700" min="1" step="50"> square feet, every square foot costs $<span class="result" id="rentPerSqftMonth">–</span> per month, or <span class="result" id="rentPerSqftDay">–</span> per day.
+      </p>
+    </section>
+
+    <section class="slide pal-4">
+      <p class="madlib">
+        If you forget <input type="number" id="wordsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="wordsNoun">thing</span> a <select id="wordsPeriodSelect" class="inline-select">
+          <option value="day" selected>day</option>
+          <option value="week">week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, in the next <input type="number" id="wordsYearsInput" class="blank-input" value="30" min="1" step="1"> years you will forget <span class="result" id="wordsLearned">–</span> things.
       </p>
     </section>
 
@@ -374,37 +369,6 @@
           <option value="flights" selected>flights of stairs</option>
           <option value="stairs">stairs</option>
         </select> a day, you will climb the Empire State Building<sup class="sn">17</sup><span class="sidenote"><b>17.</b> To the <a href="https://www.esbnyc.com/blog/what-difference-between-esbs-86th-102nd-floor-observation-decks" target="_blank" rel="noopener">86th-floor observatory</a>, ~1,050 ft up. Counting flights, that's ~105 at the <a href="https://support.google.com/fitbit/answer/14237111" target="_blank" rel="noopener">fitness-tracker convention</a> of ~10 ft per flight. Counting stairs, it's the 1,576 steps of the annual <a href="https://www.esbnyc.com/2026-esb-run-up" target="_blank" rel="noopener">Empire State Building Run-Up</a>.</span> <span id="esbResult"><span class="result" id="esbTimes">–</span> times in a year</span>.
-      </p>
-    </section>
-
-    <section class="slide pal-4">
-      <p class="madlib madlib-spaced">
-        If you <input type="text" id="activityInput" class="blank-input" value="sleep"> <input type="number" id="hoursPerDayInput" class="blank-input" value="8" min="0" step="0.5"> <select id="hoursUnitSelect" class="inline-select">
-          <option value="seconds">seconds</option>
-          <option value="minutes">minutes</option>
-          <option value="hours" selected>hours</option>
-        </select> a <select id="periodUnitSelect" class="inline-select">
-          <option value="hour">hour</option>
-          <option value="day" selected>day</option>
-          <option value="month">month</option>
-          <option value="year">year</option>
-        </select>, in the next <input type="number" id="yearsInput" class="blank-input" value="20" min="1" step="1"> <select id="durationUnitSelect" class="inline-select">
-          <option value="hours">hours</option>
-          <option value="days">days</option>
-          <option value="months">months</option>
-          <option value="years" selected>years</option>
-        </select><sup class="sn">7</sup><span class="sidenote"><b>7.</b> A month is calculated as 30 days.</span>...<br>you will <span id="activityMirror">sleep</span> for <span class="result" id="totalHours">–</span>.
-      </p>
-    </section>
-
-    <section class="slide pal-5">
-      <p class="madlib">
-        If you <input type="text" id="parkActivityInput" class="blank-input" value="go to the park"> <input type="number" id="parkFrequencyInput" class="blank-input" value="2" min="0" step="1"> times a <select id="parkPeriodSelect" class="inline-select">
-          <option value="day">day</option>
-          <option value="week" selected>week</option>
-          <option value="month">month</option>
-          <option value="year">year</option>
-        </select>, in the next <input type="number" id="parkYearsInput" class="blank-input" value="20" min="1" step="1"> years, you will <span id="parkActivityMirror">go to the park</span> <span class="result" id="parkTimes">–</span> times.
       </p>
     </section>
 
@@ -466,46 +430,6 @@
       </p>
     </section>
 
-    <section class="slide pal-3">
-      <p class="madlib madlib-spaced">
-        If you buy <input type="number" id="spendQuantityInput" class="blank-input" value="1" min="0" step="1"> <select id="spendFoodSelect" class="inline-select">
-          <option value="coffee" selected>small black coffee from Starbucks</option>
-          <option value="happymeal">Happy Meal from McDonald's</option>
-          <option value="taco">taco from Taco Bell</option>
-          <option value="chickfila">chicken sandwich from Chick-fil-A</option>
-          <option value="dunkin">donut from Dunkin'</option>
-          <option value="chipotle">chicken burrito from Chipotle</option>
-          <option value="wendys">small Frosty from Wendy's</option>
-        </select> a <select id="spendPeriodSelect" class="inline-select">
-          <option value="day" selected>day</option>
-          <option value="week">week</option>
-          <option value="month">month</option>
-        </select>, in the next <input type="number" id="spendYearsInput" class="blank-input" value="10" min="1" step="1"> years, you will spend $<span class="result" id="spendTotal">–</span><sup class="sn">12</sup><span class="sidenote"><b>12.</b> Assumes ~$2.45 per <a href="https://starbucksmenu.us/brewed-coffee-menu/" target="_blank" rel="noopener">Starbucks short coffee</a>, ~$5.99 per <a href="https://www.mac-menus.com/happy-meal/" target="_blank" rel="noopener">McDonald's Happy Meal</a>, ~$1.99 per <a href="https://tacobellmenus.net/tacos/crunchy-taco-2/" target="_blank" rel="noopener">Taco Bell Crunchy Taco</a>, ~$5.25 per <a href="https://fastfoodmenuprices.com/chick-fil-a-prices/" target="_blank" rel="noopener">Chick-fil-A Original Chicken Sandwich</a>, ~$1.09 per <a href="https://dunkinmenu.org/" target="_blank" rel="noopener">Dunkin' classic donut</a>, ~$9.79 per <a href="https://usafoodjournal.com/chipotle-menu-with-prices" target="_blank" rel="noopener">Chipotle chicken burrito</a>, and ~$2.49 per <a href="https://hackthemenu.com/wendys/menu-prices/frosty/" target="_blank" rel="noopener">Wendy's small Frosty</a>.</span> at today's prices, or $<span class="result" id="spendTotalInflated">–</span> accounting for fast-food inflation<sup class="sn">13</sup><span class="sidenote"><b>13.</b> Assumes ~5.2%/year fast-food price inflation, compounded annually — the 2020–2025 average of the BLS <a href="https://fred.stlouisfed.org/series/IPUTN72251AT050000000" target="_blank" rel="noopener">Sectoral Output Price Deflator for Limited-Service Eating Places</a> (NAICS 72251A): 4.3%, 6.6%, 7.2%, 7.0%, 4.4%, 3.3%.</span>.
-      </p>
-    </section>
-
-    <section class="slide pal-4">
-      <p class="madlib">
-        If you learn <input type="number" id="wordsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="wordsNoun">word</span> a <select id="wordsPeriodSelect" class="inline-select">
-          <option value="day" selected>day</option>
-          <option value="week">week</option>
-          <option value="month">month</option>
-          <option value="year">year</option>
-        </select>, in the next <input type="number" id="wordsYearsInput" class="blank-input" value="1" min="1" step="1"> years, you will learn <span class="result" id="wordsLearned">–</span> words.
-      </p>
-    </section>
-
-    <section class="slide pal-5">
-      <p class="madlib">
-        If you go to <input type="number" id="coffeeShopsPerDayInput" class="blank-input" value="1" min="0" step="1"> new <span id="coffeeShopNoun">coffee shop</span> a <select id="coffeeShopsPeriodSelect" class="inline-select">
-          <option value="day" selected>day</option>
-          <option value="week">week</option>
-          <option value="month">month</option>
-          <option value="year">year</option>
-        </select>, you will go to all the coffee shops in Manhattan<sup class="sn">10</sup><span class="sidenote"><b>10.</b> 1,113 Coffee/Tea establishments in Manhattan, per <a href="https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Inspection-Results/43nn-pn8j" target="_blank" rel="noopener">NYC DOHMH restaurant inspection data</a>.</span> in <span class="result" id="coffeeShopYears">–</span>.
-      </p>
-    </section>
-
     <section class="slide pal-1">
       <p class="madlib">
         If you go to <input type="number" id="restaurantsPerDayInput" class="blank-input" value="1" min="0" step="1"> new <span id="restaurantNoun">restaurant</span> a <select id="restaurantsPeriodSelect" class="inline-select">
@@ -517,27 +441,47 @@
       </p>
     </section>
 
-    <section class="slide pal-2">
-      <p class="madlib">
-        If you stand at <input type="number" id="intersectionsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="intersectionNoun">traffic light</span> a <select id="intersectionsPeriodSelect" class="inline-select">
-          <option value="day" selected>day</option>
-          <option value="week">week</option>
-          <option value="month">month</option>
-          <option value="year">year</option>
-        </select>, you will stand at every traffic light in New York City<sup class="sn">15</sup><span class="sidenote"><b>15.</b> 13,543 signalized intersections citywide, per <a href="https://www.nyc.gov/html/dot/html/infrastructure/signals.shtml" target="_blank" rel="noopener">NYC DOT</a> (March 2022).</span> in <span class="result" id="intersectionYears">–</span>.
-      </p>
-    </section>
-
     <section class="slide pal-3">
       <p class="madlib madlib-spaced">
-        If you save $<input type="number" id="dailySavingsInput" class="blank-input" value="1" min="0" step="0.5"> a <select id="savingsPeriodSelect" class="inline-select">
+        If you give away <input type="number" id="dailySavingsInput" class="blank-input" data-prefix="$" value="0.25" min="0" step="0.25"> a <select id="savingsPeriodSelect" class="inline-select">
           <option value="minute">minute</option>
           <option value="hour">hour</option>
           <option value="day" selected>day</option>
           <option value="week">week</option>
           <option value="month">month</option>
           <option value="year">year</option>
-        </select>, you will save $<span class="result" id="simpleSavings">–</span> in the next <input type="number" id="savingsYearsInput" class="blank-input" value="20" min="1" step="1"> years (assuming 5% interest<sup class="sn">8</sup><span class="sidenote"><b>8.</b> Compounded annually; treats each year's daily savings as one annual deposit.</span> compounded annually, it will be $<span class="result" id="compoundSavings">–</span>).
+        </select>, you will give away $<span class="result" id="simpleSavings">–</span> in the next <input type="number" id="savingsYearsInput" class="blank-input" value="30" min="1" step="1"> years.
+      </p>
+    </section>
+
+    <section class="slide pal-4">
+      <p class="madlib madlib-spaced">
+        If you <input type="text" id="activityInput" class="blank-input" value="sleep"> <input type="number" id="hoursPerDayInput" class="blank-input" value="8" min="0" step="0.5"> <select id="hoursUnitSelect" class="inline-select">
+          <option value="seconds">seconds</option>
+          <option value="minutes">minutes</option>
+          <option value="hours" selected>hours</option>
+        </select> a <select id="periodUnitSelect" class="inline-select">
+          <option value="hour">hour</option>
+          <option value="day" selected>day</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, in the next <input type="number" id="yearsInput" class="blank-input" value="20" min="1" step="1"> <select id="durationUnitSelect" class="inline-select">
+          <option value="hours">hours</option>
+          <option value="days">days</option>
+          <option value="months">months</option>
+          <option value="years" selected>years</option>
+        </select><sup class="sn">7</sup><span class="sidenote"><b>7.</b> A month is calculated as 30 days.</span>, you will <span id="activityMirror">sleep</span> for <span class="result" id="totalHours">–</span>.
+      </p>
+    </section>
+
+    <section class="slide pal-5">
+      <p class="madlib">
+        If you <input type="text" id="parkActivityInput" class="blank-input" value="go to the park"> <input type="number" id="parkFrequencyInput" class="blank-input" value="2" min="0" step="1"> times a <select id="parkPeriodSelect" class="inline-select">
+          <option value="day">day</option>
+          <option value="week" selected>week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, in the next <input type="number" id="parkYearsInput" class="blank-input" value="20" min="1" step="1"> years, you will <span id="parkActivityMirror">go to the park</span> <span class="result" id="parkTimes">–</span> times.
       </p>
     </section>
 
@@ -553,7 +497,7 @@
     }
 
     const STEPS_PER_MILE = 2000;
-    const BOSTON_NY_MILES = 190; // straight-line
+    const NYC_STREETS_MILES = 6300; // NYC DOT
     const GREAT_WALL_MILES = 13171;
     const EQUATOR_MILES = 24901;
     const MOON_MILES = 238855;
@@ -562,7 +506,7 @@
 
     const stepsInput = document.getElementById("stepsInput");
     const stepsNoun = document.getElementById("stepsNoun");
-    const bostonNyDays = document.getElementById("bostonNyDays");
+    const nycStreetsDays = document.getElementById("nycStreetsDays");
     const wallDays = document.getElementById("wallDays");
     const equatorDays = document.getElementById("equatorDays");
     const moonDays = document.getElementById("moonDays");
@@ -590,7 +534,7 @@
     function update() {
       stepsNoun.textContent = pluralize(Number(stepsInput.value) || 0, "step", "steps");
       const milesPerDay = milesPerDayFromSteps();
-      bostonNyDays.textContent = formatDuration(BOSTON_NY_MILES, milesPerDay);
+      nycStreetsDays.textContent = formatDuration(NYC_STREETS_MILES, milesPerDay);
       wallDays.textContent = formatDuration(GREAT_WALL_MILES, milesPerDay);
       equatorDays.textContent = formatDuration(EQUATOR_MILES, milesPerDay);
       moonDays.textContent = formatDuration(MOON_MILES, milesPerDay);
@@ -764,14 +708,12 @@
     durationUnitSelect.addEventListener("change", updateSleep);
     updateSleep();
 
-    // ---- "if you save $1 a day..." ----
+    // ---- "if you give away $1 a day..." ----
     const dailySavingsInput = document.getElementById("dailySavingsInput");
     const savingsPeriodSelect = document.getElementById("savingsPeriodSelect");
     const savingsYearsInput = document.getElementById("savingsYearsInput");
     const simpleSavings = document.getElementById("simpleSavings");
-    const compoundSavings = document.getElementById("compoundSavings");
 
-    const SAVINGS_RATE = 0.05;
     const SAVINGS_PERIOD_DAYS = {
       minute: 1 / 1440,
       hour: 1 / 24,
@@ -789,11 +731,8 @@
       const annualDeposit = daily * 365;
 
       const simpleTotal = annualDeposit * years;
-      const compoundTotal =
-        annualDeposit * ((Math.pow(1 + SAVINGS_RATE, years) - 1) / SAVINGS_RATE);
 
       simpleSavings.textContent = Math.round(simpleTotal).toLocaleString();
-      compoundSavings.textContent = Math.round(compoundTotal).toLocaleString();
     }
 
     dailySavingsInput.addEventListener("input", updateSavings);
@@ -801,7 +740,7 @@
     savingsYearsInput.addEventListener("input", updateSavings);
     updateSavings();
 
-    // ---- "if you learn 1 word a day..." ----
+    // ---- "if you forget 1 thing a day..." ----
     const wordsPerDayInput = document.getElementById("wordsPerDayInput");
     const wordsPeriodSelect = document.getElementById("wordsPeriodSelect");
     const wordsYearsInput = document.getElementById("wordsYearsInput");
@@ -812,7 +751,7 @@
 
     function updateWords() {
       const rawRate = Number(wordsPerDayInput.value) || 0;
-      wordsNoun.textContent = pluralize(rawRate, "word", "words");
+      wordsNoun.textContent = pluralize(rawRate, "thing", "things");
       const periodDays = WORDS_PERIOD_DAYS[wordsPeriodSelect.value] || 1;
       const perDay = rawRate / periodDays;
       const years = Number(wordsYearsInput.value) || 0;
@@ -878,8 +817,7 @@
     citySearchInput.addEventListener("input", updatePeople);
     updatePeople();
 
-    // ---- "if you go to 1 new coffee shop / restaurant a day..." ----
-    const MANHATTAN_COFFEE_SHOPS = 1113;
+    // ---- "if you go to 1 new restaurant a day..." ----
     const MANHATTAN_RESTAURANTS = 12526;
     const PLACES_PERIOD_DAYS = { day: 1, week: 7, month: DAYS_PER_MONTH, year: DAYS_PER_YEAR };
 
@@ -888,22 +826,6 @@
       const totalDays = totalPlaces / perDay;
       return formatDurationBreakdown(totalDays * 24, false, false);
     }
-
-    const coffeeShopsPerDayInput = document.getElementById("coffeeShopsPerDayInput");
-    const coffeeShopsPeriodSelect = document.getElementById("coffeeShopsPeriodSelect");
-    const coffeeShopYears = document.getElementById("coffeeShopYears");
-    const coffeeShopNoun = document.getElementById("coffeeShopNoun");
-
-    function updateCoffeeShops() {
-      const rawRate = Number(coffeeShopsPerDayInput.value) || 0;
-      coffeeShopNoun.textContent = pluralize(rawRate, "coffee shop", "coffee shops");
-      const periodDays = PLACES_PERIOD_DAYS[coffeeShopsPeriodSelect.value] || 1;
-      coffeeShopYears.textContent = yearsToVisitAll(MANHATTAN_COFFEE_SHOPS, rawRate / periodDays);
-    }
-
-    coffeeShopsPerDayInput.addEventListener("input", updateCoffeeShops);
-    coffeeShopsPeriodSelect.addEventListener("change", updateCoffeeShops);
-    updateCoffeeShops();
 
     const restaurantsPerDayInput = document.getElementById("restaurantsPerDayInput");
     const restaurantsPeriodSelect = document.getElementById("restaurantsPeriodSelect");
@@ -920,25 +842,6 @@
     restaurantsPerDayInput.addEventListener("input", updateRestaurants);
     restaurantsPeriodSelect.addEventListener("change", updateRestaurants);
     updateRestaurants();
-
-    // ---- "if you stand at 1 traffic light a day..." ----
-    const NYC_SIGNALIZED_INTERSECTIONS = 13543;
-
-    const intersectionsPerDayInput = document.getElementById("intersectionsPerDayInput");
-    const intersectionsPeriodSelect = document.getElementById("intersectionsPeriodSelect");
-    const intersectionNoun = document.getElementById("intersectionNoun");
-    const intersectionYears = document.getElementById("intersectionYears");
-
-    function updateIntersections() {
-      const rawRate = Number(intersectionsPerDayInput.value) || 0;
-      intersectionNoun.textContent = pluralize(rawRate, "traffic light", "traffic lights");
-      const periodDays = PLACES_PERIOD_DAYS[intersectionsPeriodSelect.value] || 1;
-      intersectionYears.textContent = yearsToVisitAll(NYC_SIGNALIZED_INTERSECTIONS, rawRate / periodDays);
-    }
-
-    intersectionsPerDayInput.addEventListener("input", updateIntersections);
-    intersectionsPeriodSelect.addEventListener("change", updateIntersections);
-    updateIntersections();
 
     // ---- "if you talk to your mom for 5 minutes a day..." ----
     const talkRelationshipSelect = document.getElementById("talkRelationshipSelect");
@@ -1034,51 +937,9 @@
     kidAgeInput.addEventListener("input", updateDinners);
     updateDinners();
 
-    // ---- "if you buy 1 small black coffee from Starbucks a day..." ----
-    const FOOD_PRICES = {
-      coffee: 2.45,
-      happymeal: 5.99,
-      taco: 1.99,
-      chickfila: 5.25,
-      dunkin: 1.09,
-      chipotle: 9.79,
-      wendys: 2.49
-    };
-    const SPEND_PERIOD_DAYS = { day: 1, week: 7, month: DAYS_PER_MONTH };
-    const FOOD_INFLATION_RATE = 0.052; // BLS Sectoral Output Price Deflator, NAICS 72251A, 2020–2025 average
-
-    const spendQuantityInput = document.getElementById("spendQuantityInput");
-    const spendFoodSelect = document.getElementById("spendFoodSelect");
-    const spendPeriodSelect = document.getElementById("spendPeriodSelect");
-    const spendYearsInput = document.getElementById("spendYearsInput");
-    const spendTotal = document.getElementById("spendTotal");
-    const spendTotalInflated = document.getElementById("spendTotalInflated");
-
     function formatDollars(n) {
       return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
-
-    function updateSpend() {
-      const quantity = Number(spendQuantityInput.value) || 0;
-      const price = FOOD_PRICES[spendFoodSelect.value] || 0;
-      const periodDays = SPEND_PERIOD_DAYS[spendPeriodSelect.value] || 1;
-      const perDay = quantity / periodDays;
-      const years = Number(spendYearsInput.value) || 0;
-      const annualSpend = perDay * DAYS_PER_YEAR * price;
-
-      const total = annualSpend * years;
-      const inflatedTotal =
-        annualSpend * ((Math.pow(1 + FOOD_INFLATION_RATE, years) - 1) / FOOD_INFLATION_RATE);
-
-      spendTotal.textContent = formatDollars(total);
-      spendTotalInflated.textContent = formatDollars(inflatedTotal);
-    }
-
-    spendQuantityInput.addEventListener("input", updateSpend);
-    spendFoodSelect.addEventListener("change", updateSpend);
-    spendPeriodSelect.addEventListener("change", updateSpend);
-    spendYearsInput.addEventListener("input", updateSpend);
-    updateSpend();
 
     // ---- spin a number blank: mouse wheel / trackpad while hovering, or drag up/down on touch ----
     // the page only stops scrolling while the pointer is over (or the finger is on) the box;
@@ -1114,7 +975,9 @@
       plus.className = "spin-btn spin-up";
       plus.setAttribute("aria-label", "Increase");
       plus.innerHTML = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5h8M5 1v8"/></svg>';
-      box.append(minus, input, plus);
+      // a unit like "$" sits inside the box, just before the number
+      const prefix = input.dataset.prefix ? Object.assign(document.createElement("span"), { className: "spin-prefix", textContent: input.dataset.prefix }) : null;
+      box.append(...[minus, prefix, input, plus].filter(Boolean));
       plus.addEventListener("click", () => setValue((parseFloat(input.value) || 0) + step));
       minus.addEventListener("click", () => setValue((parseFloat(input.value) || 0) - step));
 
