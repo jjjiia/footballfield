@@ -58,28 +58,7 @@
           color-mix(in srgb, var(--note-bg) 84.4%, #fff) calc(45% + 0.750 * (55% - var(--fade-end))),
           color-mix(in srgb, var(--note-bg) 95.7%, #fff) calc(45% + 0.875 * (55% - var(--fade-end))),
           var(--note-bg) calc(100% - var(--fade-end)));
-      position: relative; /* anchors the ::before overlay */
     }
-    /* a separate layer over the side-to-side gradients (not part of the background): solid white at the top,
-       easing out (same smoothstep curve as the side fade) to nothing 30% of the way down; the sentence and footnotes sit above it */
-    .slide::before{
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        linear-gradient(to bottom,
-          #fff 0%,
-          color-mix(in srgb, #fff 95.7%, transparent) 3.75%,
-          color-mix(in srgb, #fff 84.4%, transparent) 7.50%,
-          color-mix(in srgb, #fff 68.4%, transparent) 11.25%,
-          color-mix(in srgb, #fff 50.0%, transparent) 15.00%,
-          color-mix(in srgb, #fff 31.6%, transparent) 18.75%,
-          color-mix(in srgb, #fff 15.6%, transparent) 22.50%,
-          color-mix(in srgb, #fff 4.3%, transparent) 26.25%,
-          transparent 30%);
-      pointer-events: none;
-    }
-    .slide > *{ position: relative; z-index: 1; }
     .pal-1{ --bg: #DFC0B0; --ink: #000; --blank: #F7BE6C; --blank-ink: #791608; --rule: #000; --result: #914D2E; --note-bg: #791608; --note-ink: #F7BE6C; }
     .pal-2{ --bg: #D0D6B9; --ink: #000; --blank: #78492E; --blank-ink: #D0D6B9; --rule: #000; --result: #78492E; --note-bg: #415621; --note-ink: #D0D6B9; }
     .pal-3{ --bg: #49A4C6; --ink: #000; --blank: #D6A85A; --blank-ink: #2E2139; --rule: #000; --result: #2E2139; --note-bg: #6C4D84; --note-ink: #F4E3C4; }
@@ -132,23 +111,30 @@
     .spin-box .blank-input{
       border: none;
     }
-    .spin-arrows{
-      display: inline-flex;
-      flex-direction: column;
-      padding-right: 6px;
-    }
-    .spin-arrows button{
+    /* − and + buttons on either side of the number, drawn with the same thin black strokes as the dropdown
+       chevron, sized in em so they shrink with the sentence */
+    .spin-btn{
       all: unset;
       cursor: pointer;
       color: var(--ink);
-      font-size: 11px;
-      line-height: 1;
-      padding: 2px 3px;
-      opacity: 0.75;
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      padding: 0 0.3em;
     }
-    .spin-arrows button:hover{ opacity: 1; }
+    .spin-btn:hover{ background: rgba(0, 0, 0, 0.08); }
+    .spin-btn svg{
+      display: block;
+      width: 0.45em;
+      height: 0.45em;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
     /* when a slide comes into view, each number spins like a wheel (a reel of neighboring values rolls up,
-       then down, then settles — see spinHint) while the matching arrow flashes: "you can spin these" */
+       then down, then settles — see spinHint): "you can spin these" */
     .spin-box{ position: relative; overflow: hidden; }
     .spin-reel{
       position: absolute;
@@ -160,16 +146,6 @@
       text-align: center;
     }
     .spin-reel div{ display: flex; align-items: center; justify-content: center; }
-    .spin-box.hint .spin-arrows{ animation-delay: inherit; }
-    .spin-box.hint .spin-up{ animation: arrow-up-hint 1s ease-in-out both; animation-delay: inherit; }
-    /* the up arrow ticks once per notch as the number rolls up */
-    @keyframes arrow-up-hint{
-      0%, 25%, 50%, 100%{ transform: translateY(0); opacity: 0.75; }
-      12%, 37%, 70%{ transform: translateY(-3px); opacity: 1; }
-    }
-    @media (prefers-reduced-motion: reduce){
-      .spin-box.hint .spin-arrows button{ animation: none; }
-    }
     #activityInput{ width: 5em; max-width: 100%; }
     #hoursPerDayInput, #yearsInput{ width: 2.14em; }
     #dailySavingsInput{ width: 2.86em; }
@@ -202,8 +178,14 @@
       font-size: 1em;
       font-weight: 700;
       color: var(--ink);
-      background: transparent;
       border: 2px solid var(--rule);
+      /* the browser's own arrow swapped for the same chevron the number boxes use */
+      -webkit-appearance: none;
+      appearance: none;
+      padding-left: 0.2em;
+      padding-right: 0.95em;
+      background: transparent url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1.5l5 5 5-5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>") no-repeat right 0.3em center / 0.45em 0.3em;
+      cursor: pointer;
     }
     .inline-select option{ color: #000; background: #fff; } /* the open list isn't over the slide, so give it its own colors */
     .inline-select:focus{ outline: none; }
@@ -330,6 +312,9 @@
       .slide-arrow button{ animation: none; }
     }
     @media (max-width: 760px){
+      /* shorter boxes so neighboring lines of the sentence don't crowd each other; left/right padding unchanged */
+      .blank-input, .inline-select{ padding-top: 0; padding-bottom: 0; line-height: 1.15; }
+      .geocoder-box .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--input{ height: 1.6em; }
       .slide-arrow{ padding: 0 28px 16px; font-size: clamp(22px, 6.5vw, 34px); }
     }
     .geocoder-box .mapboxgl-ctrl-geocoder--icon{ fill: var(--ink); } /* search and clear icons match the text */
@@ -1098,17 +1083,23 @@
         }
       }
 
-      // wrap the input in a box with up/down arrows inside it
+      // wrap the input in a box with a − button before it and a + button after it
       const box = document.createElement("span");
       box.className = "spin-box";
       input.before(box);
-      box.appendChild(input);
-      const arrows = document.createElement("span");
-      arrows.className = "spin-arrows";
-      arrows.innerHTML = '<button type="button" class="spin-up" aria-label="Increase">▲</button><button type="button" class="spin-down" aria-label="Decrease">▼</button>';
-      box.appendChild(arrows);
-      arrows.querySelector(".spin-up").addEventListener("click", () => setValue((parseFloat(input.value) || 0) + step));
-      arrows.querySelector(".spin-down").addEventListener("click", () => setValue((parseFloat(input.value) || 0) - step));
+      const minus = document.createElement("button");
+      minus.type = "button";
+      minus.className = "spin-btn spin-down";
+      minus.setAttribute("aria-label", "Decrease");
+      minus.innerHTML = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5h8"/></svg>';
+      const plus = document.createElement("button");
+      plus.type = "button";
+      plus.className = "spin-btn spin-up";
+      plus.setAttribute("aria-label", "Increase");
+      plus.innerHTML = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5h8M5 1v8"/></svg>';
+      box.append(minus, input, plus);
+      plus.addEventListener("click", () => setValue((parseFloat(input.value) || 0) + step));
+      minus.addEventListener("click", () => setValue((parseFloat(input.value) || 0) - step));
 
       // the "spin me" hint: the value starts a few steps low and rolls upward into place, one notch at a time,
       // like a wheel turning in one direction; each notch is a real value change, so the results recount along with it
@@ -1127,6 +1118,7 @@
         const h = input.offsetHeight;
         const reel = document.createElement("div");
         reel.className = "spin-reel";
+        reel.style.left = input.offsetLeft + "px"; // the − button sits before the number
         reel.style.width = input.offsetWidth + "px";
         reel.style.font = getComputedStyle(input).font;
         let timer = null, anim = null, done = false;
@@ -1444,20 +1436,11 @@
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         entry.target.querySelectorAll(".spin-box").forEach((box, i) => {
-          box.classList.remove("hint");
-          void box.offsetWidth; // restart the animation
-          const delay = 350 + i * 250;
-          box.style.animationDelay = delay + "ms";
-          box.classList.add("hint");
-          if (box.spinHint) box.spinHint(delay);
+          if (box.spinHint) box.spinHint(350 + i * 250);
         });
       });
     }, { threshold: 0.6 });
     slides.forEach((slide) => hintObserver.observe(slide));
-    document.addEventListener("animationend", (e) => {
-      const box = e.target.closest && e.target.closest(".spin-box.hint");
-      if (box && e.target.classList.contains("spin-up")) box.classList.remove("hint");
-    });
   </script>
 </body>
 </html>
