@@ -202,6 +202,8 @@
       line-height: 0;
       color: var(--ink);
     }
+    /* a footnote marker right after a box gets a little room so it doesn't touch the border */
+    .blank-input + .sn, .spin-box + .sn, .inline-select + .sn, .geocoder-box + .sn, datalist + .sn{ margin-left: 4px; }
     .sidenote{
       float: right;
       clear: right;

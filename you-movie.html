@@ -203,6 +203,8 @@
       line-height: 0;
       color: var(--ink);
     }
+    /* a footnote marker right after a box gets a little room so it doesn't touch the border */
+    .blank-input + .sn, .spin-box + .sn, .inline-select + .sn, .geocoder-box + .sn, datalist + .sn{ margin-left: 4px; }
     .sidenote{
       float: right;
       clear: right;
@@ -1493,7 +1495,7 @@
     async function playSlide(slide) {
       const token = {};
       slideRuns.set(slide, token);
-      await pause(400);
+      await pause(2000); // each scene sits still for 2 seconds before its numbers start rolling
       for (const box of slide.querySelectorAll(".spin-box")) {
         if (slideRuns.get(slide) !== token) return; // slide left and came back — a newer run took over
         await box.spinHint();
