@@ -1,0 +1,36 @@
+category,name,meters,feet,note,source
+Tallest buildings,"One World Trade Center, NYC",541,1776,,https://en.wikipedia.org/wiki/One_World_Trade_Center
+Tallest buildings,"Empire State Building, to the tip",443,1454,"381 m / 1,250 ft to the roof",https://en.wikipedia.org/wiki/Empire_State_Building
+Tallest buildings,"Statue of Liberty, ground to torch",93,305,The copper statue alone is 46 m / 151 ft,https://en.wikipedia.org/wiki/Statue_of_Liberty
+Tallest buildings,"Statue of Liberty, statue alone",46.05,151.08,151 ft 1 in,https://en.wikipedia.org/wiki/Statue_of_Liberty
+Grand Canyon,"Grand Canyon, deepest point",1857,6093,Over a mile deep; 277 miles long,https://en.wikipedia.org/wiki/Grand_Canyon
+Mountain peaks,Mount Everest,8848.86,29032,,https://en.wikipedia.org/wiki/Mount_Everest
+Mountain peaks,Mount Whitney,4421,14505,Highest in the contiguous US,https://en.wikipedia.org/wiki/Mount_Whitney
+Mountain peaks,Mount Fuji,3776,12388,,https://en.wikipedia.org/wiki/Mount_Fuji
+Mountain peaks,"Mount Olympus, Washington",2430,7980,Highest point in the Olympic Mountains,https://en.wikipedia.org/wiki/Mount_Olympus_(Washington)
+Mountain peaks,"Bear Mountain, New York",393,1289,"Hudson Highlands; other sources give up to 1,305 ft",https://en.wikipedia.org/wiki/Bear_Mountain_(Hudson_Highlands)
+People's heights,Average US adult man,1.75,5.74,"About 5'9""",https://www.cdc.gov/nchs/fastats/body-measurements.htm
+People's heights,Average US adult woman,1.61,5.29,"About 5'3.5""",https://www.cdc.gov/nchs/fastats/body-measurements.htm
+People's heights,Robert Wadlow,2.72,8.93,"Tallest person ever recorded, 8'11""",https://en.wikipedia.org/wiki/Robert_Wadlow
+People's heights,S,1.219,4,48 in,
+People's heights,J,1.803,5.92,"5'11""",
+Step length,S's step length,0.505,1.66,"About 20 in; estimated as height × 0.413–0.415, a common height-based rule (stride is twice this)",https://arxiv.org/abs/2407.21676 https://steps.app/support/pedometer/android/health-metrics-and-goals/how-does-stepsapp-calculate-my-distance
+Places,Slide at Travers Park,4.267,14,,
+Animals,"Michael James, giraffe",5.182,17,,
+Animals,"Sauroposeidon, dinosaur",18,59,Estimated 16.5–18 m (54–59 ft) to the head with its neck raised; one of the tallest known dinosaurs,https://en.wikipedia.org/wiki/Sauroposeidon
+Ocean depth,Average ocean depth,3682,12080,,https://oceanservice.noaa.gov/facts/oceandepth.html
+Ocean depth,"Challenger Deep, Mariana Trench",10920,35827,"Deepest point; sonar surveys range from about 10,900 to 10,984 m",https://en.wikipedia.org/wiki/Challenger_Deep
+Ocean depth,Titanic wreck,3800,12500,,https://en.wikipedia.org/wiki/Wreck_of_the_Titanic
+Ocean depth,Where sunlight runs out,1000,3300,Most light is gone by 200 m / 660 ft,https://en.wikipedia.org/wiki/Photic_zone
+Deepest lakes,Lake Baikal,1642,5387,Deepest in the world,https://en.wikipedia.org/wiki/Lake_Baikal
+Deepest lakes,Crater Lake,594,1949,Deepest in the US,https://en.wikipedia.org/wiki/Crater_Lake
+Deepest lakes,Lake Michigan,281,923,,https://en.wikipedia.org/wiki/Lake_Michigan
+Deepest a person can go in the ocean,Recreational scuba limit,40,130,,https://en.wikipedia.org/wiki/Recreational_diving
+Deepest a person can go in the ocean,"Freediving no-limits record, Herbert Nitsch",214,702,"On one breath, 2007",https://en.wikipedia.org/wiki/Herbert_Nitsch
+Deepest a person can go in the ocean,"Scuba depth record, Ahmed Gabr",332,1090,2014,https://www.guinnessworldrecords.com/world-records/deepest-scuba-dive-(male)
+Deepest a person can go in the ocean,Submersible to Challenger Deep,10928,35853,"Victor Vescovo, 2019; earlier the Trieste in 1960 and James Cameron in 2012",https://en.wikipedia.org/wiki/Victor_Vescovo
+Commercial airplane height,Typical airliner cruise,10700,35000,"Usually between 30,000 and 38,000 ft",https://en.wikipedia.org/wiki/Cruise_(aeronautics)
+Tallest trees,"Hyperion, coast redwood, California",115.55,379.1,Tallest known living tree,https://en.wikipedia.org/wiki/Hyperion_(tree)
+Tallest trees,"Menara, yellow meranti, Borneo",100.8,331,Tallest tropical tree,https://en.wikipedia.org/wiki/Menara_(tree)
+Tallest trees,"Centurion, mountain ash, Tasmania",100.5,330,,https://en.wikipedia.org/wiki/Centurion_(tree)
+Tallest trees,"General Sherman, giant sequoia",83.8,275,Largest tree by volume,https://en.wikipedia.org/wiki/General_Sherman_(tree)

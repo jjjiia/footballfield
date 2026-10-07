@@ -1,0 +1,1239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>You grid 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
+  <style>
+    /* Inter — the open-source base of Guggenheim Sans */
+    body{ font-family: 'Inter', Arial, sans-serif; background: #FAF8F3; }
+    /* every sentence is a cell in a 3-column grid that fills exactly one window, separated by black lines;
+       the window is split into 40 tracks, the top 20 for the first six cells and the bottom 20 for the other seven */
+    body{ overflow: hidden; }
+    .inner{
+      max-width: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(40, 1fr);
+      height: 100vh;
+      height: 100dvh;
+      width: calc(100% + 1px); /* pushes the last column's right border just off screen */
+    }
+    .slide{
+      --bg: #fff; --ink: #000; --blank: #fff; --blank-ink: #000; --rule: #000; --result: #000;
+      --note-bg: #FAF8F3; --note-ink: #000;
+      box-sizing: border-box;
+      min-width: 0;
+      /* fixed cell size; all the sentences shrink together until every cell fits (see fitSlides) */
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      background: #FAF8F3;
+      color: #000;
+      border-right: 1px solid #000;
+      border-bottom: 1px solid #000;
+    }
+    /* column one runs on its own spacing, each cell sized to its sentence:
+       talk to your mom, dinner, climb, restaurants, sleep */
+    .cell-talk{ grid-column: 1; grid-row: 1 / span 8; }
+    .cell-dinner{ grid-column: 1; grid-row: 9 / span 10; }
+    /* the center column is split in proportion to how long each sentence runs: walk, forget, hair, give away */
+    .cell-walk{ grid-column: 2; grid-row: 1 / span 16; }
+    .cell-forget{ grid-column: 2; grid-row: 17 / span 6; }
+    /* "if you drink" sits top right, 1.2 cells tall, with "if you pay" under it at 0.8 */
+    .cell-drink{ grid-column: 3; grid-row: 1 / span 12; }
+    .cell-rent{ grid-column: 3; grid-row: 13 / span 8; }
+    /* bottom half: the short sentences get less room, the long ones more */
+    .cell-climb{ grid-column: 1; grid-row: 19 / span 6; }
+    .cell-restaurant{ grid-column: 1; grid-row: 25 / span 7; }
+    .cell-sleep{ grid-column: 1; grid-row: 32 / span 9; }
+    .cell-hair{ grid-column: 2; grid-row: 23 / span 12; }
+    .cell-savings{ grid-column: 2; grid-row: 35 / span 6; }
+    .cell-people{ grid-column: 3; grid-row: 21 / span 11; }
+    .cell-park{ grid-column: 3; grid-row: 32 / span 9; }
+    /* the bottom row's own bottom border would sit just past the window */
+    .cell-sleep, .cell-savings, .cell-park{ border-bottom: none; }    .madlib{
+      box-sizing: border-box;
+      width: 100%;
+      padding: 16px 22px;
+      font-size: 20px;
+      font-weight: 300;
+      line-height: 1.7;
+      margin: 0 0 auto; /* anchored at the top; the footnotes sit at the bottom of the cell */
+      color: var(--ink);
+    }
+    /* every part of the sentence you can change: an outlined box on the white slide,
+       in the sentence's ink (--blank-ink was picked for the old solid fill and can vanish without it) */
+    .blank-input{
+      width: 3.6em;
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 1em; /* follows the sentence, which fitSlides may shrink */
+      font-weight: 700;
+      text-align: center;
+      color: var(--ink);
+      background: transparent;
+      border: 2px solid var(--rule);
+    }
+    .blank-input:focus{ outline: none; }
+    /* number blanks spin: wheel over them or drag up/down on touch */
+    input.blank-input[type="number"]{
+      cursor: ns-resize;
+      touch-action: none;           /* touching the box never scrolls the page */
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+    input.blank-input[type="number"]::-webkit-inner-spin-button,
+    input.blank-input[type="number"]::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
+    /* number blanks sit in a .spin-box with little up/down arrows; the box carries the border */
+    .spin-box{
+      display: inline-flex;
+      align-items: center;
+      background: transparent;
+      border: 2px solid var(--rule);
+      touch-action: none;
+      cursor: ns-resize;
+    }
+    .spin-box:hover,
+    .spin-box.spinning{ filter: brightness(0.92); }
+    .spin-box .blank-input{
+      border: none;
+    }
+    /* a "$" inside the box, in the same weight as the number, which then lines up against it */
+    .spin-prefix{ font-weight: 700; }
+    .spin-prefix + .blank-input{ text-align: left; }
+    /* − and + buttons on either side of the number, drawn with the same thin black strokes as the dropdown
+       chevron, sized in em so they shrink with the sentence */
+    .spin-btn{
+      all: unset;
+      cursor: pointer;
+      color: var(--ink);
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      padding: 0 0.3em;
+    }
+    .spin-btn:hover{ background: rgba(0, 0, 0, 0.08); }
+    .spin-btn svg{
+      display: block;
+      width: 0.45em;
+      height: 0.45em;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    #activityInput{ width: 5em; max-width: 100%; }
+    #hoursPerDayInput, #yearsInput{ width: 2.14em; }
+    #dailySavingsInput{ width: 2.86em; }
+    #savingsYearsInput{ width: 2.14em; }
+    #rentInput{ width: 3.93em; }
+    #homeSqftInput{ width: 3.21em; }
+    #wordsPerDayInput, #restaurantsPerDayInput{ width: 2.14em; }
+    #talkAmountInput{ width: 2.14em; }
+    #parkActivityInput{ width: 5.71em; max-width: 100%; }
+    #parkFrequencyInput, #parkYearsInput{ width: 2.14em; }
+    #dinnerNightsInput, #kidAgeInput{ width: 2.14em; }
+    #climbAmountInput{ width: 2.86em; }
+    #glassesInput{ width: 2.14em; }
+    #hairAmountInput, #nailAmountInput{ width: 2.5em; }
+    #hairMonthsInput, #hairYearsInput, #nailYearsInput{ width: 2.14em; }
+    #citySearchInput{
+      width: 6.07em;
+      padding-right: 26px;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'><circle cx='10.5' cy='10.5' r='6.5'/><line x1='20' y1='20' x2='15.5' y2='15.5'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 2px center;
+      background-size: 16px 16px;
+    }
+    /* Safari/Firefox render a built-in dropdown indicator for list-backed inputs; hide it so only our icon shows */
+    #citySearchInput::-webkit-calendar-picker-indicator{ display: none; }
+    #wordsYearsInput, #peopleYearsInput{ width: 2.14em; }
+    .inline-select{
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 1em;
+      font-weight: 700;
+      color: var(--ink);
+      border: 2px solid var(--rule);
+      /* the browser's own arrow swapped for the same chevron the number boxes use */
+      -webkit-appearance: none;
+      appearance: none;
+      padding-left: 0.2em;
+      padding-right: 0.95em;
+      background: transparent url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1.5l5 5 5-5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>") no-repeat right 0.3em center / 0.45em 0.3em;
+      cursor: pointer;
+    }
+    .inline-select option{ color: #000; background: #fff; } /* the open list isn't over the slide, so give it its own colors */
+    .inline-select:focus{ outline: none; }
+    /* a line break with some extra room, between two sentences on the same slide */
+    .sentence-gap{ display: block; height: 0.6em; }
+    .madlib .result{
+      font-weight: 700;
+      color: var(--ink); /* same color as the sentence, set apart only by weight */
+      font-variant-numeric: tabular-nums; /* every digit the same width, so changing numbers reflow less */
+    }
+
+    /* footnote-style sidenotes, floated into the right margin next to where they occur */
+    .sn{
+      font-size: 9px;
+      font-weight: 700;
+      vertical-align: super;
+      line-height: 0;
+      color: var(--ink);
+    }
+    /* a footnote marker right after a box gets a little room so it doesn't touch the border */
+    .blank-input + .sn, .spin-box + .sn, .inline-select + .sn, .geocoder-box + .sn, datalist + .sn{ margin-left: 4px; }
+    .sidenote{
+      font-size: 11px;
+      font-weight: 400;
+      line-height: 1.3;
+      color: #000;
+      text-align: left;
+    }
+    .sidenote a{ color: inherit; }
+    /* footnotes stay hidden in the sentence; hovering (or tapping) a marker shows its note in a popup (see the footnote popup script) */
+    .madlib .sidenote{ display: none; }
+    .sn{ cursor: default; }
+    .note-popup{
+      position: fixed;
+      z-index: 40;
+      max-width: 260px;
+      padding: 8px 10px;
+      background: #FAF8F3;
+      border: 1px solid #000;
+    }
+    .note-popup[hidden]{ display: none; }
+    /* phones: one column, each cell a window tall */
+    @media (max-width: 760px){
+      body{ overflow: auto; }
+      .inner{ grid-template-columns: 1fr; grid-template-rows: none; grid-auto-rows: 100vh; grid-auto-rows: 100dvh; height: auto; width: 100%; }
+      .inner .slide{ grid-column: auto; grid-row: auto; border-right: none; border-bottom: 1px solid #000; }
+      .madlib{ font-size: clamp(22px, 6.5vw, 34px); padding: 40px 28px; }
+    }
+
+    .geocoder-box{
+      display: inline-block;
+      vertical-align: middle;
+      width: 8.6em; /* 240px at the full 28px sentence size; em so it shrinks with fitSlides */
+    }
+    /* the geocoder library sizes itself in px; these em overrides let it shrink with the sentence too */
+    .geocoder-box .mapboxgl-ctrl-geocoder{
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 0.64em; /* 18px at the full sentence size */
+      background: transparent;
+      box-shadow: none;
+      border: 2px solid var(--rule);
+      border-radius: 0;
+    }
+    .geocoder-box .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--input{
+      width: 100%;
+      height: 2em;
+      padding: 0 1.9em;
+      box-sizing: border-box;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .geocoder-box .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--icon-search{
+      top: 50%;
+      left: 0.4em;
+      width: 1.1em;
+      height: 1.1em;
+      transform: translateY(-50%);
+    }
+    .geocoder-box .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--pin-right > *{
+      top: 50%;
+      right: 0.4em;
+      transform: translateY(-50%);
+    }
+    .geocoder-box .suggestions-wrapper{ z-index: 30; }
+
+    /* shorter boxes so neighboring lines of the sentence don't crowd each other in a small cell */
+    .blank-input, .inline-select{ padding-top: 0; padding-bottom: 0; line-height: 1.15; }
+    .geocoder-box .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--input{ height: 1.6em; }
+    .geocoder-box .mapboxgl-ctrl-geocoder--icon{ fill: var(--ink); } /* search and clear icons match the text */
+  </style>
+</head>
+<body>
+  <div class="inner">
+    <section class="slide cell-talk pal-1">
+      <p class="madlib">
+        If you talk to your <select id="talkRelationshipSelect" class="inline-select">
+          <option value="mom" selected>mom</option>
+          <option value="dad">dad</option>
+          <option value="partner">partner</option>
+          <option value="best friend">best friend</option>
+          <option value="sibling">sibling</option>
+        </select> for <input type="number" id="talkAmountInput" class="blank-input" value="5" min="0" step="1"> <select id="talkTimeUnitSelect" class="inline-select">
+          <option value="seconds">seconds</option>
+          <option value="minutes" selected>minutes</option>
+          <option value="hours">hours</option>
+        </select> a <select id="talkPeriodSelect" class="inline-select">
+          <option value="day" selected>day</option>
+          <option value="week">week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, in the next <select id="talkYearsSelect" class="inline-select">
+          <option value="1">1</option>
+          <option value="5" selected>5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="30">30</option>
+          <option value="50">50</option>
+        </select> years, you will talk to them for <span class="result" id="talkDuration">–</span>.
+      </p>
+    </section>
+
+    <section class="slide cell-walk pal-4">
+      <p class="madlib">
+        If you walk <input type="number" id="stepsInput" class="blank-input" value="10000" min="1" step="500"> <span id="stepsNoun">steps</span> a day<sup class="sn">1</sup><span class="sidenote"><b>1.</b> Assumes ~2,000 steps per mile.</span>, you will walk every street in New York City<sup class="sn">2</sup><span class="sidenote"><b>2.</b> <a href="https://www.nyc.gov/html/dot/html/about/about.shtml" target="_blank" rel="noopener">~6,300 miles of streets</a>, per NYC DOT.</span> in <span class="result" id="nycStreetsDays">–</span>, walk the entire length of the Great Wall of China<sup class="sn">3</sup><span class="sidenote"><b>3.</b> <a href="https://www.chinadiscovery.com/great-wall/facts/how-long-is-the-great-wall-of-china.html" target="_blank" rel="noopener">Full Ming-era length</a>, ~13,171 miles.</span> in <span class="result" id="wallDays">–</span>, walk the length of the equator<sup class="sn">4</sup><span class="sidenote"><b>4.</b> <a href="https://en.wikipedia.org/wiki/Earth%27s_circumference" target="_blank" rel="noopener">Equatorial circumference</a>, ~24,901 miles.</span> in <span class="result" id="equatorDays">–</span>, walk the distance between the surface of the Earth and the Moon<sup class="sn">5</sup><span class="sidenote">Average <a href="https://spaceplace.nasa.gov/moon-distance/en/" target="_blank" rel="noopener">Earth–Moon distance</a>, ~238,855 miles.</span> in <span class="result" id="moonDays">–</span>, and walk the distance between
+        <span class="geocoder-box" id="fromBox"></span>
+        and
+        <span class="geocoder-box" id="toBox"></span><sup class="sn">6</sup><span class="sidenote"><b>6.</b> Straight-line distance between the two points, at the same ~2,000 steps per mile.</span>
+        in <span class="result" id="routeDuration">–</span>.
+      </p>
+    </section>
+
+    <section class="slide cell-forget pal-4">
+      <p class="madlib">
+        If you forget <input type="number" id="wordsPerDayInput" class="blank-input" value="1" min="0" step="1"> <span id="wordsNoun">thing</span> a <select id="wordsPeriodSelect" class="inline-select">
+          <option value="day" selected>day</option>
+          <option value="week">week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, in the next <input type="number" id="wordsYearsInput" class="blank-input" value="30" min="1" step="1"> years you will forget <span class="result" id="wordsLearned">–</span> things.
+      </p>
+    </section>
+
+    <section class="slide cell-drink pal-5">
+      <p class="madlib">
+        If you drink <input type="number" id="glassesInput" class="blank-input" value="8" min="1" step="1"> <span id="glassesNoun">glasses</span> of water a day<sup class="sn">18</sup><span class="sidenote"><b>18.</b> An 8-oz glass; eight glasses is half a gallon a day.</span>, you will drink a bathtub<sup class="sn">19</sup><span class="sidenote"><b>19.</b> ~40 gallons; <a href="https://www.hunker.com/13416360/how-many-gallons-of-water-does-the-average-house-bathtub-contain/" target="_blank" rel="noopener">household tubs hold 30–60</a>.</span> in <span class="result" id="bathtubTime">–</span>, an Olympic pool<sup class="sn">20</sup><span class="sidenote"><b>20.</b> 50 m × 25 m × 2 m deep, <a href="https://www.nbc.com/nbc-insider/olympic-swimming-pool-size-gallons-meters-depth" target="_blank" rel="noopener">~660,000 gallons</a>.</span> in <span class="result" id="poolTime">–</span>, and the Central Park Reservoir<sup class="sn">21</sup><span class="sidenote"><b>21.</b> The reservoir's earthen embankment has a <a href="https://www.enr.com/articles/62606-nyc-to-replace-160-plus-year-old-equipment-from-central-park-reservoir" target="_blank" rel="noopener">storage capacity of 1,040 million gallons</a>.</span> in <span class="result" id="reservoirTime">–</span>. If every New Yorker<sup class="sn">22</sup><span class="sidenote"><b>22.</b> 8,584,629 people, the Census Bureau's <a href="https://www.census.gov/quickfacts/fact/table/newyorkcitynewyork/PST045225" target="_blank" rel="noopener">July 2025 estimate</a> for New York City.</span> drank <span id="glassesMirror">8</span> <span id="glassesMirrorNoun">glasses</span> a day, they would drink an Olympic pool in <span class="result" id="nycPoolTime">–</span> and the Reservoir in <span class="result" id="nycReservoirTime">–</span>.
+      </p>
+    </section>
+
+    <section class="slide cell-dinner pal-1">
+      <p class="madlib">
+        If you eat dinner with your kid <input type="number" id="dinnerNightsInput" class="blank-input" value="5" min="1" max="7" step="1"> <span id="dinnerNightsNoun">nights</span> a <select id="dinnerPeriodSelect" class="inline-select">
+          <option value="week" selected>week</option>
+          <option value="month">month</option>
+        </select>, you will have <span class="result" id="dinnersLeft">–</span> dinners together before they turn 18<sup class="sn">16</sup><span class="sidenote"><b>16.</b> Assumes 52 weeks (12 months) per year, counted from birth to their 18th birthday.</span>. If your kid is <input type="number" id="kidAgeInput" class="blank-input" value="6.5" min="0" max="17" step="0.5">, you've already had about <span class="result" id="dinnersHad">–</span> of them.
+      </p>
+    </section>
+
+    <section class="slide cell-rent pal-2">
+      <p class="madlib">
+        If you pay <input type="number" id="rentInput" class="blank-input" data-prefix="$" value="3000" min="0" step="100"> in rent per month, an hour costs $<span class="result" id="rentPerHour">–</span> and a second costs <span class="result" id="rentPerSecond">–</span><sup class="sn">23</sup><span class="sidenote"><b>23.</b> Assumes 12 months, 365 days and 8,760 hours per year.</span>. If your home is <input type="number" id="homeSqftInput" class="blank-input" value="700" min="1" step="50"> square feet, every square foot costs $<span class="result" id="rentPerSqftMonth">–</span> per month, or <span class="result" id="rentPerSqftDay">–</span> per day.
+      </p>
+    </section>
+
+    <section class="slide cell-climb pal-3">
+      <p class="madlib">
+        If you climb <input type="number" id="climbAmountInput" class="blank-input" value="5" min="1" step="1"> <select id="climbUnitSelect" class="inline-select">
+          <option value="flights" selected>flights of stairs</option>
+          <option value="stairs">stairs</option>
+        </select> a day, you will climb the Empire State Building<sup class="sn">17</sup><span class="sidenote"><b>17.</b> To the <a href="https://www.esbnyc.com/blog/what-difference-between-esbs-86th-102nd-floor-observation-decks" target="_blank" rel="noopener">86th-floor observatory</a>, ~1,050 ft up. Counting flights, that's ~105 at the <a href="https://support.google.com/fitbit/answer/14237111" target="_blank" rel="noopener">fitness-tracker convention</a> of ~10 ft per flight. Counting stairs, it's the 1,576 steps of the annual <a href="https://www.esbnyc.com/2026-esb-run-up" target="_blank" rel="noopener">Empire State Building Run-Up</a>.</span> <span id="esbResult"><span class="result" id="esbTimes">–</span> times in a year</span>.
+      </p>
+    </section>
+
+    <section class="slide cell-hair pal-3">
+      <p class="madlib">
+        If your hair grew <input type="number" id="hairAmountInput" class="blank-input" value="1" min="0" step="0.25"> <span id="hairAmountNoun">inch</span> in the last <input type="number" id="hairMonthsInput" class="blank-input" value="3" min="1" step="1"> <span id="hairMonthsNoun">months</span>, at the same rate, in the next <input type="number" id="hairYearsInput" class="blank-input" value="40" min="1" step="1"> years, your hair will grow <span class="result" id="hairGrowth">–</span>.<span class="sentence-gap"></span>If your nails grew <input type="number" id="nailAmountInput" class="blank-input" value="0.1" min="0" step="0.05"> <span id="nailAmountNoun">inches</span> in the last month, at the same rate, in the next <input type="number" id="nailYearsInput" class="blank-input" value="40" min="1" step="1"> years, your nails will grow <span class="result" id="nailGrowth">–</span>.
+      </p>
+    </section>
+
+    <section class="slide cell-people pal-2">
+      <p class="madlib">
+        If you talk to a new person a <select id="peoplePeriodSelect" class="inline-select">
+          <option value="second">second</option>
+          <option value="minute">minute</option>
+          <option value="hour">hour</option>
+          <option value="day">day</option>
+          <option value="week" selected>week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select><sup class="sn">9</sup><span class="sidenote"><b>9.</b> Assumes 60 seconds/minute, 60 minutes/hour, 7 days/week, 30 days/month, 365 days/year.</span>, in the next <input type="number" id="peopleYearsInput" class="blank-input" value="20" min="1" step="1"> years, you will talk to <span class="result" id="peopleMet">–</span> strangers, and you will talk to everyone in <input type="text" id="citySearchInput" class="blank-input" list="cityDatalist" value="New York City" autocomplete="off"><datalist id="cityDatalist">
+          <option value="New York City">
+          <option value="Los Angeles">
+          <option value="Chicago">
+          <option value="Toronto">
+          <option value="Mexico City">
+          <option value="São Paulo">
+          <option value="London">
+          <option value="Paris">
+          <option value="Moscow">
+          <option value="Cairo">
+          <option value="Mumbai">
+          <option value="Delhi">
+          <option value="Beijing">
+          <option value="Shanghai">
+          <option value="Tokyo">
+        </datalist><sup class="sn">14</sup><span class="sidenote"><b>14.</b> City-proper populations from Wikipedia's <a href="https://en.wikipedia.org/wiki/List_of_largest_cities_by_population_in_2026" target="_blank" rel="noopener">List of largest cities by population in 2026</a>.</span> in <span class="result" id="cityYears">–</span>.
+      </p>
+    </section>
+
+    <section class="slide cell-restaurant pal-1">
+      <p class="madlib">
+        If you go to <input type="number" id="restaurantsPerDayInput" class="blank-input" value="1" min="0" step="1"> new <span id="restaurantNoun">restaurant</span> a <select id="restaurantsPeriodSelect" class="inline-select">
+          <option value="day" selected>day</option>
+          <option value="week">week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, you will go to all the restaurants in Manhattan<sup class="sn">11</sup><span class="sidenote"><b>11.</b> 12,526 food establishments in Manhattan, per <a href="https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Inspection-Results/43nn-pn8j" target="_blank" rel="noopener">NYC DOHMH restaurant inspection data</a>.</span> in <span class="result" id="restaurantYears">–</span>.
+      </p>
+    </section>
+
+    <section class="slide cell-savings pal-3">
+      <p class="madlib madlib-spaced">
+        If you give away <input type="number" id="dailySavingsInput" class="blank-input" data-prefix="$" value="0.25" min="0" step="0.25"> a <select id="savingsPeriodSelect" class="inline-select">
+          <option value="minute">minute</option>
+          <option value="hour">hour</option>
+          <option value="day" selected>day</option>
+          <option value="week">week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, you will give away $<span class="result" id="simpleSavings">–</span> in the next <input type="number" id="savingsYearsInput" class="blank-input" value="30" min="1" step="1"> years.
+      </p>
+    </section>
+
+    <section class="slide cell-sleep pal-4">
+      <p class="madlib madlib-spaced">
+        If you <input type="text" id="activityInput" class="blank-input" value="sleep"> <input type="number" id="hoursPerDayInput" class="blank-input" value="8" min="0" step="0.5"> <select id="hoursUnitSelect" class="inline-select">
+          <option value="seconds">seconds</option>
+          <option value="minutes">minutes</option>
+          <option value="hours" selected>hours</option>
+        </select> a <select id="periodUnitSelect" class="inline-select">
+          <option value="hour">hour</option>
+          <option value="day" selected>day</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, in the next <input type="number" id="yearsInput" class="blank-input" value="20" min="1" step="1"> <select id="durationUnitSelect" class="inline-select">
+          <option value="hours">hours</option>
+          <option value="days">days</option>
+          <option value="months">months</option>
+          <option value="years" selected>years</option>
+        </select><sup class="sn">7</sup><span class="sidenote"><b>7.</b> A month is calculated as 30 days.</span>, you will <span id="activityMirror">sleep</span> for <span class="result" id="totalHours">–</span>.
+      </p>
+    </section>
+
+    <section class="slide cell-park pal-5">
+      <p class="madlib">
+        If you <input type="text" id="parkActivityInput" class="blank-input" value="go to the park"> <input type="number" id="parkFrequencyInput" class="blank-input" value="2" min="0" step="1"> times a <select id="parkPeriodSelect" class="inline-select">
+          <option value="day">day</option>
+          <option value="week" selected>week</option>
+          <option value="month">month</option>
+          <option value="year">year</option>
+        </select>, in the next <input type="number" id="parkYearsInput" class="blank-input" value="20" min="1" step="1"> years, you will <span id="parkActivityMirror">go to the park</span> <span class="result" id="parkTimes">–</span> times.
+      </p>
+    </section>
+
+
+
+
+  </div>
+
+  <script>
+    // count === 1 -> singular, everything else (including 0 and fractions) -> plural
+    function pluralize(count, singular, plural) {
+      return count === 1 ? singular : plural;
+    }
+
+    const STEPS_PER_MILE = 2000;
+    const NYC_STREETS_MILES = 6300; // NYC DOT
+    const GREAT_WALL_MILES = 13171;
+    const EQUATOR_MILES = 24901;
+    const MOON_MILES = 238855;
+
+    const MAPBOX_TOKEN = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ";
+
+    const stepsInput = document.getElementById("stepsInput");
+    const stepsNoun = document.getElementById("stepsNoun");
+    const nycStreetsDays = document.getElementById("nycStreetsDays");
+    const wallDays = document.getElementById("wallDays");
+    const equatorDays = document.getElementById("equatorDays");
+    const moonDays = document.getElementById("moonDays");
+    const routeDuration = document.getElementById("routeDuration");
+
+    function formatDuration(miles, milesPerDay) {
+      if (milesPerDay <= 0) return "–";
+
+      const totalDays = Math.round(miles / milesPerDay);
+      const years = Math.floor(totalDays / 365);
+      const days = totalDays % 365;
+
+      const parts = [];
+      if (years > 0) parts.push(years + " " + (years === 1 ? "year" : "years"));
+      parts.push(days + " " + (days === 1 ? "day" : "days"));
+
+      return parts.join(", ");
+    }
+
+    function milesPerDayFromSteps() {
+      const steps = Number(stepsInput.value) || 0;
+      return steps / STEPS_PER_MILE;
+    }
+
+    function update() {
+      stepsNoun.textContent = pluralize(Number(stepsInput.value) || 0, "step", "steps");
+      const milesPerDay = milesPerDayFromSteps();
+      nycStreetsDays.textContent = formatDuration(NYC_STREETS_MILES, milesPerDay);
+      wallDays.textContent = formatDuration(GREAT_WALL_MILES, milesPerDay);
+      equatorDays.textContent = formatDuration(EQUATOR_MILES, milesPerDay);
+      moonDays.textContent = formatDuration(MOON_MILES, milesPerDay);
+      updateRoute();
+    }
+
+    // ---- "walk from X to Y" place search ----
+    function haversineMiles([lng1, lat1], [lng2, lat2]) {
+      const R = 3958.8; // Earth radius, miles
+      const toRad = (d) => (d * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLng = toRad(lng2 - lng1);
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    let fromCoords = [0, -72.822042];      // Antarctica
+    let toCoords = [25.730928, 66.50259];  // Rovaniemi, Finland (on the Arctic Circle)
+
+    function updateRoute() {
+      if (!fromCoords || !toCoords) {
+        routeDuration.textContent = "–";
+        return;
+      }
+      const miles = haversineMiles(fromCoords, toCoords);
+      routeDuration.textContent = formatDuration(miles, milesPerDayFromSteps());
+    }
+
+    // Use Mapbox's own search widget (the same one on the map page) for
+    // proper as-you-type place suggestions, instead of a hand-rolled dropdown.
+    mapboxgl.accessToken = MAPBOX_TOKEN;
+
+    const fromGeocoder = new MapboxGeocoder({
+      accessToken: MAPBOX_TOKEN,
+      mapboxgl: mapboxgl,
+      marker: false,
+      placeholder: "a place"
+    });
+    fromGeocoder.addTo("#fromBox");
+    fromGeocoder.setInput("Antarctica");
+
+    const toGeocoder = new MapboxGeocoder({
+      accessToken: MAPBOX_TOKEN,
+      mapboxgl: mapboxgl,
+      marker: false,
+      placeholder: "another place"
+    });
+    toGeocoder.addTo("#toBox");
+    toGeocoder.setInput("Arctic Circle");
+
+    fromGeocoder.on("result", (e) => {
+      fromCoords = e.result.center;
+      updateRoute();
+    });
+    fromGeocoder.on("clear", () => {
+      fromCoords = null;
+      updateRoute();
+    });
+
+    toGeocoder.on("result", (e) => {
+      toCoords = e.result.center;
+      updateRoute();
+    });
+    toGeocoder.on("clear", () => {
+      toCoords = null;
+      updateRoute();
+    });
+
+    stepsInput.addEventListener("input", update);
+    update();
+
+    // ---- "if you sleep 8 hours a day..." ----
+    const activityInput = document.getElementById("activityInput");
+    const activityMirror = document.getElementById("activityMirror");
+    const hoursPerDayInput = document.getElementById("hoursPerDayInput");
+    const hoursUnitSelect = document.getElementById("hoursUnitSelect");
+    const periodUnitSelect = document.getElementById("periodUnitSelect");
+    const yearsInput = document.getElementById("yearsInput");
+    const durationUnitSelect = document.getElementById("durationUnitSelect");
+    const totalHours = document.getElementById("totalHours");
+
+    const DAYS_PER_YEAR = 365;
+    const DAYS_PER_MONTH = 30;
+    const PERIOD_DAYS = { hour: 1 / 24, day: 1, month: DAYS_PER_MONTH, year: DAYS_PER_YEAR };
+    const DURATION_DAYS = { hours: 1 / 24, days: 1, months: DAYS_PER_MONTH, years: DAYS_PER_YEAR };
+
+    // Breaks a total (in hours) into a years/months/days/hours[/minutes[/seconds]]
+    // string. Only shown down to minutes or seconds when asked for, so a rate
+    // entered in whole hours doesn't produce a spurious "0 minutes".
+    function formatDurationBreakdown(totalHoursValue, showMinutes, showSeconds) {
+      let remainingSeconds = totalHoursValue * 3600;
+
+      let years = Math.floor(remainingSeconds / (24 * 3600 * DAYS_PER_YEAR));
+      remainingSeconds -= years * 24 * 3600 * DAYS_PER_YEAR;
+
+      let months = Math.floor(remainingSeconds / (24 * 3600 * DAYS_PER_MONTH));
+      remainingSeconds -= months * 24 * 3600 * DAYS_PER_MONTH;
+
+      let days = Math.floor(remainingSeconds / (24 * 3600));
+      remainingSeconds -= days * 24 * 3600;
+
+      let hours = Math.floor(remainingSeconds / 3600);
+      remainingSeconds -= hours * 3600;
+
+      let minutes = 0;
+      let seconds = 0;
+
+      if (showSeconds) {
+        minutes = Math.floor(remainingSeconds / 60);
+        remainingSeconds -= minutes * 60;
+        seconds = Math.round(remainingSeconds);
+        if (seconds === 60) { seconds = 0; minutes += 1; }
+      } else if (showMinutes) {
+        minutes = Math.round(remainingSeconds / 60);
+      } else {
+        hours += Math.round(remainingSeconds / 3600);
+      }
+
+      if (minutes === 60) { minutes = 0; hours += 1; }
+      if (hours === 24) { hours = 0; days += 1; }
+      if (days === DAYS_PER_MONTH) { days = 0; months += 1; }
+      if (months === 12) { months = 0; years += 1; }
+
+      const parts = [];
+      if (years > 0) parts.push(years.toLocaleString() + " " + (years === 1 ? "year" : "years"));
+      if (months > 0) parts.push(months + " " + (months === 1 ? "month" : "months"));
+      if (days > 0) parts.push(days + " " + (days === 1 ? "day" : "days"));
+      if (hours > 0) parts.push(hours + " " + (hours === 1 ? "hour" : "hours"));
+      if (showMinutes && minutes > 0) parts.push(minutes + " " + (minutes === 1 ? "minute" : "minutes"));
+      if (showSeconds && seconds > 0) parts.push(seconds + " " + (seconds === 1 ? "second" : "seconds"));
+
+      if (parts.length === 0) {
+        const zeroUnit = showSeconds ? "seconds" : showMinutes ? "minutes" : "hours";
+        parts.push("0 " + zeroUnit);
+      }
+
+      return parts.join(", ");
+    }
+
+    function updateSleep() {
+      activityMirror.textContent = activityInput.value.trim() || "sleep";
+
+      const rawValue = Number(hoursPerDayInput.value) || 0;
+      const rawHours =
+        hoursUnitSelect.value === "seconds" ? rawValue / 3600 :
+        hoursUnitSelect.value === "minutes" ? rawValue / 60 :
+        rawValue;
+      const periodDays = PERIOD_DAYS[periodUnitSelect.value] || 1;
+      const hoursPerDay = rawHours / periodDays;
+
+      const rawDuration = Number(yearsInput.value) || 0;
+      const durationDays = rawDuration * (DURATION_DAYS[durationUnitSelect.value] || DAYS_PER_YEAR);
+      const totalHoursValue = hoursPerDay * durationDays;
+
+      // Only break the output down into minutes/seconds when the rate
+      // was actually entered in those units — otherwise stop at hours.
+      const rateUnit = hoursUnitSelect.value;
+      const showMinutes = rateUnit === "minutes" || rateUnit === "seconds";
+      const showSeconds = rateUnit === "seconds";
+
+      totalHours.textContent = formatDurationBreakdown(totalHoursValue, showMinutes, showSeconds);
+    }
+
+    activityInput.addEventListener("input", updateSleep);
+    hoursPerDayInput.addEventListener("input", updateSleep);
+    hoursUnitSelect.addEventListener("change", updateSleep);
+    periodUnitSelect.addEventListener("change", updateSleep);
+    yearsInput.addEventListener("input", updateSleep);
+    durationUnitSelect.addEventListener("change", updateSleep);
+    updateSleep();
+
+    // ---- "if you give away $1 a day..." ----
+    const dailySavingsInput = document.getElementById("dailySavingsInput");
+    const savingsPeriodSelect = document.getElementById("savingsPeriodSelect");
+    const savingsYearsInput = document.getElementById("savingsYearsInput");
+    const simpleSavings = document.getElementById("simpleSavings");
+
+    const SAVINGS_PERIOD_DAYS = {
+      minute: 1 / 1440,
+      hour: 1 / 24,
+      day: 1,
+      week: 7,
+      month: DAYS_PER_MONTH,
+      year: DAYS_PER_YEAR
+    };
+
+    function updateSavings() {
+      const rawAmount = Number(dailySavingsInput.value) || 0;
+      const periodDays = SAVINGS_PERIOD_DAYS[savingsPeriodSelect.value] || 1;
+      const daily = rawAmount / periodDays;
+      const years = Number(savingsYearsInput.value) || 0;
+      const annualDeposit = daily * 365;
+
+      const simpleTotal = annualDeposit * years;
+
+      simpleSavings.textContent = Math.round(simpleTotal).toLocaleString();
+    }
+
+    dailySavingsInput.addEventListener("input", updateSavings);
+    savingsPeriodSelect.addEventListener("change", updateSavings);
+    savingsYearsInput.addEventListener("input", updateSavings);
+    updateSavings();
+
+    // ---- "if you forget 1 thing a day..." ----
+    const wordsPerDayInput = document.getElementById("wordsPerDayInput");
+    const wordsPeriodSelect = document.getElementById("wordsPeriodSelect");
+    const wordsYearsInput = document.getElementById("wordsYearsInput");
+    const wordsLearned = document.getElementById("wordsLearned");
+    const wordsNoun = document.getElementById("wordsNoun");
+
+    const WORDS_PERIOD_DAYS = { day: 1, week: 7, month: DAYS_PER_MONTH, year: DAYS_PER_YEAR };
+
+    function updateWords() {
+      const rawRate = Number(wordsPerDayInput.value) || 0;
+      wordsNoun.textContent = pluralize(rawRate, "thing", "things");
+      const periodDays = WORDS_PERIOD_DAYS[wordsPeriodSelect.value] || 1;
+      const perDay = rawRate / periodDays;
+      const years = Number(wordsYearsInput.value) || 0;
+      wordsLearned.textContent = Math.round(perDay * DAYS_PER_YEAR * years).toLocaleString();
+    }
+
+    wordsPerDayInput.addEventListener("input", updateWords);
+    wordsPeriodSelect.addEventListener("change", updateWords);
+    wordsYearsInput.addEventListener("input", updateWords);
+    updateWords();
+
+    // ---- "if you talk to a new person a week..." ----
+    const peoplePeriodSelect = document.getElementById("peoplePeriodSelect");
+    const peopleYearsInput = document.getElementById("peopleYearsInput");
+    const peopleMet = document.getElementById("peopleMet");
+    const citySearchInput = document.getElementById("citySearchInput");
+    const cityYears = document.getElementById("cityYears");
+
+    const PEOPLE_PERIOD_DAYS = {
+      second: 1 / 86400,
+      minute: 1 / 1440,
+      hour: 1 / 24,
+      day: 1,
+      week: 7,
+      month: DAYS_PER_MONTH,
+      year: DAYS_PER_YEAR
+    };
+
+    // City-proper populations, per Wikipedia's "List of largest cities by
+    // population in 2026" (sourced in footnote 14).
+    const CITY_POPULATIONS = {
+      "new york city": 8804190,
+      "los angeles": 3990456,
+      "chicago": 2746388,
+      "toronto": 2731571,
+      "mexico city": 9209944,
+      "são paulo": 12252023,
+      "sao paulo": 12252023,
+      "london": 8825001,
+      "paris": 2148271,
+      "moscow": 13200000,
+      "cairo": 10044894,
+      "mumbai": 12478447,
+      "delhi": 16753235,
+      "beijing": 21893095,
+      "shanghai": 24870895,
+      "tokyo": 13515271
+    };
+
+    function updatePeople() {
+      const periodDays = PEOPLE_PERIOD_DAYS[peoplePeriodSelect.value] || 7;
+      const perDay = 1 / periodDays;
+      const years = Number(peopleYearsInput.value) || 0;
+      peopleMet.textContent = Math.round(perDay * DAYS_PER_YEAR * years).toLocaleString();
+
+      const cityKey = citySearchInput.value.trim().toLowerCase();
+      const cityPopulation = CITY_POPULATIONS[cityKey];
+      cityYears.textContent = cityPopulation ? yearsToVisitAll(cityPopulation, perDay) : "–";
+    }
+
+    peoplePeriodSelect.addEventListener("change", updatePeople);
+    peopleYearsInput.addEventListener("input", updatePeople);
+    citySearchInput.addEventListener("input", updatePeople);
+    updatePeople();
+
+    // ---- "if you go to 1 new restaurant a day..." ----
+    const MANHATTAN_RESTAURANTS = 12526;
+    const PLACES_PERIOD_DAYS = { day: 1, week: 7, month: DAYS_PER_MONTH, year: DAYS_PER_YEAR };
+
+    function yearsToVisitAll(totalPlaces, perDay) {
+      if (perDay <= 0) return "–";
+      const totalDays = totalPlaces / perDay;
+      return formatDurationBreakdown(totalDays * 24, false, false);
+    }
+
+    const restaurantsPerDayInput = document.getElementById("restaurantsPerDayInput");
+    const restaurantsPeriodSelect = document.getElementById("restaurantsPeriodSelect");
+    const restaurantYears = document.getElementById("restaurantYears");
+    const restaurantNoun = document.getElementById("restaurantNoun");
+
+    function updateRestaurants() {
+      const rawRate = Number(restaurantsPerDayInput.value) || 0;
+      restaurantNoun.textContent = pluralize(rawRate, "restaurant", "restaurants");
+      const periodDays = PLACES_PERIOD_DAYS[restaurantsPeriodSelect.value] || 1;
+      restaurantYears.textContent = yearsToVisitAll(MANHATTAN_RESTAURANTS, rawRate / periodDays);
+    }
+
+    restaurantsPerDayInput.addEventListener("input", updateRestaurants);
+    restaurantsPeriodSelect.addEventListener("change", updateRestaurants);
+    updateRestaurants();
+
+    // ---- "if you talk to your mom for 5 minutes a day..." ----
+    const talkRelationshipSelect = document.getElementById("talkRelationshipSelect");
+    const talkAmountInput = document.getElementById("talkAmountInput");
+    const talkTimeUnitSelect = document.getElementById("talkTimeUnitSelect");
+    const talkPeriodSelect = document.getElementById("talkPeriodSelect");
+    const talkYearsSelect = document.getElementById("talkYearsSelect");
+    const talkDuration = document.getElementById("talkDuration");
+
+    const TALK_PERIOD_DAYS = { day: 1, week: 7, month: DAYS_PER_MONTH, year: DAYS_PER_YEAR };
+
+    function updateTalk() {
+      const rawValue = Number(talkAmountInput.value) || 0;
+      const timeUnit = talkTimeUnitSelect.value;
+      const rawHours =
+        timeUnit === "seconds" ? rawValue / 3600 :
+        timeUnit === "minutes" ? rawValue / 60 :
+        rawValue;
+      const periodDays = TALK_PERIOD_DAYS[talkPeriodSelect.value] || 1;
+      const hoursPerDay = rawHours / periodDays;
+
+      const years = Number(talkYearsSelect.value) || 0;
+      const totalHoursValue = hoursPerDay * years * DAYS_PER_YEAR;
+
+      const showMinutes = timeUnit === "minutes" || timeUnit === "seconds";
+      const showSeconds = timeUnit === "seconds";
+
+      talkDuration.textContent = formatDurationBreakdown(totalHoursValue, showMinutes, showSeconds);
+    }
+
+    talkRelationshipSelect.addEventListener("change", updateTalk);
+    talkAmountInput.addEventListener("input", updateTalk);
+    talkTimeUnitSelect.addEventListener("change", updateTalk);
+    talkPeriodSelect.addEventListener("change", updateTalk);
+    talkYearsSelect.addEventListener("change", updateTalk);
+    updateTalk();
+
+    // ---- "if you go to the park 2x a week..." ----
+    const parkActivityInput = document.getElementById("parkActivityInput");
+    const parkActivityMirror = document.getElementById("parkActivityMirror");
+    const parkFrequencyInput = document.getElementById("parkFrequencyInput");
+    const parkPeriodSelect = document.getElementById("parkPeriodSelect");
+    const parkYearsInput = document.getElementById("parkYearsInput");
+    const parkTimes = document.getElementById("parkTimes");
+
+    const PARK_PERIOD_DAYS = { day: 1, week: 7, month: DAYS_PER_MONTH, year: DAYS_PER_YEAR };
+
+    function updatePark() {
+      parkActivityMirror.textContent = parkActivityInput.value.trim() || "go to the park";
+
+      const frequency = Number(parkFrequencyInput.value) || 0;
+      const periodDays = PARK_PERIOD_DAYS[parkPeriodSelect.value] || 1;
+      const perDay = frequency / periodDays;
+      const years = Number(parkYearsInput.value) || 0;
+
+      parkTimes.textContent = Math.round(perDay * DAYS_PER_YEAR * years).toLocaleString();
+    }
+
+    parkActivityInput.addEventListener("input", updatePark);
+    parkFrequencyInput.addEventListener("input", updatePark);
+    parkPeriodSelect.addEventListener("change", updatePark);
+    parkYearsInput.addEventListener("input", updatePark);
+    updatePark();
+
+    // ---- "if you eat dinner with your kid 5 nights a week..." ----
+    const dinnerNightsInput = document.getElementById("dinnerNightsInput");
+    const dinnerNightsNoun = document.getElementById("dinnerNightsNoun");
+    const dinnerPeriodSelect = document.getElementById("dinnerPeriodSelect");
+    const kidAgeInput = document.getElementById("kidAgeInput");
+    const dinnersLeft = document.getElementById("dinnersLeft");
+    const dinnersHad = document.getElementById("dinnersHad");
+
+    const DINNER_PERIODS_PER_YEAR = { week: 52, month: 12 };
+
+    // "about" — round to the nearest 100 once it's in the thousands, else the nearest 10
+    function roughly(n) {
+      const unit = n >= 1000 ? 100 : 10;
+      return (Math.round(n / unit) * unit).toLocaleString();
+    }
+
+    function updateDinners() {
+      const nights = Number(dinnerNightsInput.value) || 0;
+      dinnerNightsNoun.textContent = nights === 1 ? "night" : "nights";
+      const perYear = nights * (DINNER_PERIODS_PER_YEAR[dinnerPeriodSelect.value] || 52);
+      const age = Math.min(18, Math.max(0, Number(kidAgeInput.value) || 0));
+
+      dinnersLeft.textContent = Math.round(perYear * 18).toLocaleString();
+      dinnersHad.textContent = roughly(perYear * age);
+    }
+
+    dinnerNightsInput.addEventListener("input", updateDinners);
+    dinnerPeriodSelect.addEventListener("change", updateDinners);
+    kidAgeInput.addEventListener("input", updateDinners);
+    updateDinners();
+
+    function formatDollars(n) {
+      return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // ---- spin a number blank: mouse wheel / trackpad while hovering, or drag up/down on touch ----
+    // the page only stops scrolling while the pointer is over (or the finger is on) the box;
+    // a plain tap/click still lets you type
+    function enableScrollAdjust(input) {
+      const step = parseFloat(input.step) || 1;
+      const min = input.min !== "" ? parseFloat(input.min) : -Infinity;
+      const max = input.max !== "" ? parseFloat(input.max) : Infinity;
+      const decimals = (String(step).split(".")[1] || "").length;
+      const PIXELS_PER_STEP = 12;   // touch drag distance per step
+      const WHEEL_PER_STEP = 40;    // wheel/trackpad delta per step
+
+      function setValue(next) {
+        next = Math.min(max, Math.max(min, next));
+        next = Number(next.toFixed(decimals));
+        if (next !== parseFloat(input.value)) {
+          input.value = next;
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      }
+
+      // wrap the input in a box with a − button before it and a + button after it
+      const box = document.createElement("span");
+      box.className = "spin-box";
+      input.before(box);
+      const minus = document.createElement("button");
+      minus.type = "button";
+      minus.className = "spin-btn spin-down";
+      minus.setAttribute("aria-label", "Decrease");
+      minus.innerHTML = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5h8"/></svg>';
+      const plus = document.createElement("button");
+      plus.type = "button";
+      plus.className = "spin-btn spin-up";
+      plus.setAttribute("aria-label", "Increase");
+      plus.innerHTML = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5h8M5 1v8"/></svg>';
+      // a unit like "$" sits inside the box, just before the number
+      const prefix = input.dataset.prefix ? Object.assign(document.createElement("span"), { className: "spin-prefix", textContent: input.dataset.prefix }) : null;
+      box.append(...[minus, prefix, input, plus].filter(Boolean));
+      plus.addEventListener("click", () => setValue((parseFloat(input.value) || 0) + step));
+      minus.addEventListener("click", () => setValue((parseFloat(input.value) || 0) - step));
+
+      // wheel anywhere over the box: scroll up = bigger number
+      let wheelAccum = 0;
+      box.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        const delta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY; // lines -> pixels
+        wheelAccum -= delta;
+        const steps = wheelAccum > 0 ? Math.floor(wheelAccum / WHEEL_PER_STEP) : Math.ceil(wheelAccum / WHEEL_PER_STEP);
+        if (steps !== 0) {
+          wheelAccum -= steps * WHEEL_PER_STEP;
+          setValue((parseFloat(input.value) || 0) + steps * step);
+        }
+      }, { passive: false });
+      box.addEventListener("mouseleave", () => { wheelAccum = 0; });
+
+      // touch: drag up = bigger number
+      let startY = 0;
+      let startValue = 0;
+      let dragging = false;
+
+      input.addEventListener("touchstart", (e) => {
+        startY = e.touches[0].clientY;
+        startValue = parseFloat(input.value) || 0;
+        dragging = false;
+      }, { passive: true });
+
+      input.addEventListener("touchmove", (e) => {
+        e.preventDefault(); // finger is on the box — spin the number, don't scroll the page
+        const deltaY = startY - e.touches[0].clientY; // positive = dragged up
+
+        if (!dragging) {
+          if (Math.abs(deltaY) < 8) return;
+          dragging = true;
+          input.blur(); // dragging to adjust, not typing — dismiss/skip the keyboard
+          box.classList.add("spinning");
+        }
+
+        setValue(startValue + Math.round(deltaY / PIXELS_PER_STEP) * step);
+      }, { passive: false });
+
+      const endDrag = () => {
+        dragging = false;
+        box.classList.remove("spinning");
+      };
+      input.addEventListener("touchend", endDrag, { passive: true });
+      input.addEventListener("touchcancel", endDrag, { passive: true });
+    }
+
+    // ---- "if you climb 5 flights of stairs a day..." ----
+    const climbAmountInput = document.getElementById("climbAmountInput");
+    const climbUnitSelect = document.getElementById("climbUnitSelect");
+    const esbResult = document.getElementById("esbResult");
+
+    // one Empire State Building, to the 86th-floor observatory
+    const ESB_UNITS = { flights: 105, stairs: 1576 };
+
+    function updateEsb() {
+      const perDay = Number(climbAmountInput.value) || 0;
+      const perYear = perDay * DAYS_PER_YEAR / (ESB_UNITS[climbUnitSelect.value] || 105);
+
+      if (perYear <= 0) {
+        esbResult.innerHTML = '<span class="result">–</span>';
+      } else if (perYear >= 1) {
+        const times = Math.round(perYear);
+        esbResult.innerHTML = '<span class="result">' + times.toLocaleString() + "</span> " + (times === 1 ? "time" : "times") + " in a year";
+      } else {
+        const years = 1 / perYear;
+        esbResult.innerHTML = 'in <span class="result">' + (years < 10 ? years.toFixed(1) : Math.round(years).toLocaleString()) + "</span> years";
+      }
+    }
+
+    climbAmountInput.addEventListener("input", updateEsb);
+    climbUnitSelect.addEventListener("change", updateEsb);
+    updateEsb();
+
+    // ---- "if you drink 8 glasses of water a day..." ----
+    const glassesInput = document.getElementById("glassesInput");
+    const glassesNoun = document.getElementById("glassesNoun");
+    const glassesMirror = document.getElementById("glassesMirror");
+    const glassesMirrorNoun = document.getElementById("glassesMirrorNoun");
+
+    const GALLONS_PER_GLASS = 8 / 128; // 8 oz
+    const BATHTUB_GALLONS = 40;
+    const OLYMPIC_POOL_GALLONS = 660000;
+    const RESERVOIR_GALLONS = 1040e6;
+    const NYC_POPULATION = 8584629;
+
+    // days -> "80 days", "3,600 years", "5.7 million years", "6 hours", "20 minutes"
+    function formatWaterTime(days) {
+      if (!isFinite(days)) return "–";
+      if (days * 24 < 1) {
+        const minutes = Math.max(1, Math.round(days * 24 * 60));
+        return minutes + (minutes === 1 ? " minute" : " minutes");
+      }
+      if (days < 1) {
+        const hours = Math.round(days * 24);
+        return hours + (hours === 1 ? " hour" : " hours");
+      }
+      if (days < 2 * DAYS_PER_YEAR) {
+        const d = Math.round(days);
+        return d.toLocaleString() + (d === 1 ? " day" : " days");
+      }
+      const years = days / DAYS_PER_YEAR;
+      if (years >= 1e6) return (years / 1e6).toFixed(1) + " million years";
+      const rounded = years < 10 ? Number(years.toFixed(1)) : years < 1000 ? Math.round(years) : Math.round(years / 100) * 100;
+      return rounded.toLocaleString() + " years";
+    }
+
+    function updateWater() {
+      const glasses = Number(glassesInput.value) || 0;
+      const noun = glasses === 1 ? "glass" : "glasses";
+      glassesNoun.textContent = noun;
+      glassesMirror.textContent = glasses.toLocaleString();
+      glassesMirrorNoun.textContent = noun;
+
+      const gallonsPerDay = glasses * GALLONS_PER_GLASS;
+      document.getElementById("bathtubTime").textContent = formatWaterTime(BATHTUB_GALLONS / gallonsPerDay);
+      document.getElementById("poolTime").textContent = formatWaterTime(OLYMPIC_POOL_GALLONS / gallonsPerDay);
+      document.getElementById("reservoirTime").textContent = formatWaterTime(RESERVOIR_GALLONS / gallonsPerDay);
+      document.getElementById("nycPoolTime").textContent = formatWaterTime(OLYMPIC_POOL_GALLONS / (gallonsPerDay * NYC_POPULATION));
+      document.getElementById("nycReservoirTime").textContent = formatWaterTime(RESERVOIR_GALLONS / (gallonsPerDay * NYC_POPULATION));
+    }
+
+    glassesInput.addEventListener("input", updateWater);
+    updateWater();
+
+    // ---- one slide: "if your hair grew 1 inch in the last 3 months..." and "if your nails grew 0.1 inches in the last month..." ----
+    // inches -> "6 feet, 8 inches", "9.5 inches", "1 foot"
+    function formatLength(inches) {
+      if (!isFinite(inches) || inches < 0) return "–";
+      if (inches < 12) {
+        const n = Number(inches.toFixed(1));
+        return n + (n === 1 ? " inch" : " inches");
+      }
+      let feet = Math.floor(inches / 12);
+      let rest = Math.round(inches - feet * 12);
+      if (rest === 12) { feet += 1; rest = 0; }
+      const feetText = feet.toLocaleString() + (feet === 1 ? " foot" : " feet");
+      return rest ? feetText + ", " + rest + (rest === 1 ? " inch" : " inches") : feetText;
+    }
+
+    const hairAmountInput = document.getElementById("hairAmountInput");
+    const hairMonthsInput = document.getElementById("hairMonthsInput");
+    const hairYearsInput = document.getElementById("hairYearsInput");
+    function updateHair() {
+      const amount = Number(hairAmountInput.value) || 0;
+      const months = Number(hairMonthsInput.value) || 0;
+      const years = Number(hairYearsInput.value) || 0;
+      document.getElementById("hairAmountNoun").textContent = amount === 1 ? "inch" : "inches";
+      document.getElementById("hairMonthsNoun").textContent = months === 1 ? "month" : "months";
+      document.getElementById("hairGrowth").textContent = months ? formatLength(amount / months * 12 * years) : "–";
+    }
+    [hairAmountInput, hairMonthsInput, hairYearsInput].forEach((el) => el.addEventListener("input", updateHair));
+    updateHair();
+
+    const nailAmountInput = document.getElementById("nailAmountInput");
+    const nailYearsInput = document.getElementById("nailYearsInput");
+    function updateNail() {
+      const amount = Number(nailAmountInput.value) || 0;
+      const years = Number(nailYearsInput.value) || 0;
+      document.getElementById("nailAmountNoun").textContent = amount === 1 ? "inch" : "inches";
+      document.getElementById("nailGrowth").textContent = formatLength(amount * 12 * years);
+    }
+    [nailAmountInput, nailYearsInput].forEach((el) => el.addEventListener("input", updateNail));
+    updateNail();
+
+    // ---- "if you pay $3,000 in rent per month..." ----
+    const rentInput = document.getElementById("rentInput");
+    const homeSqftInput = document.getElementById("homeSqftInput");
+
+    // small amounts read better in cents: 0.0011 -> "0.11¢", 0.43 -> "43¢"
+    function formatMoneyOrCents(n) {
+      if (n >= 1) return "$" + formatDollars(n);
+      const cents = n * 100;
+      const digits = cents >= 10 ? 0 : cents >= 1 ? 1 : cents >= 0.1 ? 2 : 3;
+      return cents.toFixed(digits) + "¢";
+    }
+
+    function updateRent() {
+      const rent = Number(rentInput.value) || 0;
+      const sqft = Number(homeSqftInput.value) || 0;
+      const perYear = rent * 12;
+
+      document.getElementById("rentPerHour").textContent = formatDollars(perYear / (DAYS_PER_YEAR * 24));
+      document.getElementById("rentPerSecond").textContent = formatMoneyOrCents(perYear / (DAYS_PER_YEAR * 24 * 3600));
+      document.getElementById("rentPerSqftMonth").textContent = sqft ? formatDollars(rent / sqft) : "–";
+      document.getElementById("rentPerSqftDay").textContent = sqft ? formatMoneyOrCents(perYear / DAYS_PER_YEAR / sqft) : "–";
+    }
+
+    rentInput.addEventListener("input", updateRent);
+    homeSqftInput.addEventListener("input", updateRent);
+    updateRent();
+
+    // ---- text blanks grow/shrink to fit what's typed ----
+    const sizer = document.createElement("span");
+    sizer.style.cssText = "position:absolute;visibility:hidden;white-space:pre;left:-9999px;top:0";
+    document.body.appendChild(sizer);
+
+    function fitTextInput(input) {
+      const cs = getComputedStyle(input);
+      sizer.style.font = cs.font;
+      sizer.style.letterSpacing = cs.letterSpacing;
+      sizer.textContent = input.value || input.placeholder || " ";
+      input.style.width = Math.ceil(sizer.getBoundingClientRect().width) + 24 + "px";
+      // some boxes (the city search, with its icon and suggestion list) need more room than the text alone; widen by what still overflows
+      const overflow = input.scrollWidth - input.clientWidth;
+      if (overflow > 0) input.style.width = parseFloat(input.style.width) + overflow + "px";
+    }
+
+    document.querySelectorAll('input.blank-input[type="text"]').forEach((input) => {
+      fitTextInput(input);
+      input.addEventListener("input", () => fitTextInput(input));
+    });
+    // re-measure once the web font has loaded
+    if (document.fonts) document.fonts.ready.then(() => document.querySelectorAll('input.blank-input[type="text"]').forEach(fitTextInput));
+
+    // ---- every sentence shares one font size: the largest at which every cell fits ----
+    // (the boxes are sized in em, so they shrink along with the text)
+    function fitSlides() {
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const paras = slides.map((slide) => slide.querySelector(".madlib"));
+      const textInputs = document.querySelectorAll('.madlib input.blank-input[type="text"]');
+      const setSize = (px) => {
+        paras.forEach((para) => { para.style.fontSize = px === null ? "" : px + "px"; });
+        textInputs.forEach(fitTextInput);
+      };
+      const fits = () => slides.every((slide) => slide.scrollHeight <= slide.clientHeight);
+      setSize(null);
+      if (fits()) return;
+      let lo = 8, hi = parseFloat(getComputedStyle(paras[0]).fontSize);
+      while (hi - lo > 0.25) {
+        const mid = (lo + hi) / 2;
+        setSize(mid);
+        if (fits()) lo = mid; else hi = mid;
+      }
+      setSize(lo);
+    }
+    let fitQueued = false;
+    const queueFit = () => {
+      if (fitQueued) return;
+      fitQueued = true;
+      requestAnimationFrame(() => { fitQueued = false; fitSlides(); });
+    };
+    window.addEventListener("resize", queueFit);
+    // answers change length as people edit, so re-fit after every edit
+    document.addEventListener("input", queueFit);
+    document.addEventListener("change", queueFit);
+    if (document.fonts) {
+      document.fonts.ready.then(queueFit);
+      // Inter's bold can arrive after fonts.ready; re-measure the boxes whenever a font finishes loading
+      document.fonts.addEventListener("loadingdone", queueFit);
+    }
+
+    // ---- footnote popup: hover (or tap) a marker to see its note just below it ----
+    // one shared popup at the page level, so the cells' own scrolling never clips it;
+    // it stays open while the pointer moves from the marker onto it, so its links can be clicked
+    const notePopup = document.createElement("div");
+    notePopup.className = "note-popup sidenote";
+    notePopup.hidden = true;
+    document.body.appendChild(notePopup);
+    let noteHideTimer = null;
+    let noteMarker = null;
+
+    function showNote(marker) {
+      clearTimeout(noteHideTimer);
+      const note = marker.nextElementSibling;
+      if (!note || !note.classList.contains("sidenote")) return;
+      noteMarker = marker;
+      notePopup.innerHTML = note.innerHTML;
+      notePopup.hidden = false;
+      const r = marker.getBoundingClientRect();
+      const w = notePopup.offsetWidth, h = notePopup.offsetHeight;
+      const left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left - 10));
+      const below = r.bottom + 6;
+      notePopup.style.left = left + "px";
+      notePopup.style.top = (below + h > window.innerHeight - 8 ? r.top - h - 6 : below) + "px";
+    }
+    function hideNoteSoon() {
+      clearTimeout(noteHideTimer);
+      noteHideTimer = setTimeout(() => { notePopup.hidden = true; noteMarker = null; }, 150);
+    }
+
+    document.querySelectorAll(".madlib .sn").forEach((marker) => {
+      marker.addEventListener("mouseenter", () => showNote(marker));
+      marker.addEventListener("mouseleave", hideNoteSoon);
+      // touch: tap a marker to open its note, tap it again to close
+      marker.addEventListener("click", () => {
+        if (noteMarker === marker && !notePopup.hidden) { notePopup.hidden = true; noteMarker = null; }
+        else showNote(marker);
+      });
+    });
+    notePopup.addEventListener("mouseenter", () => clearTimeout(noteHideTimer));
+    notePopup.addEventListener("mouseleave", hideNoteSoon);
+    // a tap anywhere else, or scrolling, closes it
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".sn, .note-popup")) { notePopup.hidden = true; noteMarker = null; }
+    });
+    window.addEventListener("scroll", () => { notePopup.hidden = true; noteMarker = null; }, { capture: true, passive: true });
+
+    document.querySelectorAll('input.blank-input[type="number"]').forEach(enableScrollAdjust);
+    fitSlides();
+
+  </script>
+</body>
+</html>

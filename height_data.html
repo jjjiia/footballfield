@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Height data</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+  <style>
+    body{ font-family: 'Inter', Arial, sans-serif; background: #FAF8F3; }
+    .inner{ max-width: 1100px; padding: 48px 20px; }
+    h1{ font-size: 28px; font-weight: 700; margin: 0 0 24px; }
+    table{ width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td{ text-align: left; vertical-align: top; padding: 6px 10px; border-bottom: 1px solid #000; }
+    th{ font-weight: 700; border-bottom-width: 2px; }
+    td.num, th.num{ text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    tr.group td{ font-weight: 700; padding-top: 20px; }
+    a{ color: inherit; }
+    @media (max-width: 760px){
+      .table-wrap{ overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="inner">
+    <h1>Height data</h1>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Name</th><th class="num">Meters</th><th class="num">Feet</th><th>Note</th><th>Source</th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // minimal CSV parser: handles quoted fields with commas and doubled quotes
+    function parseCSV(text) {
+      const rows = [];
+      let row = [], field = "", quoted = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (quoted) {
+          if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+          else if (c === '"') quoted = false;
+          else field += c;
+        } else if (c === '"') quoted = true;
+        else if (c === ",") { row.push(field); field = ""; }
+        else if (c === "\n" || c === "\r") {
+          if (c === "\r" && text[i + 1] === "\n") i++;
+          row.push(field); rows.push(row); row = []; field = "";
+        } else field += c;
+      }
+      if (field || row.length) { row.push(field); rows.push(row); }
+      const [header, ...body] = rows;
+      return body.filter((r) => r.length === header.length).map((r) => Object.fromEntries(header.map((h, i) => [h, r[i]])));
+    }
+
+    const formatNumber = (v) => Number(v).toLocaleString(undefined, { maximumFractionDigits: 3 });
+
+    fetch("height_data.csv")
+      .then((r) => r.text())
+      .then((text) => {
+        const tbody = document.getElementById("rows");
+        let category = null;
+        parseCSV(text).forEach((d) => {
+          // a heading row whenever the category changes
+          if (d.category !== category) {
+            category = d.category;
+            const tr = tbody.insertRow();
+            const td = tr.insertCell();
+            td.colSpan = 5;
+            td.textContent = category;
+            tr.className = "group";
+          }
+          const tr = tbody.insertRow();
+          tr.insertCell().textContent = d.name;
+          const m = tr.insertCell(); m.className = "num"; m.textContent = formatNumber(d.meters);
+          const ft = tr.insertCell(); ft.className = "num"; ft.textContent = formatNumber(d.feet);
+          tr.insertCell().textContent = d.note;
+          const sourceCell = tr.insertCell();
+          // a row can list several sources separated by spaces; rows like personal heights have none
+          d.source.split(/\s+/).filter(Boolean).forEach((url, i) => {
+            if (i > 0) sourceCell.appendChild(document.createElement("br"));
+            const a = document.createElement("a");
+            a.href = url;
+            a.target = "_blank";
+            a.rel = "noopener";
+            a.textContent = new URL(url).hostname.replace(/^www\./, "");
+            sourceCell.appendChild(a);
+          });
+        });
+      });
+  </script>
+</body>
+</html>

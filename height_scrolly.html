@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Heights</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+  <style>
+    /* scrolly: each step is a full-screen slide that snaps into place */
+    html{ scroll-snap-type: y mandatory; }
+    body{ font-family: 'Inter', Arial, sans-serif; background: #FAF8F3; color: #000; }
+    .inner{ max-width: none; padding: 0; }
+    .slide{
+      box-sizing: border-box;
+      height: 100vh;
+      height: 100dvh;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10vh 24px 8vh;
+    }
+    .sentence{
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1.5;
+      text-align: center;
+      margin: 0;
+    }
+    /* the lines stand on a shared baseline at the bottom of the slide, side by side */
+    .stage{
+      flex: 1;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 120px;
+      margin-top: 32px;
+    }
+    .bar{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    /* the name and height, centered on top of the line */
+    .bar-label{
+      font-size: 16px;
+      text-align: center;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .bar-label b{ display: block; }
+    /* a line is one or more segments stacked bottom to top, with a small gap where one ends and the next begins */
+    .bar-line{ display: flex; flex-direction: column-reverse; align-items: center; gap: var(--joint-gap); }
+    .bar-segment{ width: 6px; background: #000; }
+    :root{ --joint-gap: 4px; }
+    /* sideways step: the lines lie flat, one under another, starting at the left;
+       the stage runs off the right edge of the window so anything longer than the fit is cut off there */
+    .slide.sideways .stage{
+      flex-direction: column;
+      justify-content: center;
+      align-items: stretch;
+      gap: 20px;
+      width: calc(100% + 24px);
+      margin-right: -24px;
+      overflow: hidden;
+    }
+    .slide.sideways .bar{ align-items: flex-start; }
+    .slide.sideways .bar-label{ text-align: left; }
+    .slide.sideways .bar-line{ flex-direction: row; }
+    .slide.sideways .bar-segment{ height: 6px; }
+    /* a step with many lines packs them closer, so their labels get room */
+    .slide.crowded .stage{ gap: 40px; }
+    /* axis step: a scale on the left in the picked unit, the count on top of each line, the name running up beside it */
+    .slide.axis .stage{ gap: 0; justify-content: flex-start; align-items: stretch; }
+    .axis-scale{ position: relative; flex: none; width: 72px; margin-left: 5vw; border-right: 1px solid #000; }
+    .axis-tick{ position: absolute; right: 0; padding-right: 10px; font-size: 12px; line-height: 1; transform: translateY(50%); white-space: nowrap; }
+    .axis-tick::after{ content: ""; position: absolute; right: 0; top: 50%; width: 6px; height: 1px; background: #000; }
+    .axis-title{ position: absolute; bottom: calc(100% + 4px); left: 0; font-size: 12px; font-weight: 700; white-space: nowrap; } /* runs right, over the chart, so a long unit name isn't cut off */
+    .axis-plot{ flex: 1; display: flex; justify-content: space-around; align-items: flex-end; }
+    .abar{ position: relative; display: flex; flex-direction: column; align-items: center; }
+    /* the number sits on top of the line, flush with its right edge, so it never runs into the name on the right */
+    .abar-num{ position: absolute; right: calc(50% - 3px); font-size: 14px; white-space: nowrap; }
+    .abar-name{
+      position: absolute;
+      bottom: 0;
+      left: calc(50% + 8px);
+      writing-mode: vertical-rl;
+      transform: rotate(180deg); /* reads bottom to top */
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.15;
+      /* in sideways text, height is the length along the line: its full length, capped by max-height in drawAxisSlide */
+      width: max-content;
+      height: max-content;
+    }
+    /* walking-time chart: names lie flat, centered over the line, with the time just under them */
+    .slide.time .abar-name{
+      writing-mode: horizontal-tb;
+      transform: translateX(-50%);
+      left: 50%;
+      bottom: auto;
+      width: max-content;
+      height: auto;
+      max-width: 120px;
+      text-align: center;
+    }
+    .slide.time .abar-num{ right: auto; left: 50%; transform: translateX(-50%); }
+    /* the "measure in" dropdown and number boxes inside a sentence */
+    .measure{
+      font: inherit;
+      font-weight: 700;
+      color: #000;
+      background: transparent;
+      border: 2px solid #000;
+      padding: 0 0.2em;
+    }
+    select.measure{ max-width: 100%; }
+    input.measure{ width: 2.6em; text-align: center; -moz-appearance: textfield; appearance: textfield; }
+    input.measure::-webkit-inner-spin-button, input.measure::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
+    /* number boxes get a − before and a + after, inside one outlined box */
+    .spin-box{ display: inline-flex; align-items: stretch; border: 2px solid #000; vertical-align: baseline; }
+    .spin-box input.measure{ border: none; }
+    .spin-btn{ all: unset; cursor: pointer; padding: 0 0.3em; font-weight: 700; }
+    /* phones: upright lines share the width evenly instead of sitting 120px apart, with smaller wrapping labels */
+    @media (max-width: 760px){
+      .sentence{ font-size: 22px; }
+      .slide:not(.sideways) .stage{ gap: 8px; }
+      .slide:not(.sideways) .bar{ flex: 1 1 0; min-width: 0; max-width: 120px; }
+      .bar-label{ font-size: 12px; hyphens: auto; -webkit-hyphens: auto; }
+      /* many lines side by side: smaller labels so words fit their narrow columns */
+      .slide.crowded .bar-label{ font-size: 10px; }
+      .axis-scale{ width: 44px; margin-left: 0; }
+      .axis-tick, .axis-title{ font-size: 10px; }
+      .abar-num{ font-size: 10px; }
+      .abar-name{ font-size: 11px; left: calc(50% + 6px); }
+      .slide.time .abar-name{ left: 50%; max-width: 44px; font-size: 9px; }
+      .slide.sideways .bar-label{ font-size: 14px; }
+    }
+    /* feet / meters switch, pinned top right; the unit in use is bold and underlined */
+    .unit-toggle{
+      position: fixed;
+      top: 16px;
+      right: 20px;
+      z-index: 10;
+      font-size: 16px;
+    }
+    .unit-toggle button{
+      all: unset;
+      cursor: pointer;
+      padding: 2px 4px;
+    }
+    .unit-toggle button[aria-pressed="true"]{ font-weight: 700; text-decoration: underline; }
+    .unit-toggle[hidden]{ display: none; }
+  </style>
+</head>
+<body>
+  <div class="unit-toggle" role="group" aria-label="Units" hidden>
+    <button type="button" data-unit="ft" aria-pressed="true">ft</button> / <button type="button" data-unit="m" aria-pressed="false">m</button>
+  </div>
+  <div class="inner">
+    <section class="slide" data-names="S|J" data-labels="You|Me">
+      <p class="sentence">You are <span class="h" data-m="1.22 m">48 inches</span> tall. I am <span class="h" data-m="1.80 m">5'11"</span>.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide" data-names="S|J|Robert Wadlow" data-labels="You|Me|Robert Wadlow" data-sublabels="||8'11&quot;">
+      <p class="sentence">The tallest person ever recorded, Robert Wadlow, was <span class="h" data-m="2.72 m">8'11"</span>.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide" data-names="S|J|Robert Wadlow|Slide at Travers Park" data-labels="You|Me|Robert Wadlow|Slide" data-sublabels="||8'11&quot;|">
+      <p class="sentence">The slide at Travers Park is <span class="h" data-m="4.27 m">14ft</span>.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide" data-names="S|J|Robert Wadlow|Slide at Travers Park|Michael James, giraffe" data-labels="You|Me|Robert Wadlow|Slide|Michael James" data-sublabels="||8'11&quot;||">
+      <p class="sentence">The giraffe at the Bronx Zoo is <span class="h" data-m="5.18 m">17ft</span>.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide" data-names="Slide at Travers Park+S|Michael James, giraffe" data-labels="You, on the slide|Giraffe">
+      <p class="sentence">When you are at the top of the slide, you are a little bit taller than Michael James the giraffe.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide" data-names="Michael James, giraffe*9|Statue of Liberty, statue alone" data-labels="9 giraffes|Statue of Liberty">
+      <p class="sentence">If there were 9 Michael Jameses, each one standing on the last one's head, that is about the height of the Statue of Liberty.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide" data-names="Statue of Liberty, statue alone|Empire State Building, to the tip" data-labels="Statue of Liberty|Empire State Building" data-captions="9 giraffes|86 giraffes">
+      <p class="sentence">The Empire State Building is about 86 giraffes.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide" data-names="Statue of Liberty, statue alone|Hyperion, coast redwood, California|Empire State Building, to the tip" data-labels="Statue of Liberty|Tallest tree|Empire State Building" data-captions="9 giraffes|22 giraffes|86 giraffes">
+      <p class="sentence">The tallest tree in the world is about 22 giraffes, and about a quarter of an Empire State Building.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide" data-names="Statue of Liberty, statue alone|Hyperion, coast redwood, California|Empire State Building, to the tip|Mount Everest" data-labels="Statue of Liberty|Tallest tree|Empire State Building|Mount Everest" data-captions="9 giraffes|22 giraffes|86 giraffes|1,700 giraffes">
+      <p class="sentence">The tallest mountain is about 1,700 giraffes and 20 Empire State Buildings.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide sideways" data-fit="Michael James, giraffe" data-names="S's step length|Michael James, giraffe" data-labels="Your step|The height of Michael James" data-sublabels="20 in|" data-captions="|10 steps">
+      <p class="sentence">If Michael James was laying down, it would take you about 10 steps to walk from his toes to his head.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide sideways" data-fit="Statue of Liberty, statue alone" data-names="S's step length|Michael James, giraffe|Statue of Liberty, statue alone" data-labels="Your step|The height of Michael James|The height of the Statue of Liberty" data-sublabels="20 in||" data-captions="|10 steps|91 steps">
+      <p class="sentence">It would take you about 91 steps to go from the Statue of Liberty's toes to the top of her torch.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide sideways" data-fit="Empire State Building, to the tip" data-names="Statue of Liberty, statue alone|Empire State Building, to the tip" data-labels="The height of the Statue of Liberty|The height of the Empire State Building" data-captions="1 minute|about 10 minutes">
+      <p class="sentence">It takes you under 1 minute to walk 91 steps.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide sideways" data-fit="Mount Everest" data-names="Statue of Liberty, statue alone|Empire State Building, to the tip|Mount Everest" data-labels="The height of the Statue of Liberty|The height of the Empire State Building|The height of Mount Everest" data-captions="1 minute|about 10 minutes|about 3 hours, 12 minutes">
+      <p class="sentence">Walking the height of Mount Everest would take you about 3 hours and 12 minutes.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide crowded axis" data-names="Michael James, giraffe|Grand Canyon, deepest point|Mount Everest|Average ocean depth|Sauroposeidon, dinosaur|Typical airliner cruise|Crater Lake|Hyperion, coast redwood, California|Empire State Building, to the tip|Statue of Liberty, statue alone" data-labels="Michael James|Deepest part of the Grand Canyon|Mount Everest|Average ocean depth|Tallest dinosaur|Airplanes fly at|Crater Lake|Tallest tree|Empire State Building|Statue of Liberty">
+      <p class="sentence">Let's measure some things in<br><select class="measure" aria-label="Measure in">
+          <option value="Michael James, giraffe" data-plural="giraffes" selected>giraffes</option>
+          <option value="Statue of Liberty, statue alone" data-plural="Statues of Liberty">Statues of Liberty</option>
+          <option value="Empire State Building, to the tip" data-plural="Empire State Buildings">Empire State Buildings</option>
+          <option value="S" data-plural="of you">you</option>
+          <option value="J" data-plural="Moms">Mom</option>
+          <option value="Robert Wadlow" data-plural="Robert Wadlows">Robert Wadlows</option>
+          <option value="Average US adult man" data-plural="average US men">average US men</option>
+          <option value="Average US adult woman" data-plural="average US women">average US women</option>
+        </select>.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide crowded axis time" data-below="Michael James" data-names="Michael James, giraffe|Grand Canyon, deepest point|Mount Everest|Average ocean depth|Typical airliner cruise|Empire State Building, to the tip|Statue of Liberty, statue alone" data-labels="Michael James|Deepest part of the Grand Canyon|Mount Everest|Average ocean depth|Airplanes fly at|Empire State Building|Statue of Liberty">
+      <p class="sentence">Let's measure some things in steps and time. If you are <input type="number" class="measure walker-height" value="48" min="20" max="100" step="1" aria-label="Your height in inches"> inches tall, your estimated step length is <span class="walker-step">20 inches</span>, and you take <input type="number" class="measure walker-pace" value="100" min="10" max="250" step="5" aria-label="Steps per minute"> steps per minute. At this speed, you will travel the height of a giraffe in <span class="walker-giraffe">–</span>.</p>
+      <div class="stage"></div>
+    </section>
+  </div>
+
+  <script>
+    // minimal CSV parser: handles quoted fields with commas and doubled quotes
+    function parseCSV(text) {
+      const rows = [];
+      let row = [], field = "", quoted = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (quoted) {
+          if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+          else if (c === '"') quoted = false;
+          else field += c;
+        } else if (c === '"') quoted = true;
+        else if (c === ",") { row.push(field); field = ""; }
+        else if (c === "\n" || c === "\r") {
+          if (c === "\r" && text[i + 1] === "\n") i++;
+          row.push(field); rows.push(row); row = []; field = "";
+        } else field += c;
+      }
+      if (field || row.length) { row.push(field); rows.push(row); }
+      const [header, ...body] = rows;
+      return body.filter((r) => r.length === header.length).map((r) => Object.fromEntries(header.map((h, i) => [h, r[i]])));
+    }
+
+    let byName = {};
+    let unit = "ft";
+
+    // ---- feet / meters toggle: relabels the lines and the heights in the sentences ----
+    document.querySelectorAll(".h").forEach((el) => { el.dataset.ft = el.textContent; });
+    document.querySelectorAll(".unit-toggle button").forEach((button) => {
+      button.addEventListener("click", () => {
+        unit = button.dataset.unit;
+        document.querySelectorAll(".unit-toggle button").forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
+        document.querySelectorAll(".h").forEach((el) => { el.textContent = el.dataset[unit]; });
+        drawSlides();
+      });
+    });
+
+    // 1,708 / 358 / 3.5 / 0.04: whole numbers once there are 10 or more, otherwise two significant digits
+    function formatCount(n) {
+      if (n >= 10) return Math.round(n).toLocaleString();
+      return Number(n.toPrecision(2)).toLocaleString();
+    }
+
+    // a dropdown is as wide as its longest option; size it to the one picked instead
+    const selectSizer = document.createElement("span");
+    selectSizer.style.cssText = "position:absolute;visibility:hidden;white-space:pre;left:-9999px;top:0";
+    document.body.appendChild(selectSizer);
+    function fitSelect(select) {
+      const cs = getComputedStyle(select);
+      selectSizer.style.font = cs.font;
+      selectSizer.textContent = select.selectedOptions[0].textContent;
+      select.style.width = Math.ceil(selectSizer.getBoundingClientRect().width) + 40 + "px"; // room for the arrow
+    }
+    document.querySelectorAll("select.measure").forEach((select) => {
+      fitSelect(select);
+      select.addEventListener("change", () => { fitSelect(select); drawSlides(); });
+    });
+    if (document.fonts) document.fonts.ready.then(() => document.querySelectorAll("select.measure").forEach(fitSelect));
+    // − and + around each number box, stepping by its step and staying within its min and max
+    document.querySelectorAll("input.measure[type=number]").forEach((input) => {
+      const box = document.createElement("span");
+      box.className = "spin-box";
+      input.before(box);
+      const button = (label, text, dir) => {
+        const b = Object.assign(document.createElement("button"), { type: "button", className: "spin-btn", textContent: text });
+        b.setAttribute("aria-label", label);
+        b.addEventListener("click", () => {
+          const step = Number(input.step) || 1;
+          const next = Math.min(Number(input.max) || Infinity, Math.max(Number(input.min) || 0, (Number(input.value) || 0) + dir * step));
+          input.value = next;
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+        return b;
+      };
+      box.append(button("Decrease", "−", -1), input, button("Increase", "+", 1));
+    });
+
+    // height and pace boxes redraw their step as you type
+    document.querySelectorAll(".walker-height, .walker-pace").forEach((input) => input.addEventListener("input", drawSlides));
+
+    // draws each slide's lines, scaled so the tallest one fills its stage
+    // 1, 2 or 5 times a power of ten, so the axis counts 0, 100, 200… or 0, 500, 1,000…
+    function niceStep(raw) {
+      const p = Math.pow(10, Math.floor(Math.log10(raw)));
+      const f = raw / p;
+      return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p;
+    }
+
+    // step length as a share of height: the midpoint of 0.413 (women) and 0.415 (men), per the step length sources
+    const STEP_FACTOR = 0.414;
+
+    // minutes -> "6 seconds", "2.1 minutes", "3 hours, 31 minutes"; short: "6 sec", "2.1 min", "3 hr 31 min" for the chart
+    function formatDuration(minutes, short) {
+      if (!isFinite(minutes) || minutes <= 0) return "–";
+      const unit = (n, one, many, abbr) => n.toLocaleString() + " " + (short ? abbr : n === 1 ? one : many);
+      if (minutes < 1) return unit(Math.round(minutes * 60), "second", "seconds", "sec");
+      if (minutes < 60) return unit(minutes < 10 ? Number(minutes.toFixed(1)) : Math.round(minutes), "minute", "minutes", "min");
+      let h = Math.floor(minutes / 60), m = Math.round(minutes - h * 60);
+      if (m === 60) { h += 1; m = 0; }
+      const hours = unit(h, "hour", "hours", "hr");
+      return m ? hours + (short ? " " : ", ") + unit(m, "minute", "minutes", "min") : hours;
+    }
+
+    function drawAxisSlide(slide) {
+      const stage = slide.querySelector(".stage");
+      const labels = slide.dataset.labels.split("|");
+      const names = slide.dataset.names.split("|");
+      let items, plural;
+      if (slide.classList.contains("time")) {
+        // walking time: each height divided by your step length, then by your steps per minute
+        const heightIn = Number(slide.querySelector(".walker-height").value) || 0;
+        const perMinute = Number(slide.querySelector(".walker-pace").value) || 0;
+        const stepIn = heightIn * STEP_FACTOR;
+        const minutesFor = (meters) => (stepIn > 0 && perMinute > 0 ? meters / (stepIn * 0.0254) / perMinute : 0);
+        slide.querySelector(".walker-step").textContent = Math.round(stepIn) + (Math.round(stepIn) === 1 ? " inch" : " inches");
+        slide.querySelector(".walker-giraffe").textContent = formatDuration(minutesFor(Number(byName["Michael James, giraffe"].meters)));
+        const minutes = names.map((name) => minutesFor(Number(byName[name].meters)));
+        // the axis counts in seconds, minutes or hours, whichever suits the longest walk
+        const longest = Math.max(...minutes);
+        const [per, unitName] = longest < 2 ? [1 / 60, "seconds"] : longest < 120 ? [1, "minutes"] : [60, "hours"];
+        plural = unitName;
+        items = names.map((name, i) => ({ label: labels[i] || name, value: minutes[i] / per, text: formatDuration(minutes[i], true) }));
+      } else {
+        const measure = slide.querySelector("select.measure");
+        const unitMeters = Number(byName[measure.value].meters);
+        plural = measure.selectedOptions[0].dataset.plural;
+        items = names.map((name, i) => {
+          const value = Number(byName[name].meters) / unitMeters;
+          return { label: labels[i] || name, value, text: formatCount(value) };
+        });
+      }
+      // shortest to tallest, left to right
+      items.sort((a, b) => a.value - b.value);
+
+      stage.innerHTML = '<div class="axis-scale"><div class="axis-title"></div></div><div class="axis-plot"></div>';
+      const scale = stage.querySelector(".axis-scale");
+      const plot = stage.querySelector(".axis-plot");
+      scale.querySelector(".axis-title").textContent = plural;
+
+      const bars = items.map((d) => {
+        const bar = document.createElement("div");
+        bar.className = "abar";
+        bar.innerHTML = '<div class="abar-num"></div><div class="bar-segment"></div><div class="abar-name"></div>';
+        bar.querySelector(".abar-num").textContent = d.text;
+        bar.querySelector(".abar-name").textContent = d.label;
+        plot.appendChild(bar);
+        return { bar, value: d.value };
+      });
+
+      // leave room above the tallest line for its number (and, when names lie flat on top, its name) and the axis title
+      const flatNames = slide.classList.contains("time");
+      // data-below lists names whose labels sit under the baseline, out of the way
+      const below = slide.dataset.below ? slide.dataset.below.split("|") : [];
+      const numHeight = bars[0].bar.querySelector(".abar-num").offsetHeight + 6;
+      const nameHeight = flatNames ? Math.max(...bars.map(({ bar }) => bar.querySelector(".abar-name").offsetHeight)) + 2 : 0;
+      const titleHeight = scale.querySelector(".axis-title").offsetHeight + 8;
+      const max = Math.max(...items.map((d) => d.value));
+      const pxPerUnit = (stage.clientHeight - Math.max(numHeight + nameHeight, titleHeight)) / max;
+      bars.forEach(({ bar, value }) => {
+        bar.querySelector(".bar-segment").style.height = value * pxPerUnit + "px";
+        bar.querySelector(".abar-num").style.bottom = value * pxPerUnit + 6 + "px";
+        if (flatNames) {
+          const name = bar.querySelector(".abar-name");
+          if (below.includes(name.textContent)) {
+            // this one's name and time go under the baseline instead, name first
+            const num = bar.querySelector(".abar-num");
+            name.style.bottom = -(name.offsetHeight + 6) + "px";
+            num.style.bottom = -(name.offsetHeight + num.offsetHeight + 8) + "px";
+          } else {
+            name.style.bottom = value * pxPerUnit + numHeight + 2 + "px";
+          }
+          return;
+        }
+        // a name longer than its line wraps onto a second line instead of towering over it;
+        // phone columns are too narrow for two lines, so there names stay on one
+        const name = bar.querySelector(".abar-name");
+        if (!matchMedia("(max-width: 760px)").matches) {
+          const fullLength = name.offsetHeight; // the name on one line
+          name.style.maxHeight = Math.max(value * pxPerUnit, 110, fullLength / 2 + 12) + "px"; // never more than two lines
+        }
+      });
+
+      const step = niceStep(max / 5);
+      for (let v = 0; v <= max; v += step) {
+        const tick = document.createElement("div");
+        tick.className = "axis-tick";
+        tick.style.bottom = v * pxPerUnit + "px";
+        tick.textContent = formatCount(v);
+        scale.appendChild(tick);
+      }
+    }
+
+    // ---- show the ft / m toggle only while a step that uses it is on screen ----
+    function watchUnitSteps() {
+      const toggle = document.querySelector(".unit-toggle");
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) toggle.hidden = entry.target.dataset.usesUnits !== "true";
+        });
+      }, { threshold: 0.5 });
+      document.querySelectorAll(".slide").forEach((slide) => observer.observe(slide));
+    }
+
+    function drawSlides() {
+      document.querySelectorAll(".slide[data-names]").forEach((slide) => {
+        if (slide.classList.contains("axis")) { slide.dataset.usesUnits = "false"; drawAxisSlide(slide); return; }
+        const stage = slide.querySelector(".stage");
+        // data-labels and data-sublabels, when given, replace the CSV name and height shown on top of each line
+        const labels = slide.dataset.labels ? slide.dataset.labels.split("|") : [];
+        const sublabels = slide.dataset.sublabels ? slide.dataset.sublabels.split("|") : [];
+        // data-captions replaces the height text in both units, for things like "86 giraffes"
+        let captions = slide.dataset.captions ? slide.dataset.captions.split("|") : [];
+        // a step with a "measure" dropdown labels every line in units of whatever is picked
+        const measure = slide.querySelector("select.measure");
+        if (measure) {
+          const unitMeters = Number(byName[measure.value].meters);
+          const plural = measure.selectedOptions[0].dataset.plural;
+          captions = slide.dataset.names.split("|").map((name) => formatCount(Number(byName[name].meters) / unitMeters) + " " + plural);
+        }
+        // "Slide at Travers Park+S" stands S on top of the slide: one line made of both, bottom first;
+        // "name*9" stacks nine of the same thing
+        const items = slide.dataset.names.split("|").map((names, i) => {
+          const parts = names.split("+").flatMap((name) => {
+            const [base, count] = name.split("*");
+            return Array(Number(count) || 1).fill(byName[base]);
+          });
+          if (!parts.length || parts.some((d) => !d)) return null;
+          const feet = parts.reduce((sum, d) => sum + Number(d.feet), 0);
+          const meters = parts.reduce((sum, d) => sum + Number(d.meters), 0);
+          return {
+            parts,
+            label: labels[i] || names,
+            sublabel: captions[i] ? captions[i] : unit === "m"
+              ? meters.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m"
+              : sublabels[i] || (parts.length === 1 && parts[0].note) || Number(feet.toFixed(1)).toLocaleString() + " ft"
+          };
+        }).filter(Boolean);
+        // the ft / m toggle only matters on a step that shows a height in feet or meters somewhere
+        slide.dataset.usesUnits = String(Boolean(slide.querySelector(".h")) || items.some((d, i) => !captions[i]));
+        stage.innerHTML = "";
+        const bars = items.map((d) => {
+          const bar = document.createElement("div");
+          bar.className = "bar";
+          bar.innerHTML = '<div class="bar-label"><b></b><span></span></div><div class="bar-line"></div>';
+          bar.querySelector("b").textContent = d.label;
+          bar.querySelector("span").textContent = d.sublabel;
+          const line = bar.querySelector(".bar-line");
+          const segments = d.parts.map((part, j) => {
+            const seg = Object.assign(document.createElement("div"), { className: "bar-segment" });
+            line.appendChild(seg);
+            return { seg, meters: Number(part.meters) };
+          });
+          stage.appendChild(bar);
+          return { bar, segments, meters: segments.reduce((sum, x) => sum + x.meters, 0) };
+        });
+        // sideways: data-fit names the thing that spans the width, up to the right gutter; longer lines run off the edge
+        if (slide.classList.contains("sideways")) {
+          const fit = byName[slide.dataset.fit];
+          const pxPerMeter = (stage.clientWidth - 24) / Number(fit.meters);
+          bars.forEach(({ segments }) => segments.forEach(({ seg, meters }) => { seg.style.width = Math.min(meters * pxPerMeter, stage.clientWidth + 10) + "px"; }));
+          return;
+        }
+        // the room left for the tallest line once its label is on top
+        const labelHeight = Math.max(...bars.map(({ bar }) => bar.querySelector(".bar-label").offsetHeight + 8));
+        const tallest = Math.max(...bars.map((b) => b.meters));
+        const pxPerMeter = (stage.clientHeight - labelHeight) / tallest;
+        // each gap comes out of the segment above it, so a stacked line still ends at its true height
+        const jointGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--joint-gap")) || 0;
+        bars.forEach(({ segments }) => segments.forEach(({ seg, meters }, j) => { seg.style.height = meters * pxPerMeter - (j > 0 ? jointGap : 0) + "px"; }));
+      });
+    }
+
+    fetch("height_data.csv")
+      .then((r) => r.text())
+      .then((text) => {
+        parseCSV(text).forEach((d) => { byName[d.name] = d; });
+        drawSlides();
+        window.addEventListener("resize", drawSlides);
+        watchUnitSteps();
+      });
+  </script>
+</body>
+</html>
