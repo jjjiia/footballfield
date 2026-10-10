@@ -22,7 +22,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 10vh 24px 8vh;
+      padding: 10vh 24px 8vh 72px; /* extra room on the left for the progress dots */
     }
     .sentence{
       font-size: 28px;
@@ -98,18 +98,26 @@
       width: max-content;
       height: max-content;
     }
-    /* walking-time chart: names lie flat, centered over the line, with the time just under them */
-    .slide.time .abar-name{
-      writing-mode: horizontal-tb;
-      transform: translateX(-50%);
-      left: 50%;
-      bottom: auto;
-      width: max-content;
-      height: auto;
-      max-width: 120px;
-      text-align: center;
-    }
-    .slide.time .abar-num{ right: auto; left: 50%; transform: translateX(-50%); }
+    /* walking-time chart: flat lines starting at the left, shortest on top, each with its name and time above it,
+       and the time scale running along the bottom */
+    /* time / giraffes switch in the walking chart's top right corner, styled like the ft / m switch */
+    .slide.time{ position: relative; }
+    .measure-toggle{ position: absolute; top: 16px; right: 20px; font-size: 16px; }
+    .measure-toggle button{ all: unset; cursor: pointer; padding: 2px 4px; }
+    .measure-toggle button[aria-pressed="true"]{ font-weight: 700; text-decoration: underline; }
+    /* the switch also swaps the sentence: the walking calculator for time, the measure-in dropdown for giraffes */
+    .slide.time:not([data-measure-in="giraffes"]) .giraffe-sentence, .slide.time[data-measure-in="giraffes"] .time-sentence{ display: none; }
+    /* steps: the same calculator sentence without the pace and time parts */
+    .slide.time[data-measure-in="steps"] .pace-part{ display: none; }
+    .slide.time .stage{ flex-direction: column; justify-content: center; align-items: stretch; }
+    .trow{ margin-bottom: 12px; }
+    .trow-label{ font-size: 14px; line-height: 1.3; margin-bottom: 4px; }
+    .trow-label span{ margin-left: 8px; }
+    .trow .bar-segment{ height: 6px; }
+    .taxis{ position: relative; height: 44px; border-top: 1px solid #000; }
+    .taxis-tick{ position: absolute; top: 0; padding-top: 10px; font-size: 12px; line-height: 1; transform: translateX(-50%); white-space: nowrap; }
+    .taxis-tick::before{ content: ""; position: absolute; top: 0; left: 50%; width: 1px; height: 6px; background: #000; }
+    .taxis-title{ position: absolute; left: 0; top: 28px; font-size: 12px; font-weight: 700; white-space: nowrap; }
     /* the "measure in" dropdown and number boxes inside a sentence */
     .measure{
       font: inherit;
@@ -138,7 +146,7 @@
       .axis-tick, .axis-title{ font-size: 10px; }
       .abar-num{ font-size: 10px; }
       .abar-name{ font-size: 11px; left: calc(50% + 6px); }
-      .slide.time .abar-name{ left: 50%; max-width: 44px; font-size: 9px; }
+      .trow-label, .taxis-tick, .taxis-title{ font-size: 11px; }
       .slide.sideways .bar-label{ font-size: 14px; }
     }
     /* feet / meters switch, pinned top right; the unit in use is bold and underlined */
@@ -156,12 +164,40 @@
     }
     .unit-toggle button[aria-pressed="true"]{ font-weight: 700; text-decoration: underline; }
     .unit-toggle[hidden]{ display: none; }
+    /* progress dots down the left side, one per step; every step up to the one on screen is filled in */
+    .progress{
+      position: fixed;
+      left: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .progress button{
+      all: unset;
+      cursor: pointer;
+      box-sizing: border-box;
+      width: 10px;
+      height: 10px;
+      border: 1.5px solid #000;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+    .progress button.done{ background: #000; }
+    @media (max-width: 760px){
+      .slide{ padding-left: 40px; }
+      .progress{ left: 12px; gap: 7px; }
+      .progress button{ width: 8px; height: 8px; }
+    }
   </style>
 </head>
 <body>
   <div class="unit-toggle" role="group" aria-label="Units" hidden>
     <button type="button" data-unit="ft" aria-pressed="true">ft</button> / <button type="button" data-unit="m" aria-pressed="false">m</button>
   </div>
+  <nav class="progress" aria-label="Steps"></nav>
   <div class="inner">
     <section class="slide" data-names="S|J" data-labels="You|Me">
       <p class="sentence">You are <span class="h" data-m="1.22 m">48 inches</span> tall. I am <span class="h" data-m="1.80 m">5'11"</span>.</p>
@@ -228,7 +264,7 @@
     </section>
 
     <section class="slide sideways" data-fit="Statue of Liberty, statue alone" data-names="S's step length|Michael James, giraffe|Statue of Liberty, statue alone" data-labels="Your step|The height of Michael James|The height of the Statue of Liberty" data-sublabels="20 in||" data-captions="|10 steps|91 steps">
-      <p class="sentence">It would take you about 91 steps to go from the Statue of Liberty's toes to the top of her torch.</p>
+      <p class="sentence">You are 50 inches tall, and your step is about 20 inches long. It would take you about 91 steps to go from the Statue of Liberty's toes to the top of her torch.</p>
       <div class="stage"></div>
     </section>
 
@@ -242,8 +278,19 @@
       <div class="stage"></div>
     </section>
 
-    <section class="slide crowded axis time" data-below="Michael James" data-names="Michael James, giraffe|Grand Canyon, deepest point|Mount Everest|Average ocean depth|Typical airliner cruise|Empire State Building, to the tip|Statue of Liberty, statue alone" data-labels="Michael James|Deepest part of the Grand Canyon|Mount Everest|Average ocean depth|Airplanes fly at|Empire State Building|Statue of Liberty">
-      <p class="sentence">Let's measure some things in steps and time. If you are <input type="number" class="measure walker-height" value="48" min="20" max="100" step="1" aria-label="Your height in inches"> inches tall, your estimated step length is <span class="walker-step">20 inches</span>, and you take <input type="number" class="measure walker-pace" value="100" min="10" max="250" step="5" aria-label="Steps per minute"> steps per minute. At this speed, you will travel the height of a giraffe in <span class="walker-giraffe">–</span>.</p>
+    <section class="slide crowded axis time" data-measure-in="time" data-names="Michael James, giraffe|Grand Canyon, deepest point|Mount Everest|Average ocean depth|Typical airliner cruise|Empire State Building, to the tip|Statue of Liberty, statue alone" data-labels="Michael James|Deepest part of the Grand Canyon|Mount Everest|Average ocean depth|Airplanes fly at|Empire State Building|Statue of Liberty">
+      <div class="measure-toggle" role="group" aria-label="Measure in">measure in <button type="button" data-measure-in="giraffes" aria-pressed="false">giraffes</button> / <button type="button" data-measure-in="steps" aria-pressed="false">steps</button> / <button type="button" data-measure-in="time" aria-pressed="true">time</button></div>
+      <p class="sentence giraffe-sentence">Let's measure some things in<br><select class="measure" aria-label="Measure in">
+          <option value="Michael James, giraffe" data-plural="giraffes" selected>giraffes</option>
+          <option value="Statue of Liberty, statue alone" data-plural="Statues of Liberty">Statues of Liberty</option>
+          <option value="Empire State Building, to the tip" data-plural="Empire State Buildings">Empire State Buildings</option>
+          <option value="S" data-plural="of you">you</option>
+          <option value="J" data-plural="Moms">Mom</option>
+          <option value="Robert Wadlow" data-plural="Robert Wadlows">Robert Wadlows</option>
+          <option value="Average US adult man" data-plural="average US men">average US men</option>
+          <option value="Average US adult woman" data-plural="average US women">average US women</option>
+        </select>.</p>
+      <p class="sentence time-sentence">Let's measure some things in steps<span class="pace-part"> and time</span>. If you are <input type="number" class="measure walker-height" value="48" min="20" max="100" step="1" aria-label="Your height in inches"> inches tall, your estimated step length is <span class="walker-step">20 inches</span><span class="pace-part">, and you take <input type="number" class="measure walker-pace" value="100" min="10" max="250" step="5" aria-label="Steps per minute"> steps per minute. At this speed, you will travel the height of a giraffe in <span class="walker-giraffe">–</span></span>.</p>
       <div class="stage"></div>
     </section>
   </div>
@@ -327,6 +374,13 @@
 
     // height and pace boxes redraw their step as you type
     document.querySelectorAll(".walker-height, .walker-pace").forEach((input) => input.addEventListener("input", drawSlides));
+    document.querySelectorAll(".measure-toggle button").forEach((button) => button.addEventListener("click", () => {
+      const slide = button.closest(".slide");
+      slide.dataset.measureIn = button.dataset.measureIn;
+      slide.querySelectorAll(".measure-toggle button").forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
+      slide.querySelectorAll("select.measure").forEach(fitSelect);
+      drawSlides();
+    }));
 
     // draws each slide's lines, scaled so the tallest one fills its stage
     // 1, 2 or 5 times a power of ten, so the axis counts 0, 100, 200… or 0, 500, 1,000…
@@ -351,6 +405,36 @@
       return m ? hours + (short ? " " : ", ") + unit(m, "minute", "minutes", "min") : hours;
     }
 
+    // walking-time chart: one flat line per thing, shortest on top, all on one time scale along the bottom
+    function drawTimeRows(stage, items, unitName) {
+      stage.innerHTML = '<div class="trows"></div><div class="taxis"><div class="taxis-title"></div></div>';
+      const rows = stage.querySelector(".trows");
+      const axis = stage.querySelector(".taxis");
+      axis.querySelector(".taxis-title").textContent = unitName;
+      items = [...items].sort((a, b) => a.value - b.value); // shortest on top, longest at the bottom
+      const segments = items.map((d) => {
+        const row = document.createElement("div");
+        row.className = "trow";
+        row.innerHTML = '<div class="trow-label"><b></b><span></span></div><div class="bar-segment"></div>';
+        row.querySelector("b").textContent = d.label;
+        row.querySelector("span").textContent = d.text;
+        rows.appendChild(row);
+        return { seg: row.querySelector(".bar-segment"), value: d.value };
+      });
+      // the longest walk spans the width, short of the right gutter
+      const max = Math.max(...items.map((d) => d.value));
+      const pxPerUnit = (stage.clientWidth - 40) / max;
+      segments.forEach(({ seg, value }) => { seg.style.width = value * pxPerUnit + "px"; });
+      const step = niceStep(max / 5);
+      for (let v = 0; v <= max; v += step) {
+        const tick = document.createElement("div");
+        tick.className = "taxis-tick";
+        tick.style.left = v * pxPerUnit + "px";
+        tick.textContent = formatCount(v);
+        axis.appendChild(tick);
+      }
+    }
+
     function drawAxisSlide(slide) {
       const stage = slide.querySelector(".stage");
       const labels = slide.dataset.labels.split("|");
@@ -370,6 +454,26 @@
         const [per, unitName] = longest < 2 ? [1 / 60, "seconds"] : longest < 120 ? [1, "minutes"] : [60, "hours"];
         plural = unitName;
         items = names.map((name, i) => ({ label: labels[i] || name, value: minutes[i] / per, text: formatDuration(minutes[i], true) }));
+        // the corner switch can show the same lines counted in your steps
+        if (slide.dataset.measureIn === "steps") {
+          plural = "steps";
+          items = names.map((name, i) => {
+            const value = stepIn > 0 ? Number(byName[name].meters) / (stepIn * 0.0254) : 0;
+            return { label: labels[i] || name, value, text: formatCount(value) + " steps" };
+          });
+        }
+        // or measured in giraffes, or whatever the dropdown picks, instead
+        if (slide.dataset.measureIn === "giraffes") {
+          const measure = slide.querySelector("select.measure");
+          const unitMeters = Number(byName[measure.value].meters);
+          plural = measure.selectedOptions[0].dataset.plural;
+          items = names.map((name, i) => {
+            const value = Number(byName[name].meters) / unitMeters;
+            return { label: labels[i] || name, value, text: formatCount(value) + " " + plural };
+          });
+        }
+        drawTimeRows(stage, items, plural);
+        return;
       } else {
         const measure = slide.querySelector("select.measure");
         const unitMeters = Number(byName[measure.value].meters);
@@ -397,30 +501,14 @@
         return { bar, value: d.value };
       });
 
-      // leave room above the tallest line for its number (and, when names lie flat on top, its name) and the axis title
-      const flatNames = slide.classList.contains("time");
-      // data-below lists names whose labels sit under the baseline, out of the way
-      const below = slide.dataset.below ? slide.dataset.below.split("|") : [];
+      // leave room above the tallest line for its number and the axis title
       const numHeight = bars[0].bar.querySelector(".abar-num").offsetHeight + 6;
-      const nameHeight = flatNames ? Math.max(...bars.map(({ bar }) => bar.querySelector(".abar-name").offsetHeight)) + 2 : 0;
       const titleHeight = scale.querySelector(".axis-title").offsetHeight + 8;
       const max = Math.max(...items.map((d) => d.value));
-      const pxPerUnit = (stage.clientHeight - Math.max(numHeight + nameHeight, titleHeight)) / max;
+      const pxPerUnit = (stage.clientHeight - Math.max(numHeight, titleHeight)) / max;
       bars.forEach(({ bar, value }) => {
         bar.querySelector(".bar-segment").style.height = value * pxPerUnit + "px";
         bar.querySelector(".abar-num").style.bottom = value * pxPerUnit + 6 + "px";
-        if (flatNames) {
-          const name = bar.querySelector(".abar-name");
-          if (below.includes(name.textContent)) {
-            // this one's name and time go under the baseline instead, name first
-            const num = bar.querySelector(".abar-num");
-            name.style.bottom = -(name.offsetHeight + 6) + "px";
-            num.style.bottom = -(name.offsetHeight + num.offsetHeight + 8) + "px";
-          } else {
-            name.style.bottom = value * pxPerUnit + numHeight + 2 + "px";
-          }
-          return;
-        }
         // a name longer than its line wraps onto a second line instead of towering over it;
         // phone columns are too narrow for two lines, so there names stay on one
         const name = bar.querySelector(".abar-name");
@@ -449,6 +537,30 @@
         });
       }, { threshold: 0.5 });
       document.querySelectorAll(".slide").forEach((slide) => observer.observe(slide));
+    }
+
+    // ---- progress dots: one per step, filled up to the step on screen; clicking a dot jumps to its step ----
+    function watchProgress() {
+      const nav = document.querySelector(".progress");
+      const slides = [...document.querySelectorAll(".slide")];
+      const dots = slides.map((slide, i) => {
+        const dot = Object.assign(document.createElement("button"), { type: "button" });
+        dot.setAttribute("aria-label", "Step " + (i + 1));
+        dot.addEventListener("click", () => slide.scrollIntoView({ behavior: "smooth" }));
+        nav.appendChild(dot);
+        return dot;
+      });
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const current = slides.indexOf(entry.target);
+          dots.forEach((dot, i) => {
+            dot.classList.toggle("done", i <= current);
+            if (i === current) dot.setAttribute("aria-current", "step"); else dot.removeAttribute("aria-current");
+          });
+        });
+      }, { threshold: 0.5 });
+      slides.forEach((slide) => observer.observe(slide));
     }
 
     function drawSlides() {
@@ -527,6 +639,7 @@
         drawSlides();
         window.addEventListener("resize", drawSlides);
         watchUnitSteps();
+        watchProgress();
       });
   </script>
 </body>
