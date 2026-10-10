@@ -258,12 +258,12 @@
       <div class="stage"></div>
     </section>
 
-    <section class="slide sideways" data-fit="Michael James, giraffe" data-names="S's step length|Michael James, giraffe" data-labels="Your step|The height of Michael James" data-sublabels="20 in|" data-captions="|10 steps">
+    <section class="slide sideways" data-no-units data-fit="Michael James, giraffe" data-names="S's step length|Michael James, giraffe" data-labels="Your step|The height of Michael James" data-sublabels="20 in|" data-captions="|10 steps">
       <p class="sentence">If Michael James was laying down, it would take you about 10 steps to walk from his toes to his head.</p>
       <div class="stage"></div>
     </section>
 
-    <section class="slide sideways" data-fit="Statue of Liberty, statue alone" data-names="S's step length|Michael James, giraffe|Statue of Liberty, statue alone" data-labels="Your step|The height of Michael James|The height of the Statue of Liberty" data-sublabels="20 in||" data-captions="|10 steps|91 steps">
+    <section class="slide sideways" data-no-units data-fit="Statue of Liberty, statue alone" data-names="S's step length|Michael James, giraffe|Statue of Liberty, statue alone" data-labels="Your step|The height of Michael James|The height of the Statue of Liberty" data-sublabels="20 in||" data-captions="|10 steps|91 steps">
       <p class="sentence">You are 50 inches tall, and your step is about 20 inches long. It would take you about 91 steps to go from the Statue of Liberty's toes to the top of her torch.</p>
       <div class="stage"></div>
     </section>
@@ -598,7 +598,8 @@
           };
         }).filter(Boolean);
         // the ft / m toggle only matters on a step that shows a height in feet or meters somewhere
-        slide.dataset.usesUnits = String(Boolean(slide.querySelector(".h")) || items.some((d, i) => !captions[i]));
+        // data-no-units hides it anyway, for steps whose only height is a fixed one like "20 in"
+        slide.dataset.usesUnits = String(!slide.hasAttribute("data-no-units") && (Boolean(slide.querySelector(".h")) || items.some((d, i) => !captions[i])));
         stage.innerHTML = "";
         const bars = items.map((d) => {
           const bar = document.createElement("div");
