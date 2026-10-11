@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Count Atoms</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+  <style>
+    /* one screen: a circle drawn over and over in the top half, counting seconds, and a sentence under it */
+    body{ font-family: 'Inter', Arial, sans-serif; background: #FAF8F3; color: #000; overflow: hidden; }
+    .sentence{
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1.5;
+      text-align: center;
+      margin: 0;
+      max-width: 640px;
+    }
+    .circle{
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50vh;
+      height: 50dvh;
+      pointer-events: none;
+    }
+    .circle path{ fill: none; stroke: #000; stroke-width: 8px; }
+    /* the sentence, pinned just under the circle's half of the window */
+    .about{
+      position: fixed;
+      top: calc(50vh + 32px);
+      top: calc(50dvh + 32px);
+      left: 24px;
+      right: 24px;
+      margin: 0 auto;
+    }
+    /* after 10 Mississippis: a note about saving this page's address, faded in under the sentence */
+    .save-note{ display: block; margin-top: 24px; opacity: 0; transition: opacity 1s; }
+    .save-note.shown{ opacity: 1; }
+    /* "1 Mississippi" sits in the middle of the circle, kept to the middle 60% of its width
+       (the circle is as big as fits in the top half), so the lines under the count wrap inside it */
+    .mississippi{
+      position: fixed;
+      top: 25vh;
+      top: 25dvh;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      transform: translateY(-50%);
+      max-width: calc(min(100vw, 50vh) * 0.6);
+    }
+    /* under the count: when counting started, and once a whole hair's worth is counted, how many */
+    .counting-since, .hairs-counted{ display: block; font-size: 16px; }
+    @media (max-width: 760px){
+      .sentence{ font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <svg class="circle" aria-hidden="true"><path class="pen"></path></svg>
+  <p class="sentence mississippi"><span class="count">1 Mississippi</span><span class="counting-since"></span><span class="hairs-counted"></span></p>
+  <p class="sentence about">If you count 1 atom per second, it would take 11 days, 13 hours, 46 minutes and 40 seconds to count all the atoms across the width of a hair.<span class="save-note">You can save your unique URL to this page and come back to check on it.</span></p>
+
+  <script>
+    const svg = document.querySelector(".circle");
+    const pen = svg.querySelector(".pen");
+
+    // the circle's wobble: three big, slow waves going round a whole number of times each, so the outline is a
+    // lumpy, smooth-curved blob rather than a circle, but still meets itself; a new one for every circle drawn
+    function makeWobble() {
+      const between = (low, high) => low + Math.random() * (high - low);
+      return [
+        { times: Math.floor(between(2, 4)), size: between(0.12, 0.2), phase: between(0, 2 * Math.PI) },
+        { times: Math.floor(between(3, 6)), size: between(0.06, 0.11), phase: between(0, 2 * Math.PI) },
+        { times: Math.floor(between(5, 8)), size: between(0.02, 0.05), phase: between(0, 2 * Math.PI) },
+      ];
+    }
+    let wobbleShape = makeWobble();
+    // how much of the wobble to use: none on the first circle, a perfect one, then a little more each second
+    // until it is all there by the 11th
+    const WOBBLE_IN = 10;
+    let wobbliness = 0;
+
+    // the circle: as big as fits in the top half of the window, a little in from its edges, starting and ending
+    // at its right-hand side. The wobble pushes the outline in and out, and is shifted to be zero there,
+    // so every circle starts exactly where the one before ended
+    function drawCircle() {
+      const w = svg.clientWidth, h = svg.clientHeight;
+      const radius = Math.min(w, h) / 2 - 16;
+      const waves = (turn) => wobbleShape.reduce((sum, wave) => sum + wave.size * Math.sin(wave.times * turn + wave.phase), 0);
+      const points = [];
+      for (let i = 0; i <= 720; i++) {
+        const turn = (i / 720 - 0.5) * 2 * Math.PI;
+        const r = radius * (1 + wobbliness * (waves(turn) - waves(Math.PI)));
+        points.push((w / 2 - Math.cos(turn) * r).toFixed(1) + "," + (h / 2 + Math.sin(turn) * r).toFixed(1));
+      }
+      pen.setAttribute("d", "M" + points.join("L") + "Z");
+    }
+
+    // ---- the pen draws the circle round in exactly one second, again and again,
+    // and the count fades in at the start of every second: 1 Mississippi, 2 Mississippi, 3 Mississippi... ----
+    const CIRCLE_MS = 1000, FADE_MS = 300;
+    // each finished circle stays behind: it fades to 30% over its first second, then by a tenth every second after,
+    // and goes for good after 20 seconds
+    const GHOST_FADE = 0.9, GHOST_MS = 20000;
+    let ghosts = [];
+    function keepGhost(born) {
+      const ghost = pen.cloneNode();
+      ghost.setAttribute("class", "ghost");
+      ghost.style.strokeDasharray = ghost.style.strokeDashoffset = "";
+      pen.before(ghost);
+      ghosts.push({ ghost, born });
+    }
+
+    // the address marks when counting started, as #counting=<milliseconds since 1970>, so a saved link picks it up again
+    const match = location.hash.match(/^#counting=(\d+)$/);
+    const startedAt = match ? Number(match[1]) : Date.now();
+    history.replaceState(null, "", "#counting=" + startedAt);
+    const circleStart = performance.now() - (Date.now() - startedAt); // a count already under way carries on where it is
+    document.querySelector(".counting-since").textContent = "since " + new Date(startedAt).toLocaleString(undefined, {
+      weekday: "long", month: "long", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit",
+    });
+
+    // a count already under way: lay down the circles from the last 10 seconds, as if they had been drawn,
+    // each with its own wobble for the second it was drawn in and faded for its age
+    const opened = performance.now();
+    let drawing = Math.floor((opened - circleStart) / CIRCLE_MS) + 1;
+    for (let back = Math.min(10, drawing - 1); back >= 1; back--) {
+      wobbleShape = makeWobble();
+      wobbliness = Math.min(1, (drawing - back - 1) / WOBBLE_IN);
+      drawCircle();
+      keepGhost(opened - back * CIRCLE_MS);
+    }
+    wobbleShape = makeWobble();
+    wobbliness = Math.min(1, (drawing - 1) / WOBBLE_IN);
+    drawCircle();
+
+    requestAnimationFrame(function tick(now) {
+      const n = Math.floor((now - circleStart) / CIRCLE_MS) + 1;
+      if (n !== drawing) {
+        keepGhost(now); // the circle just finished stays, whole, behind the next one
+        drawing = n;
+        wobbleShape = makeWobble(); // each new circle wobbles its own way
+        wobbliness = Math.min(1, (n - 1) / WOBBLE_IN);
+        drawCircle();
+      }
+      ghosts = ghosts.filter(({ ghost, born }) => {
+        if (now - born >= GHOST_MS) { ghost.remove(); return false; }
+        const age = (now - born) / 1000;
+        ghost.style.opacity = age < 1 ? 1 - age * 0.7 : 0.3 * GHOST_FADE ** (age - 1);
+        return true;
+      });
+      const length = pen.getTotalLength();
+      const elapsed = (now - circleStart) % CIRCLE_MS;
+      const progress = elapsed / CIRCLE_MS;
+      pen.style.strokeDasharray = length;
+      pen.style.strokeDashoffset = length * (1 - progress * progress * progress); // eases in: slow at the start of the second, fast at the end
+      // a hair is a million atoms: at a million the count starts over, and the hairs counted so far go up by one
+      const count = document.querySelector(".mississippi");
+      const hairs = Math.floor((n - 1) / 1e6);
+      // Mississippi for the first three seconds, to set the pace, then it is atoms being counted
+      count.querySelector(".count").textContent = (((n - 1) % 1e6) + 1).toLocaleString() + (n <= 3 ? " Mississippi" : " atoms");
+      count.querySelector(".hairs-counted").textContent = hairs ? hairs.toLocaleString() + (hairs === 1 ? " hair width" : " hair widths") + " of atoms counted" : "";
+      count.querySelector(".count").style.opacity = Math.min(1, elapsed / FADE_MS); // only the count fades in each second
+      document.querySelector(".save-note").classList.toggle("shown", n > 10); // once 10 Mississippis have passed
+      requestAnimationFrame(tick);
+    });
+
+    window.addEventListener("resize", drawCircle);
+  </script>
+</body>
+</html>
