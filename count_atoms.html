@@ -6,7 +6,7 @@
   <title>Count Atoms</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="site.css">
   <style>
     /* one screen: a circle drawn over and over in the top half, counting seconds, and a sentence under it */
@@ -19,13 +19,14 @@
       margin: 0;
       max-width: 640px;
     }
+    .sentence b{ font-weight: 800; } /* extra bold, between bold and the heaviest */
     .circle{
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      height: 50vh;
-      height: 50dvh;
+      height: 100vh; /* the whole window, so a wobble past the circle's half is never cut off at the bottom */
+      height: 100dvh;
       pointer-events: none;
     }
     .circle path{ fill: none; stroke: #000; stroke-width: 8px; }
@@ -63,7 +64,7 @@
 <body>
   <svg class="circle" aria-hidden="true"><path class="pen"></path></svg>
   <p class="sentence mississippi"><span class="count">1 Mississippi</span><span class="counting-since"></span><span class="hairs-counted"></span></p>
-  <p class="sentence about">If you count 1 atom per second, it would take 11 days, 13 hours, 46 minutes and 40 seconds to count all the atoms across the width of a hair.<span class="save-note">You can save your unique URL to this page and come back to check on it.</span></p>
+  <p class="sentence about">If you count 1 atom per second, it would take 11 days, 13 hours, 46 minutes and 40 seconds to count all the atoms across the width of a hair. <b>You will have counted 1 hair width of atoms by <span class="done-at"></span>.</b><span class="save-note">You can save your unique URL to this page and come back to check its progress.</span></p>
 
   <script>
     const svg = document.querySelector(".circle");
@@ -89,7 +90,7 @@
     // at its right-hand side. The wobble pushes the outline in and out, and is shifted to be zero there,
     // so every circle starts exactly where the one before ended
     function drawCircle() {
-      const w = svg.clientWidth, h = svg.clientHeight;
+      const w = svg.clientWidth, h = svg.clientHeight / 2; // the circle is sized and centered for the top half
       const radius = Math.min(w, h) / 2 - 16;
       const waves = (turn) => wobbleShape.reduce((sum, wave) => sum + wave.size * Math.sin(wave.times * turn + wave.phase), 0);
       const points = [];
@@ -121,9 +122,15 @@
     const startedAt = match ? Number(match[1]) : Date.now();
     history.replaceState(null, "", "#counting=" + startedAt);
     const circleStart = performance.now() - (Date.now() - startedAt); // a count already under way carries on where it is
-    document.querySelector(".counting-since").textContent = "since " + new Date(startedAt).toLocaleString(undefined, {
-      weekday: "long", month: "long", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit",
-    });
+    const when = { weekday: "long", month: "long", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit" };
+    document.querySelector(".counting-since").textContent = "since " + new Date(startedAt).toLocaleString(undefined, when);
+    // a hair's width is a million atoms, so a million seconds after the count started: said as today or tomorrow
+    // at a time when it is that soon, and as a full date when it is further off
+    const doneAt = new Date(startedAt + 1e6 * 1000);
+    const daysAway = Math.round((new Date(doneAt).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)) / 86400000);
+    const atTime = doneAt.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+    document.querySelector(".done-at").textContent =
+      daysAway === 0 ? "today at " + atTime : daysAway === 1 ? "tomorrow at " + atTime : doneAt.toLocaleString(undefined, when);
 
     // a count already under way: lay down the circles from the last 10 seconds, as if they had been drawn,
     // each with its own wobble for the second it was drawn in and faded for its age
@@ -157,8 +164,10 @@
       const length = pen.getTotalLength();
       const elapsed = (now - circleStart) % CIRCLE_MS;
       const progress = elapsed / CIRCLE_MS;
-      pen.style.strokeDasharray = length;
-      pen.style.strokeDashoffset = length * (1 - progress * progress * progress); // eases in: slow at the start of the second, fast at the end
+      // one dash the length of the outline, then a gap three times as long: phones can measure the outline a little
+      // differently from how they draw it, and with a gap any shorter the dash repeats and the line shows in segments
+      pen.style.strokeDasharray = length + "px " + length * 3 + "px";
+      pen.style.strokeDashoffset = length * (1 - progress * progress * progress) + "px"; // eases in: slow at the start of the second, fast at the end
       // a hair is a million atoms: at a million the count starts over, and the hairs counted so far go up by one
       const count = document.querySelector(".mississippi");
       const hairs = Math.floor((n - 1) / 1e6);
