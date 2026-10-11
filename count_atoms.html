@@ -29,7 +29,7 @@
       height: 100dvh;
       pointer-events: none;
     }
-    .circle path{ fill: none; stroke: #000; stroke-width: 8px; }
+    .circle path{ fill: none; stroke: #000; stroke-width: 8px; stroke-linejoin: round; stroke-linecap: round; }
     /* the sentence, pinned just under the circle's half of the window */
     .about{
       position: fixed;
@@ -93,13 +93,29 @@
       const w = svg.clientWidth, h = svg.clientHeight / 2; // the circle is sized and centered for the top half
       const radius = Math.min(w, h) / 2 - 16;
       const waves = (turn) => wobbleShape.reduce((sum, wave) => sum + wave.size * Math.sin(wave.times * turn + wave.phase), 0);
-      const points = [];
+      circlePoints = [];
       for (let i = 0; i <= 720; i++) {
         const turn = (i / 720 - 0.5) * 2 * Math.PI;
         const r = radius * (1 + wobbliness * (waves(turn) - waves(Math.PI)));
-        points.push((w / 2 - Math.cos(turn) * r).toFixed(1) + "," + (h / 2 + Math.sin(turn) * r).toFixed(1));
+        circlePoints.push([w / 2 - Math.cos(turn) * r, h / 2 + Math.sin(turn) * r]);
       }
-      pen.setAttribute("d", "M" + points.join("L") + "Z");
+      drawPen(1);
+    }
+    let circlePoints = [];
+    const pointText = ([x, y]) => x.toFixed(1) + "," + y.toFixed(1);
+
+    // the pen's line: just the part of the outline drawn so far, 0 to 1 of the way round, ending part way
+    // between two points so it moves smoothly. (Drawn this way, not with a dash pattern, which phones can
+    // show broken into segments)
+    function drawPen(drawn) {
+      const along = drawn * (circlePoints.length - 1);
+      const whole = Math.floor(along);
+      const done = circlePoints.slice(0, whole + 1);
+      if (whole < circlePoints.length - 1) {
+        const [x0, y0] = circlePoints[whole], [x1, y1] = circlePoints[whole + 1], part = along - whole;
+        done.push([x0 + (x1 - x0) * part, y0 + (y1 - y0) * part]);
+      }
+      pen.setAttribute("d", "M" + done.map(pointText).join("L") + (drawn >= 1 ? "Z" : ""));
     }
 
     // ---- the pen draws the circle round in exactly one second, again and again,
@@ -112,7 +128,7 @@
     function keepGhost(born) {
       const ghost = pen.cloneNode();
       ghost.setAttribute("class", "ghost");
-      ghost.style.strokeDasharray = ghost.style.strokeDashoffset = "";
+      ghost.setAttribute("d", "M" + circlePoints.map(pointText).join("L") + "Z"); // the whole outline
       pen.before(ghost);
       ghosts.push({ ghost, born });
     }
@@ -161,13 +177,9 @@
         ghost.style.opacity = age < 1 ? 1 - age * 0.7 : 0.3 * GHOST_FADE ** (age - 1);
         return true;
       });
-      const length = pen.getTotalLength();
       const elapsed = (now - circleStart) % CIRCLE_MS;
       const progress = elapsed / CIRCLE_MS;
-      // one dash the length of the outline, then a gap three times as long: phones can measure the outline a little
-      // differently from how they draw it, and with a gap any shorter the dash repeats and the line shows in segments
-      pen.style.strokeDasharray = length + "px " + length * 3 + "px";
-      pen.style.strokeDashoffset = length * (1 - progress * progress * progress) + "px"; // eases in: slow at the start of the second, fast at the end
+      drawPen(progress * progress * progress); // eases in: slow at the start of the second, fast at the end
       // a hair is a million atoms: at a million the count starts over, and the hairs counted so far go up by one
       const count = document.querySelector(".mississippi");
       const hairs = Math.floor((n - 1) / 1e6);
