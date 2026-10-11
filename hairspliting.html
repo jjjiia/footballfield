@@ -13,7 +13,7 @@
        that drive them (see onScroll) */
     body{ font-family: 'Inter', Arial, sans-serif; background: #FAF8F3; color: #000; }
     .inner{ max-width: none; padding: 0; }
-    .slide{ height: 60vh; } /* scrolling one of these plays its step: twice as long as before, longer than the split steps */
+    .slide{ height: 100vh; } /* scrolling one of these plays its step: a full window height */
     .split-step{ height: 20vh; } /* past the third step, each of these splits the hair once more: 10 splits per 2 screens */
     .steps-end{ height: 100vh; } /* room for the last step to reach the top */
     .sentence{
@@ -63,7 +63,9 @@
     /* "1 Mississippi" sits in the middle of the circle, which is centered in the top half of the window */
     /* under the count: when counting started, and once a whole hair's worth is counted, how many */
     .counting-since, .hairs-counted{ display: block; font-size: 16px; }
-    .slide .sentence.mississippi{ top: 25vh; top: 25dvh; left: 0; right: 0; transform: translateY(-50%); }
+    /* kept to the middle 60% of the circle's width (the circle is as big as fits in the top half), so the
+       lines under the count wrap inside it */
+    .slide .sentence.mississippi{ top: 25vh; top: 25dvh; left: 0; right: 0; transform: translateY(-50%); max-width: calc(min(100vw, 50vh) * 0.6); }
     .caption, .slide .sentence{
       position: fixed;
       top: calc(50vh + 32px);
