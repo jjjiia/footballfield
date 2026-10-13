@@ -115,13 +115,22 @@
 }
 .fade-overlay.visible{ opacity: 1; }
 
-.place-search{ display: inline-block; vertical-align: middle; pointer-events: auto; }
-/* search sits on its own at the bottom left of the map */
+/* the search box shrinks to fit, never wider than 240px */
+.search-line{
+  box-sizing: border-box;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.go-to-label{ white-space: nowrap; flex-shrink: 0; }
+.place-search{ flex: 0 1 240px; min-width: 0; pointer-events: auto; }
 /* bottom left: grid toggle above the search */
 .bottom-left{
   position: absolute;
   bottom: 20px;
   left: 20px;
+  right: 64px; /* clear of the +/- zoom buttons at bottom right */
   z-index: 20;
   display: flex;
   flex-direction: column;
@@ -129,10 +138,28 @@
   gap: 10px;
 }
 .grid-btn{
+  position: relative;
   border: none;
   cursor: pointer;
   line-height: normal;
 }
+/* hover popup explaining the grid, to the right of the button */
+.grid-btn::after{
+  content: attr(data-tip);
+  display: none;
+  position: absolute;
+  left: calc(100% + 10px);
+  bottom: 0;
+  width: max-content;
+  max-width: 280px;
+  padding: 6px 12px;
+  background: #000;
+  color: #FAF8F3;
+  font-size: 16px;
+  font-weight: 300;
+  text-align: left;
+}
+.grid-btn:hover::after{ display: block; }
 /* "Make your own" unit popup */
 .custom-popup{
   position: absolute;
@@ -200,7 +227,7 @@
 .search-line .suggestions-wrapper .suggestions{ top: auto; bottom: 110%; }
 .search-line .mapboxgl-ctrl-geocoder{
   margin: 0;
-  width: 240px;
+  width: 100%;
   min-width: 0;
   max-width: none;
   background: #FAF8F3;
@@ -224,6 +251,44 @@
   fill: #000;
 }
 .search-line .mapboxgl-ctrl-geocoder--pin-right > *{ top: 50%; transform: translateY(-50%); }
+/* +/- zoom buttons in the page's style: square off-white boxes, light Inter text */
+.map-wrapper .mapboxgl-ctrl-group{
+  margin: 0 20px 20px 0; /* bottom lines up with the search box, same 20px inset */
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.map-wrapper .mapboxgl-ctrl-group button{
+  width: 32px;
+  height: 32px;
+  border-radius: 0;
+  border: none;
+  background: #FAF8F3;
+}
+.map-wrapper .mapboxgl-ctrl-group button + button{ border-top: none; }
+.map-wrapper .mapboxgl-ctrl-group button:not(:disabled):hover{ background-color: #FAF8F3; }
+.map-wrapper .mapboxgl-ctrl button .mapboxgl-ctrl-icon{
+  background-image: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 300;
+  color: #000;
+}
+.map-wrapper .mapboxgl-ctrl button.mapboxgl-ctrl-zoom-in .mapboxgl-ctrl-icon::before{ content: "+"; }
+.map-wrapper .mapboxgl-ctrl button.mapboxgl-ctrl-zoom-out .mapboxgl-ctrl-icon::before{ content: "\2212"; }
+
+/* phones: slightly smaller text on the map */
+@media (max-width: 600px){
+  .map-line,
+  .unit-select,
+  .search-line .mapboxgl-ctrl-geocoder{ font-size: 16px; }
+}
 </style>
 </head>
 <body>
@@ -236,7 +301,7 @@
     <div class="fade-overlay"></div>
     <div class="labels">
       <span class="map-line">This white outline is a <select class="unit-select"></select>. Measure any place by <span class="measure-unit"></span>.</span>
-      <span class="map-line">You are at <select class="unit-select place-select"><option value="home" selected>Levi's Stadium, site of the 2025 American Super Bowl</option></select>.</span>
+      <span class="map-line">You are at <select class="unit-select place-select"><option value="home" selected>Levi's Stadium</option></select><span class="place-note">, site of the 2025 American Super Bowl</span>.</span>
       <span class="map-line area-text"></span>
     </div>
     <div class="custom-popup" hidden>
@@ -271,7 +336,7 @@
     </div>
     <div class="bottom-left">
       <button class="map-line grid-btn" type="button">Show grid</button>
-      <span class="map-line search-line">Search for a place: <span class="place-search"></span></span>
+      <span class="map-line search-line"><span class="go-to-label">Go to:</span> <span class="place-search"></span></span>
     </div>
   </div>
 </div>
@@ -582,6 +647,12 @@ function initMapExperience(root, options) {
     option.textContent = p.name;
     placeSelect.appendChild(option);
   });
+  // the note after the dropdown only belongs to Levi's Stadium
+  const placeNote = root.querySelector(".place-note");
+  function placeShown() {
+    fitSelectToContent(placeSelect);
+    placeNote.hidden = placeSelect.value !== "home";
+  }
   fitSelectToContent(placeSelect);
   document.fonts.ready.then(() => fitSelectToContent(placeSelect));
 
@@ -618,7 +689,7 @@ function initMapExperience(root, options) {
     proximity: null,
     limit: 6,
     autocomplete: true,
-    placeholder: ""
+    placeholder: "Search for a place"
   });
   map.addControl(geocoder, "bottom-left");
   // Added as a map control so it still moves the map on a result, then
@@ -637,12 +708,13 @@ function initMapExperience(root, options) {
     }
     option.textContent = e.result.text;
     placeSelect.value = "search";
-    fitSelectToContent(placeSelect);
+    placeShown();
   });
 
 
   function updateFieldsText() {
     measureUnit.textContent = currentUnit.plural;
+    gridBtn.dataset.tip = "The grid is rectangles the size of the unit being used (" + currentUnit.singular + ").";
     const r = computeFieldsInView(map, unitAreaM2(currentUnit));
     textLabel.innerHTML =
       "The total map area you see on screen is about " +
@@ -753,7 +825,7 @@ function initMapExperience(root, options) {
       // hidden behind the overlay: jump straight to the new spot, still at the old zoom
       map.jumpTo({ center: target.center, bearing: target.bearing, zoom: holdZoom });
       placeSelect.value = placeValue;
-      fitSelectToContent(placeSelect);
+      placeShown();
 
       // fade back in, then ease from the old zoom to this place's own (in or out)
       fadeOverlay.classList.remove("visible");
@@ -873,9 +945,8 @@ function initMapExperience(root, options) {
 
       drawForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        const name = drawName.value.trim();
+        const name = drawName.value.trim() || "your shape";
         if (drawPoints.length < 3) { drawHint.textContent = "Add at least 3 corners."; return; }
-        if (!name) { drawName.focus(); return; }
 
         // corners -> local east/north meters, centered on the shape's bounding box
         const lng0 = drawPoints.reduce((a, p) => a + p[0], 0) / drawPoints.length;
