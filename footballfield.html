@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Football Fields</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.css" rel="stylesheet" />
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
+  <style>
+    html, body { height: 100%; }
+
+/* top banner, calculators' font, off-white on black */
+.top-banner{
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  box-sizing: border-box;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  background: #000;
+  color: #FAF8F3;
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: 1px;
+  padding: 0 20px;
+  margin: 0;
+}
+
+/* each map section sticks to the viewport while its scroll-steps play out */
+.map-scrolly{
+  position: relative;
+}
+.map-wrapper{
+  position: sticky;
+  top: 56px; /* sits just under the sticky banner */
+  height: calc(100vh - 56px);
+  overflow: hidden;
+}
+/* map starts in black and white; switches to color once a dropdown is used */
+.map.grayscale .mapboxgl-canvas{ filter: grayscale(1); }
+.map {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:0;
+}/* The overlay container is absolutely positioned within .map-wrapper */
+.labels{
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+
+  display: flex;
+  flex-direction: column;   /* stack text then button */
+  align-items: flex-start;
+  gap: 10px;
+
+  z-index: 20;
+  pointer-events: none;     /* map still draggable */
+}
+
+/* sentence text */
+.map-line{
+  font-size: 20px;
+  font-weight: 300;
+  color: #000;
+  font-family: 'Inter', Arial, sans-serif;
+  background: #FAF8F3;
+  padding: 6px 12px;
+}
+
+/* unit-of-measurement dropdown */
+.unit-select{
+  pointer-events: auto;
+  /* own arrow instead of the native one, so it can sit in from the right edge */
+  -webkit-appearance: none;
+  appearance: none;
+  background: #FAF8F3 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 12px center;
+  color: #000;
+  border: none;
+  border-bottom: 2px solid #000; /* underline (text-decoration doesn't render on a <select>) */
+  border-radius: 0;
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 300;
+  font-size: 20px;
+  line-height: normal;
+  padding: 0 36px 0 8px;
+}
+
+
+/* scrolly sections: invisible spacers that drive the tour via scroll position,
+   no visible or interactive content of their own -- without pointer-events:none
+   this z-indexed layer sits above the sticky map-wrapper's buttons (show-more,
+   search) and silently swallows clicks meant for them. */
+.scroll-sections{
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+.scroll-step{
+  height: 100vh;
+}
+
+/* "show more" button, shown once the current tour runs out of stops */
+.show-more-btn{
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  pointer-events: auto;
+  padding: 10px 18px;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  text-shadow:
+    0 0 6px rgba(0,0,0,1),
+    0 0 14px rgba(0,0,0,1);
+  transition: opacity 0.3s ease;
+}
+.show-more-btn:hover{ opacity: 0.85; }
+.show-more-btn.hidden{
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mapboxgl-ctrl-logo,
+.mapboxgl-ctrl-attrib { display: none !important; }
+
+/* cross-fade shown while the camera jumps between locations */
+.fade-overlay{
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 15;
+  transition: opacity 0.45s ease;
+}
+.fade-overlay.visible{ opacity: 1; }
+
+.place-search{ display: inline-block; vertical-align: middle; pointer-events: auto; }
+/* search sits on its own at the bottom left of the map */
+.search-line{
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 20;
+}
+/* open the suggestions list upward, since the box is at the bottom */
+.search-line .suggestions-wrapper .suggestions{ top: auto; bottom: 110%; }
+.search-line .mapboxgl-ctrl-geocoder{
+  margin: 0;
+  width: 240px;
+  min-width: 0;
+  max-width: none;
+  background: #FAF8F3;
+  border-bottom: 1px solid #000;
+  border-radius: 0;
+  box-shadow: none;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 20px;
+  line-height: normal;
+}
+.search-line .mapboxgl-ctrl-geocoder--input{
+  height: auto;
+  padding: 0 28px 0 26px;
+  font: inherit;
+  color: #000;
+}
+.search-line .mapboxgl-ctrl-geocoder--icon-search{
+  top: 50%;
+  left: 2px;
+  transform: translateY(-50%);
+  fill: #000;
+}
+.search-line .mapboxgl-ctrl-geocoder--pin-right > *{ top: 50%; transform: translateY(-50%); }
+</style>
+</head>
+<body>
+
+<h1 class="top-banner">Football field map</h1>
+
+<div class="map-scrolly" id="map-scrolly-2">
+  <div class="map-wrapper">
+    <div class="map grayscale"></div>
+    <div class="fade-overlay"></div>
+    <div class="labels">
+      <span class="map-line">This white rectangle is a <select class="unit-select"></select>.</span>
+      <span class="map-line">Measure any place by <span class="measure-unit"></span>.</span>
+      <span class="map-line">You are at <select class="unit-select place-select"><option value="home" selected>Levi's Stadium, site of the 2025 American Super Bowl</option></select>.</span>
+      <span class="map-line area-text"></span>
+    </div>
+    <span class="map-line search-line">Search for a place: <span class="place-search"></span></span>
+    <button class="show-more-btn hidden" type="button">Show more</button>
+  </div>
+
+  <div class="scroll-sections">
+    <section class="scroll-step" data-index="0"></section>
+    <section class="scroll-step" data-index="1"></section>
+    <section class="scroll-step" data-index="2"></section>
+    <section class="scroll-step" data-index="3"></section>
+    <section class="scroll-step" data-index="4"></section>
+    <section class="scroll-step" data-index="5"></section>
+  </div>
+</div>
+
+<script>
+mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ"
+
+const STYLE = "mapbox://styles/jjjiia123/cmmb9euid00at01qr9mbfapn7";
+const INITIAL_CENTER = [-121.96979950341608, 37.403187791716775]; // Hoboken-ish; change me
+
+const ftToM = (ft) => ft * 0.3048;
+
+// Selectable comparison units (dropdown label, singular/plural wording,
+// real-world footprint, and the `place` lat/lng/zoom/bearing the map flies
+// to when picked) live in units.json, tuned with football_tester.html,
+// rather than inline here. Populated once fetched, below.
+let UNITS = [];
+
+function unitFootprintMeters(unit) {
+  return unit.widthFt != null
+    ? { widthM: ftToM(unit.widthFt), heightM: ftToM(unit.lengthFt) }
+    : { widthM: unit.widthM, heightM: unit.lengthM };
+}
+
+// The unit's own true area -- widthM*heightM only holds for a rectangle;
+// a pentagon (or any other non-rectangular shape added later) needs its
+// own formula so the "X of these fit in view" count stays correct.
+function unitAreaM2(unit) {
+  const { widthM, heightM } = unitFootprintMeters(unit);
+  if (unit.shape === "pentagon") {
+    const side = widthM; // side length, per makeFieldFeature's convention
+    return (1 / 4) * Math.sqrt(5 * (5 + 2 * Math.sqrt(5))) * side * side;
+  }
+  return widthM * heightM;
+}
+
+// Units are grouped into a small category hierarchy (squares, parks,
+// sports, buildings) -- rendered as <optgroup>s in this fixed order so the
+// dropdown reads as organized rather than one flat list.
+const CATEGORY_LABELS = { squares: "Squares", parks: "Parks", sports: "Sports", buildings: "Buildings" };
+const CATEGORY_ORDER = ["squares", "parks", "sports", "buildings"];
+
+function populateUnitSelect(selectEl, units) {
+  selectEl.innerHTML = "";
+  CATEGORY_ORDER.forEach((cat) => {
+    const inCategory = units.filter((u) => u.category === cat);
+    if (!inCategory.length) return;
+    const group = document.createElement("optgroup");
+    group.label = CATEGORY_LABELS[cat] || cat;
+    inCategory.forEach((u) => {
+      const option = document.createElement("option");
+      option.value = u.key;
+      option.textContent = u.label;
+      group.appendChild(option);
+    });
+    selectEl.appendChild(group);
+  });
+}
+
+// A <select> is normally as wide as its longest option -- size it to just
+// the chosen option's text (plus its padding, which holds the arrow).
+function fitSelectToContent(selectEl) {
+  const probe = document.createElement("span");
+  const cs = getComputedStyle(selectEl);
+  probe.style.cssText = "position:absolute;visibility:hidden;white-space:pre;";
+  probe.style.font = cs.font;
+  probe.style.letterSpacing = cs.letterSpacing;
+  probe.textContent = selectEl.options[selectEl.selectedIndex]?.text || "";
+  document.body.appendChild(probe);
+  const w = probe.getBoundingClientRect().width;
+  probe.remove();
+  selectEl.style.width = Math.ceil(w + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)) + "px";
+}
+
+// ---- Small-area meter<->degree helpers ----
+function metersPerDeg(lat) {
+  const rad = lat * Math.PI / 180;
+  return {
+    mPerDegLat: 111132.92,
+    mPerDegLng: 111320.0 * Math.cos(rad)
+  };
+}
+
+// Rotates local east/north-meter offsets by -bearing (so the shape stays
+// upright on screen regardless of map rotation) and projects them to
+// lng/lat around `centerLngLat`. Shared by every shape (rectangle,
+// pentagon, ...) -- each shape only needs to supply its own local corners.
+function localCornersToScreenVerticalRing(centerLngLat, localCorners, mapBearingDeg) {
+  const [lng0, lat0] = centerLngLat;
+  const { mPerDegLat, mPerDegLng } = metersPerDeg(lat0);
+
+  const theta = (-mapBearingDeg) * Math.PI / 180;
+  const cosT = Math.cos(theta);
+  const sinT = Math.sin(theta);
+
+  return localCorners.map(([x, y]) => {
+    const xr = x * cosT - y * sinT; // east (meters)
+    const yr = x * sinT + y * cosT; // north (meters)
+    return [lng0 + xr / mPerDegLng, lat0 + yr / mPerDegLat];
+  });
+}
+
+// Local EN (meters) corners of a widthM x heightM rectangle, centered at (0,0).
+function rectangleLocalCorners(widthM, heightM) {
+  const hw = widthM / 2;
+  const hh = heightM / 2;
+  return [[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh], [-hw, -hh]];
+}
+
+// Local EN (meters) corners of a regular polygon (given side count and side
+// length), point-first-vertex-north, centered at (0,0) -- used for the
+// Pentagon's actual 5-sided footprint instead of a rectangle approximation.
+function regularPolygonLocalCorners(sideM, sides) {
+  const R = sideM / (2 * Math.sin(Math.PI / sides)); // circumradius from side length
+  const corners = [];
+  for (let k = 0; k < sides; k++) {
+    const theta = Math.PI / 2 + k * (2 * Math.PI / sides);
+    corners.push([R * Math.cos(theta), R * Math.sin(theta)]);
+  }
+  corners.push(corners[0]);
+  return corners;
+}
+
+function buildScreenVerticalRectangle(centerLngLat, widthM, heightM, mapBearingDeg) {
+  return localCornersToScreenVerticalRing(centerLngLat, rectangleLocalCorners(widthM, heightM), mapBearingDeg);
+}
+
+function makeFieldFeature(map, widthM, heightM, shape) {
+  const c = map.getCenter();              // <-- viewport center in lng/lat
+  const center = [c.lng, c.lat];
+  const bearing = map.getBearing();
+
+  // Only the Pentagon unit uses "pentagon" so far -- widthM doubles as its
+  // side length there (lengthM is unused/kept equal for that shape, since a
+  // regular pentagon has only one degree of freedom).
+  // "diamond" (baseball diamond) is a widthM-sided square standing on a corner.
+  const ring = shape === "pentagon"
+    ? localCornersToScreenVerticalRing(center, regularPolygonLocalCorners(widthM, 5), bearing)
+    : shape === "diamond"
+    ? localCornersToScreenVerticalRing(center, regularPolygonLocalCorners(widthM, 4), bearing)
+    : buildScreenVerticalRectangle(center, widthM, heightM, bearing);
+
+  // close the ring
+  ring.push(ring[0]);
+
+  return {
+    type: "Feature",
+    properties: { label: "comparison shape (screen-centered, screen-vertical)" },
+    geometry: { type: "Polygon", coordinates: [ring] }
+  };
+}
+
+/// WGS84 lon/lat -> Web Mercator meters (EPSG:3857)
+function lngLatToMercatorMeters(lng, lat) {
+  const R = 6378137;
+  const x = R * (lng * Math.PI / 180);
+  const y = R * Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI / 180) / 2));
+  return [x, y];
+}
+
+function polygonAreaMeters2(coordsXY) {
+  let area2 = 0;
+  const n = coordsXY.length;
+  for (let i = 0; i < n; i++) {
+    const [x1, y1] = coordsXY[i];
+    const [x2, y2] = coordsXY[(i + 1) % n];
+    area2 += (x1 * y2 - x2 * y1);
+  }
+  return Math.abs(area2) / 2;
+}
+
+function computeFieldsInView(map, singleUnitAreaM2) {
+  const canvas = map.getCanvas();
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+
+  const nw = map.unproject([0, 0]);
+  const ne = map.unproject([w, 0]);
+  const se = map.unproject([w, h]);
+  const sw = map.unproject([0, h]);
+
+  const ringLngLat = [nw, ne, se, sw];
+  const ringXY = ringLngLat.map(p => lngLatToMercatorMeters(p.lng, p.lat));
+
+  // Area in Web Mercator "meters²" (distorted)
+  const areaMercatorM2 = polygonAreaMeters2(ringXY);
+
+  // Convert to approx ground area using local scale factor cos²(lat)
+  const latRef = map.getCenter().lat;
+  const cosLat = Math.cos(latRef * Math.PI / 180);
+  const areaGroundM2 = areaMercatorM2 * (cosLat * cosLat);
+
+  return {
+    corners: { nw, ne, se, sw },
+    areaGroundM2,
+    fields: areaGroundM2 / singleUnitAreaM2
+  };
+}
+
+function formatNumber(n) {
+  const abs = Math.abs(n);
+
+  if (abs < 1000) return (Math.round(n*10)/10).toString();
+
+  if (abs < 1_000_000)
+    return (n / 1_000).toFixed(1) + "K";
+
+  if (abs < 1_000_000_000)
+    return (n / 1_000_000).toFixed(1) + "M";
+
+  return (n / 1_000_000_000).toFixed(1) + "B";
+}
+
+function pickRandomStops(list, n) {
+  const arr = list.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, n);
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Sets up one full map + scrolly-tour experience inside `root`
+// (a `.map-scrolly` element). Pass `showUnitSelector: true` to enable
+// the comparison-unit dropdown for that instance only.
+function initMapExperience(root, options) {
+  const mapDiv = root.querySelector(".map");
+  const fadeOverlay = root.querySelector(".fade-overlay");
+  const textLabel = root.querySelector(".area-text");
+  const measureUnit = root.querySelector(".measure-unit");
+  const unitSelect = options.showUnitSelector ? root.querySelector(".unit-select") : null;
+  const DEFAULT_UNIT = UNITS.find((u) => u.key === "football-field") || UNITS[0];
+  if (unitSelect) {
+    populateUnitSelect(unitSelect, UNITS);
+    unitSelect.value = DEFAULT_UNIT.key;
+    fitSelectToContent(unitSelect);
+    document.fonts.ready.then(() => fitSelectToContent(unitSelect)); // re-measure once Inter has loaded
+  }
+  const showMoreBtn = root.querySelector(".show-more-btn");
+  const placeSelect = root.querySelector(".place-select");
+  options.allPlaces.forEach((p, i) => {
+    const option = document.createElement("option");
+    option.value = String(i);
+    option.textContent = p.name;
+    placeSelect.appendChild(option);
+  });
+  fitSelectToContent(placeSelect);
+  document.fonts.ready.then(() => fitSelectToContent(placeSelect));
+  const scrollSections = root.querySelector(".scroll-sections");
+
+  let currentUnit = DEFAULT_UNIT;
+  let { widthM, heightM } = unitFootprintMeters(currentUnit);
+
+  const map = new mapboxgl.Map({
+    container: mapDiv,
+    style: options.style,
+    center: options.initialCenter,
+    zoom: options.initialZoom,
+    bearing: options.initialBearing,
+    pitch: 0,
+    bearingSnap: 0 // otherwise Mapbox silently snaps any bearing within 7° of north to exactly 0
+  });
+
+
+  // The tour is driven by page scroll, not direct map gestures —
+  // disable manual interaction so wheel/touch scroll the page instead of the map.
+  map.scrollZoom.disable();
+  map.dragPan.disable();
+  map.dragRotate.disable();
+  map.doubleClickZoom.disable();
+  map.touchZoomRotate.disable();
+  map.touchPitch.disable();
+  map.keyboard.disable();
+  map.boxZoom.disable();
+
+  // Search box
+  const geocoder = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl,
+    proximity: null,
+    limit: 6,
+    autocomplete: true,
+    placeholder: ""
+  });
+  map.addControl(geocoder, "bottom-left");
+  // Added as a map control so it still moves the map on a result, then
+  // moved into the "Measure any place..." sentence.
+  root.querySelector(".place-search").appendChild(geocoder.container ?? root.querySelector(".mapboxgl-ctrl-geocoder"));
+
+  // A searched place has no entry in the place dropdown -- add (or reuse)
+  // one so "You are at ..." names it.
+  geocoder.on("result", (e) => {
+    let option = placeSelect.querySelector('option[value="search"]');
+    if (!option) {
+      option = document.createElement("option");
+      option.value = "search";
+      option.hidden = true;
+      placeSelect.appendChild(option);
+    }
+    option.textContent = e.result.text;
+    placeSelect.value = "search";
+    fitSelectToContent(placeSelect);
+  });
+
+
+  function updateFieldsText() {
+    measureUnit.textContent = currentUnit.plural;
+    const r = computeFieldsInView(map, unitAreaM2(currentUnit));
+    textLabel.innerHTML =
+      "The total map area you see on screen is about " +
+      formatNumber(r.fields) + " " + currentUnit.plural + ".";
+  }
+
+  map.on("load", () => {
+
+    // Darkens the black-and-white map, drawn under the rectangle so the
+    // rectangle stays bright; hidden along with the grayscale once a dropdown is used
+    map.addSource("tint", {
+      type: "geojson",
+      data: {
+        type: "Feature",
+        geometry: { type: "Polygon", coordinates: [[[-180, -85], [180, -85], [180, 85], [-180, 85], [-180, -85]]] }
+      }
+    });
+    map.addLayer({
+      id: "tint",
+      type: "fill",
+      source: "tint",
+      paint: { "fill-color": "#000", "fill-opacity": 0.4 }
+    });
+
+    map.addSource("field", {
+      type: "geojson",
+      data: { type: "FeatureCollection", features: [makeFieldFeature(map, widthM, heightM, currentUnit.shape)] }
+    });
+
+    map.addLayer({
+      id: "field-shadow",
+      type: "line",
+      source: "field",
+      paint: {
+        "line-color": "#000",
+        "line-width": 20,
+        "line-opacity": 0.4,
+        "line-blur": 6
+      }
+    });
+
+    map.addLayer({
+      id: "field-fill",
+      type: "fill",
+      source: "field",
+      paint: { "fill-color": "#ffcf01", "fill-opacity": 0 }
+    });
+
+    map.addLayer({
+      id: "field-outline",
+      type: "line",
+      source: "field",
+      paint: { "line-color": "#fff", "line-width": 8 }
+    });
+
+    // --- Update on any camera change (pan/zoom/rotate/pitch) ---
+    let raf = null;
+    function update() {
+      raf = null;
+      const src = map.getSource("field");
+      if (!src) return;
+      src.setData({
+        type: "FeatureCollection",
+        features: [makeFieldFeature(map, widthM, heightM, currentUnit.shape)]
+      });
+    }
+
+    const FADE_MS = 450;
+    const ZOOM_IN_MS = 1400;
+
+    // Shared fade-out/jump/fade-in camera move, used both by the scrolly
+    // tour below and by the unit-select dropdown, so picking a unit moves
+    // the map the same way scrolling to a new stop does.
+    // `placeValue` is the place dropdown's option for where we're going
+    // ("home" for the starting view, else an index into options.allPlaces).
+    async function flyToPlace(target, placeValue) {
+      // Hold at whatever zoom the last place left us at -- the zoom change
+      // itself only happens once we've arrived, not during the pan.
+      const holdZoom = map.getZoom();
+
+      fadeOverlay.classList.add("visible");
+      await wait(FADE_MS);
+
+      // hidden behind the overlay: jump straight to the new spot, still at the old zoom
+      map.jumpTo({ center: target.center, bearing: target.bearing, zoom: holdZoom });
+      placeSelect.value = placeValue;
+      fitSelectToContent(placeSelect);
+
+      // fade back in, then ease from the old zoom to this place's own (in or out)
+      fadeOverlay.classList.remove("visible");
+      map.easeTo({ zoom: target.zoom, duration: ZOOM_IN_MS, essential: true });
+    }
+
+    function showColor() {
+      mapDiv.classList.remove("grayscale");
+      map.setLayoutProperty("tint", "visibility", "none");
+    }
+
+    if (unitSelect) {
+      unitSelect.addEventListener("change", () => {
+        showColor();
+        currentUnit = UNITS.find((u) => u.key === unitSelect.value) || UNITS[0];
+        fitSelectToContent(unitSelect);
+        ({ widthM, heightM } = unitFootprintMeters(currentUnit));
+        // Stay where we are: redraw the shape, then zoom so its longest
+        // side spans about half of the map's shorter screen dimension.
+        update();
+        updateFieldsText();
+        const canvas = map.getCanvas();
+        const targetPx = 0.5 * Math.min(canvas.clientWidth, canvas.clientHeight);
+        const extentM = currentUnit.shape === "pentagon"
+          ? widthM / Math.sin(Math.PI / 5) // circumscribed diameter
+          : currentUnit.shape === "diamond"
+          ? widthM * Math.SQRT2 // corner-to-corner
+          : Math.max(widthM, heightM);
+        const lat = map.getCenter().lat;
+        const zoom = Math.log2(78271.517 * Math.cos(lat * Math.PI / 180) * targetPx / extentM);
+        map.easeTo({ zoom, duration: ZOOM_IN_MS, essential: true });
+      });
+    }
+
+    placeSelect.addEventListener("change", () => {
+      showColor();
+      if (placeSelect.value === "home") {
+        flyToPlace({ center: options.initialCenter, zoom: options.initialZoom, bearing: options.initialBearing }, "home");
+        return;
+      }
+      const p = options.allPlaces[Number(placeSelect.value)];
+      flyToPlace({ center: [p.lng, p.lat], zoom: p.zoom ?? 15, bearing: p.bearing || 0 }, placeSelect.value);
+    });
+
+    // --- Scrolly tour: index 0 is always the starting view; ---
+    // --- indices 1-5 are 5 randomly chosen places from `options.pois`. ---
+    const tour = [null, ...pickRandomStops(options.pois, 5)];
+
+    let currentStep = 0;
+
+    function updateEndControls() {
+      const atEnd = currentStep >= tour.length - 1;
+      showMoreBtn.classList.toggle("hidden", !atEnd);
+    }
+
+    async function goToStep(index) {
+      if (index === currentStep) return;
+      currentStep = index;
+      const poi = tour[index];
+
+      const target = poi
+        ? { center: [poi.lng, poi.lat], zoom: poi.zoom ?? 15, bearing: poi.bearing || 0 }
+        : { center: options.initialCenter, zoom: options.initialZoom, bearing: options.initialBearing };
+
+      await flyToPlace(target, poi ? String(options.allPlaces.indexOf(poi)) : "home");
+
+      updateEndControls();
+    }
+
+    const stepObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          goToStep(Number(entry.target.dataset.index));
+        }
+      });
+    }, { threshold: [0.5] });
+
+    scrollSections.querySelectorAll(".scroll-step").forEach((section) => {
+      stepObserver.observe(section);
+    });
+
+    // Ran out of stops — pick 5 more (avoiding repeats where possible) and
+    // append new scroll-step sections so the visitor can keep scrolling.
+    function addMoreStops() {
+      const alreadyShown = new Set(tour.filter(Boolean).map((p) => p.name));
+      const remaining = options.pois.filter((p) => !alreadyShown.has(p.name));
+      const pool = remaining.length >= 5 ? remaining : options.pois;
+      const newStops = pickRandomStops(pool, 5);
+      const startIndex = tour.length;
+      tour.push(...newStops);
+
+      newStops.forEach((_, i) => {
+        const section = document.createElement("section");
+        section.className = "scroll-step";
+        section.dataset.index = String(startIndex + i);
+        scrollSections.appendChild(section);
+        stepObserver.observe(section);
+      });
+
+      showMoreBtn.classList.add("hidden");
+
+      scrollSections
+        .querySelector(`.scroll-step[data-index="${startIndex}"]`)
+        .scrollIntoView({ behavior: "smooth" });
+    }
+
+    showMoreBtn.addEventListener("click", addMoreStops);
+
+    // 'move' fires for pan/zoom/rotate/pitch continuously
+    map.on("move", () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    });
+  });
+
+  map.on("load", updateFieldsText);
+  map.on("moveend", updateFieldsText);
+}
+
+// Place and unit data (name/lat/lng/zoom/bearing) lives in places.json and
+// units.json, both tuned with football_tester.html, rather than inline
+// here -- only `active: true` places are used as tour stops.
+Promise.all([
+  fetch("places.json").then((r) => r.json()),
+  fetch("units.json").then((r) => r.json())
+]).then(([places, units]) => {
+    const pois = places.filter((p) => p.active !== false);
+    UNITS = units;
+
+    initMapExperience(document.getElementById("map-scrolly-2"), {
+      style: STYLE,
+      initialCenter: INITIAL_CENTER,
+      initialZoom: 17,
+      initialBearing: -29,
+      pois: pois,
+      allPlaces: places,
+      showUnitSelector: true
+    });
+  });
+</script>
+</body>
+</html>
