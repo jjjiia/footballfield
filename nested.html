@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nested</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  <script>
+    // nested.html?embed -- shown inside another page (scrolly.html): no banner
+    if (new URLSearchParams(location.search).has("embed")) document.documentElement.classList.add("embed");
+  </script>
+  <style>
+html, body{ background: #FAF8F3; color: #000; }
+.embed .top-banner{ display: none; }
+body{ font-family: 'Inter', Arial, sans-serif; }
+b{ font-weight: 700; }
+
+/* top banner, same as the football field page */
+.top-banner{
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  box-sizing: border-box;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  background: #000;
+  color: #FAF8F3;
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: 1px;
+  padding: 0 20px;
+  margin: 0;
+}
+
+.nested{ padding: 40px 20px; }
+
+.nest-line{
+  font-size: 40px;
+  font-weight: 300;
+  line-height: 1.3;
+  margin: 0 0 16px;
+}
+/* the dropdown line: smaller, with room under it for each place's area */
+/* line-height leaves room for the captions when the line wraps onto two lines */
+.nest-pick{ font-size: 20px; line-height: 2.5; margin-bottom: 24px; }
+.nest-pick .combo{ line-height: normal; } /* captions sit right under the box */
+.nest-pick .unit-select{ font-size: 20px; padding: 0 36px 0 8px; background-position: right 12px center; }
+/* each place's area, under its dropdown's underline */
+.combo-area{
+  position: absolute;
+  left: 8px;
+  top: calc(100% + 4px);
+  font-size: 13px;
+  font-weight: 300;
+  white-space: nowrap;
+}
+
+/* dropdowns, same as the jobs page */
+.unit-select{
+  -webkit-appearance: none;
+  appearance: none;
+  background: #FAF8F3 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 16px center;
+  color: #000;
+  border: none;
+  border-bottom: 2px solid #000;
+  border-radius: 0;
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 40px;
+  line-height: normal;
+  padding: 0 48px 0 8px;
+  max-width: 100%;
+}
+
+/* searchable dropdown, same as the jobs page: type in the box to narrow the list */
+.combo{ position: relative; display: inline-block; max-width: 100%; }
+.combo-input{ box-sizing: border-box; cursor: pointer; }
+.combo-input:focus{ outline: none; cursor: text; min-width: 320px; }
+.combo-input::placeholder{ color: #000; opacity: 0.5; }
+.combo-list{
+  position: absolute;
+  left: 0;
+  top: calc(100% + 4px);
+  z-index: 20;
+  box-sizing: border-box;
+  min-width: 100%;
+  width: max-content;
+  max-width: min(480px, calc(100vw - 40px));
+  max-height: 320px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  background: #FAF8F3;
+  border: 2px solid #000;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.3;
+}
+.combo-list li{ padding: 4px 12px; cursor: pointer; }
+.combo-list li.section{ font-weight: 700; font-size: 14px; padding-top: 10px; cursor: pointer; }
+.combo-list li.active{ background: #000; color: #FAF8F3; }
+
+.nest-map{ display: block; width: 100%; height: 60vh; }
+.nest-map .outer{ fill: none; stroke: #000; stroke-width: 1.5; }
+.nest-map .inner-shape{ fill: #000; stroke: none; }
+
+.source{
+  font-size: 11px;
+  font-weight: 300;
+  line-height: 1.5;
+  margin: 24px 0 0;
+}
+.source a{ color: #000; }
+
+@media (max-width: 700px){
+  .nest-line, .unit-select{ font-size: 28px; }
+  .unit-select{ padding-right: 36px; background-position: right 12px center; }
+  .nest-pick, .nest-pick .unit-select{ font-size: 16px; }
+  .combo-input:focus{ min-width: 240px; }
+  .combo-list{ font-size: 16px; }
+  .nest-map{ height: 50vh; }
+}
+  </style>
+</head>
+<body>
+
+<h1 class="top-banner">Nested</h1>
+
+<div class="nested">
+  <p class="nest-line nest-pick">
+    Measure <span class="combo" id="thing"></span>
+    in <span class="combo" id="unit"></span>
+  </p>
+  <p class="nest-line" id="result"></p>
+  <svg class="nest-map" id="map"></svg>
+  <p class="source">
+    Areas are land area, leaving out water; lakes and reservoirs are water surface area.
+    US states and metropolitan statistical areas: U.S. Census Bureau, 2024 cartographic boundary files (land area).
+    Countries: <a href="https://data.worldbank.org/indicator/AG.LND.TOTL.K2">World Bank, Land area (sq. km)</a>, 2024, and World Bank Official Boundaries.
+    Lakes and reservoirs of 5,000 km² or more: <a href="https://www.hydrosheds.org/products/hydrolakes">HydroLAKES</a> (Messager et al. 2016).
+    <a href="nested_data_source.html">All areas and sources</a>.
+    Shapes are drawn to the same scale on an equal-area projection centered on each place.
+  </p>
+</div>
+
+<script>
+const FILES = [
+  { file: "areas/states.geojson", group: "US states" },
+  { file: "areas/msas.geojson", group: "US metro areas" },
+  { file: "areas/countries.geojson", group: "Countries" },
+  { file: "areas/lakes.geojson", group: "Lakes and reservoirs" },
+];
+
+// d3 draws a polygon's rings clockwise; GeoJSON files wind them the other way,
+// which d3 reads as "the whole globe minus this shape". Flip any that come out
+// bigger than a hemisphere.
+function rewind(feature) {
+  const polys = feature.geometry.type === "Polygon" ? [feature.geometry.coordinates] : feature.geometry.coordinates;
+  for (const rings of polys) {
+    if (d3.geoArea({ type: "Polygon", coordinates: rings }) > 2 * Math.PI) rings.forEach(r => r.reverse());
+  }
+  return feature;
+}
+
+// 253, 8.3, 0.12, 0.0039: whole numbers from 10 up, two significant digits below
+const fmt = n => n >= 10 ? Math.round(n).toLocaleString("en-US") : String(Number(n.toPrecision(2)));
+
+// "Rhode Island" -> "Rhode Islands"; names already ending in s ("United States",
+// "Bahamas") and metro names ("Austin-Round Rock-San Marcos, TX") stay as they are
+const plural = name => /s$|,/.test(name) ? name : name + "s";
+const km2 = n => Math.round(n).toLocaleString("en-US") + " km²";
+
+// Size the box to its text (plus its padding, which holds the arrow).
+function fitToContent(input) {
+  const probe = document.createElement("span");
+  const cs = getComputedStyle(input);
+  probe.style.cssText = "position:absolute;visibility:hidden;white-space:pre;";
+  probe.style.font = cs.font;
+  probe.style.letterSpacing = cs.letterSpacing;
+  probe.textContent = input.value || input.placeholder;
+  document.body.appendChild(probe);
+  const w = probe.getBoundingClientRect().width;
+  probe.remove();
+  input.style.width = Math.ceil(w + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 4) + "px";
+}
+
+// A dropdown you can type in, same as the jobs page. items: [{ value, label, section }].
+// Clicking the box shows the sections closed, accordion style: click a section to
+// open or close it. Typing searches every section and shows all matches.
+function makeCombo(root, label, items, onPick) {
+  const input = Object.assign(document.createElement("input"), { className: "unit-select combo-input", type: "text" });
+  input.setAttribute("aria-label", label);
+  input.setAttribute("autocomplete", "off");
+  input.spellcheck = false;
+  const list = Object.assign(document.createElement("ul"), { className: "combo-list", hidden: true });
+  root.append(input, list);
+  const byValue = new Map(items.map((it) => [it.value, it]));
+  let value = null, shown = [], active = -1;
+  const open = new Set();
+  const counts = {};
+  for (const it of items) counts[it.section] = (counts[it.section] || 0) + 1;
+  const combo = {};
+
+  function render() {
+    const q = input.value.trim().toLowerCase();
+    list.innerHTML = "";
+    shown = [];
+    let section = null;
+    for (const it of items) {
+      if (q && !it.label.toLowerCase().includes(q)) continue;
+      if (it.section !== section) {
+        const sec = it.section;
+        const head = Object.assign(document.createElement("li"), { className: "section" });
+        if (q) head.textContent = sec;
+        else {
+          head.textContent = `${open.has(sec) ? "▾" : "▸"} ${sec} (${counts[sec]})`;
+          head.addEventListener("mousedown", (e) => {
+            e.preventDefault(); // keep the box focused
+            const top = list.scrollTop;
+            open.has(sec) ? open.delete(sec) : open.add(sec);
+            render();
+            list.scrollTop = top;
+          });
+        }
+        list.append(head);
+      }
+      section = it.section;
+      if (!q && !open.has(section)) continue;
+      const li = Object.assign(document.createElement("li"), { textContent: it.label });
+      li.dataset.i = shown.length;
+      shown.push({ it, li });
+      li.addEventListener("mousedown", (e) => { e.preventDefault(); pick(it.value); });
+      list.append(li);
+    }
+    setActive(shown.length && q ? 0 : -1);
+  }
+  function setActive(i) {
+    if (shown[active]) shown[active].li.classList.remove("active");
+    active = i;
+    if (shown[active]) { shown[active].li.classList.add("active"); shown[active].li.scrollIntoView({ block: "nearest" }); }
+  }
+  function pick(v) {
+    input.blur();
+    if (v !== value) { combo.set(v); onPick(v); }
+  }
+  input.addEventListener("focus", () => {
+    input.placeholder = byValue.get(value).label;
+    input.value = "";
+    open.clear();
+    list.hidden = false;
+    render();
+    list.scrollTop = 0;
+  });
+  input.addEventListener("input", render);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown") { e.preventDefault(); setActive(Math.min(active + 1, shown.length - 1)); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setActive(Math.max(active - 1, 0)); }
+    else if (e.key === "Enter") { e.preventDefault(); if (shown[active]) pick(shown[active].it.value); }
+    else if (e.key === "Escape") input.blur();
+  });
+  input.addEventListener("blur", () => {
+    list.hidden = true;
+    input.value = byValue.get(value).label;
+    input.placeholder = "";
+    fitToContent(input);
+  });
+  combo.set = (v) => { value = v; input.value = byValue.get(v).label; fitToContent(input); };
+  combo.get = () => value;
+  combo.fit = () => { if (document.activeElement !== input) fitToContent(input); };
+  return combo;
+}
+
+Promise.all(FILES.map(f => d3.json(f.file))).then(datas => {
+  const places = new Map();
+  const items = [];
+  datas.forEach((data, i) => {
+    for (const f of data.features) {
+      const key = FILES[i].group + "|" + f.properties.id;
+      places.set(key, rewind(f));
+      items.push({ value: key, label: f.properties.name, section: FILES[i].group });
+    }
+  });
+  const thing = makeCombo(document.getElementById("thing"), "Place to measure", items, () => draw());
+  const unit = makeCombo(document.getElementById("unit"), "Unit", items.map(it => ({ ...it, label: plural(it.label) })), () => draw());
+  // each place's area sits under its dropdown
+  const thingArea = Object.assign(document.createElement("span"), { className: "combo-area" });
+  const unitArea = Object.assign(document.createElement("span"), { className: "combo-area" });
+  document.getElementById("thing").append(thingArea);
+  document.getElementById("unit").append(unitArea);
+  thing.set("US states|48"); // Texas
+  unit.set("US states|44");  // Rhode Island
+
+  const svg = d3.select("#map");
+
+  function draw() {
+    const t = places.get(thing.get()), u = places.get(unit.get());
+    const T = t.properties.area_km2, U = u.properties.area_km2;
+    // "California is 1.4 Arizonas." -- singular when it comes out to exactly 1
+    const n = fmt(T / U);
+    const result = document.getElementById("result");
+    result.innerHTML = "";
+    result.append(t.properties.name + " is ", Object.assign(document.createElement("b"), {
+      textContent: n + " " + (n === "1" ? u.properties.name : plural(u.properties.name)),
+    }), ".");
+    thingArea.textContent = km2(T);
+    unitArea.textContent = km2(U);
+
+    // the bigger shape fills the box; the smaller one is drawn at the same scale on top, centered
+    const outer = T >= U ? t : u, inner = T >= U ? u : t;
+    const node = svg.node();
+    const w = node.clientWidth, h = node.clientHeight;
+    const proj = f => d3.geoAzimuthalEqualArea().rotate(d3.geoCentroid(f).map(x => -x));
+    const po = proj(outer).fitExtent([[10, 10], [w - 10, h - 10]], outer);
+    const [cx, cy] = [w / 2, h / 2];
+    const pi = proj(inner).scale(po.scale()).translate([0, 0]);
+    const [[x0, y0], [x1, y1]] = d3.geoPath(pi).bounds(inner);
+    pi.translate([cx - (x0 + x1) / 2, cy - (y0 + y1) / 2]);
+    const [[ox0, oy0], [ox1, oy1]] = d3.geoPath(po).bounds(outer);
+    po.translate([po.translate()[0] + cx - (ox0 + ox1) / 2, po.translate()[1] + cy - (oy0 + oy1) / 2]);
+
+    svg.selectAll("*").remove();
+    svg.append("path").attr("class", "outer").attr("d", d3.geoPath(po)(outer));
+    svg.append("path").attr("class", "inner-shape").attr("d", d3.geoPath(pi)(inner));
+  }
+
+  window.addEventListener("resize", () => { thing.fit(); unit.fit(); draw(); });
+  draw();
+});
+</script>
+</body>
+</html>

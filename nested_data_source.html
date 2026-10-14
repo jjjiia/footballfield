@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nested data source</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+  <style>
+    html, body{ background: #FAF8F3; }
+    body{ font-family: 'Inter', Arial, sans-serif; }
+    .inner{ max-width: 1100px; padding: 48px 20px; }
+    h1{ font-size: 28px; font-weight: 700; margin: 0 0 24px; }
+    .note{ font-size: 14px; line-height: 1.5; margin: 0 0 24px; }
+    table{ width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td{ text-align: left; vertical-align: top; padding: 6px 10px; border-bottom: 1px solid #000; }
+    th{ font-weight: 700; border-bottom-width: 2px; }
+    td.num, th.num{ text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    /* one collapsible section per category, all closed at first */
+    details{ border-top: 2px solid #000; }
+    details:last-of-type{ border-bottom: 2px solid #000; }
+    summary{ font-size: 20px; font-weight: 700; padding: 12px 0; cursor: pointer; }
+    summary .count{ font-weight: 300; }
+    details table{ margin-bottom: 24px; }
+    a{ color: inherit; }
+    @media (max-width: 760px){
+      .table-wrap{ overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="inner">
+    <h1>Nested data source</h1>
+    <p class="note">
+      All areas are in square kilometers. Square miles are converted from km² (1 sq mi = 2.589988 km²). States, metro areas and countries are land area, leaving out water. Lakes and reservoirs are water surface area. US states and metro areas use land area from the Census Bureau's 2024 boundary files, which give square meters. Countries use land area from the World Bank (FAO) for 2024, which leaves out inland water such as major rivers and lakes. Check: Census land for the 50 states plus DC sums to 9,151,638 km², and the World Bank gives 9,147,420 km² for the US.
+      Metro areas are the 393 metropolitan statistical areas, sorted by 2024 population. Lakes and reservoirs are every one of 5,000 km² or more in HydroLAKES, a global dataset that calculates each lake's area from its outline the same way for every lake. It is a peer-reviewed research dataset, not official figures.
+      Data: <a href="nested_data_source.csv">nested_data_source.csv</a>. Shapes: <a href="areas/SOURCES.md">areas/</a>.
+    </p>
+    <div id="sections"></div>
+  </div>
+
+  <script>
+    // minimal CSV parser: handles quoted fields with commas and doubled quotes
+    function parseCSV(text) {
+      const rows = [];
+      let row = [], field = "", quoted = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (quoted) {
+          if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+          else if (c === '"') quoted = false;
+          else field += c;
+        } else if (c === '"') quoted = true;
+        else if (c === ",") { row.push(field); field = ""; }
+        else if (c === "\n" || c === "\r") {
+          if (c === "\r" && text[i + 1] === "\n") i++;
+          row.push(field); rows.push(row); row = []; field = "";
+        } else field += c;
+      }
+      if (field || row.length) { row.push(field); rows.push(row); }
+      const [header, ...body] = rows;
+      return body.filter((r) => r.length === header.length).map((r) => Object.fromEntries(header.map((h, i) => [h, r[i]])));
+    }
+
+    const formatNumber = (v) => v === "" ? "" : Number(v).toLocaleString("en-US", { maximumFractionDigits: 1 });
+
+    // link text for each source, by URL
+    function sourceLabel(url) {
+      if (url.includes("cartographic-boundary")) return "Census boundary files 2024";
+      if (url.includes("popest")) return "Census population estimates 2024";
+      if (url.includes("AG.LND.TOTL.K2")) return "World Bank land area";
+      if (url.includes("datacatalog.worldbank.org")) return "World Bank boundaries";
+      if (url.includes("hydrolakes")) return "HydroLAKES";
+      return new URL(url).hostname.replace(/^www\./, "");
+    }
+
+    fetch("nested_data_source.csv")
+      .then((r) => r.text())
+      .then((text) => {
+        const sections = document.getElementById("sections");
+        const rows = parseCSV(text);
+        let category = null, tbody = null;
+        rows.forEach((d) => {
+          // a collapsed section, with its own table, whenever the category changes
+          if (d.category !== category) {
+            category = d.category;
+            const count = rows.filter((r) => r.category === category).length;
+            const details = document.createElement("details");
+            details.innerHTML = `<summary></summary><div class="table-wrap"><table><thead><tr><th>Name</th><th class="num">Area (km²)</th><th class="num">Area (sq mi)</th><th>Measure</th><th class="num">Population</th><th class="num">Year</th><th>Source</th></tr></thead><tbody></tbody></table></div>`;
+            details.querySelector("summary").append(category + " ", Object.assign(document.createElement("span"), { className: "count", textContent: `(${count})` }));
+            tbody = details.querySelector("tbody");
+            sections.append(details);
+          }
+          const tr = tbody.insertRow();
+          tr.insertCell().textContent = d.name;
+          for (const key of ["area_km2", "area_sq_mi"]) {
+            const td = tr.insertCell(); td.className = "num"; td.textContent = formatNumber(d[key]);
+          }
+          tr.insertCell().textContent = d.area_type;
+          const pop = tr.insertCell(); pop.className = "num"; pop.textContent = formatNumber(d.population_2024);
+          const yr = tr.insertCell(); yr.className = "num"; yr.textContent = d.year;
+          const sourceCell = tr.insertCell();
+          d.source.split(/\s+/).filter(Boolean).forEach((url, i) => {
+            if (i > 0) sourceCell.appendChild(document.createElement("br"));
+            const a = document.createElement("a");
+            a.href = url;
+            a.target = "_blank";
+            a.rel = "noopener";
+            a.textContent = sourceLabel(url);
+            sourceCell.appendChild(a);
+          });
+        });
+      });
+  </script>
+</body>
+</html>

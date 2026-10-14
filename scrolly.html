@@ -84,10 +84,17 @@
    for three screens of scrolling, one per place, then the page moves on */
 .map-scrolly{ height: 300vh; }
 /* the jobs page (jobs.html), one screen tall */
-.jobs-frame{
+.jobs-frame, .nested-frame{
   display: block;
   width: 100%;
   height: 100vh;
+  border: 0;
+}
+/* the people page (nested_people.html): as tall as its content, set by the script below */
+.people-frame{
+  display: block;
+  width: 100%;
+  height: 480px;
   border: 0;
 }
 .map-frame{
@@ -133,7 +140,7 @@
   </div>
 </section>
 
-<div class="placeholder">Nesting map</div>
+<iframe class="nested-frame" src="nested.html?embed" title="Nesting map"></iframe>
 
 <section class="text-block">
   <div class="text-block-inner">
@@ -141,7 +148,7 @@
   </div>
 </section>
 
-<div class="placeholder">Population nesting map</div>
+<iframe class="people-frame" src="nested_people.html?embed" title="Population nesting"></iframe>
 
 <section class="text-block">
   <div class="text-block-inner">
@@ -183,6 +190,17 @@ document.querySelectorAll(".map-scrolly").forEach((mapScrolly) => {
   }
   window.addEventListener("scroll", () => sendStep(false), { passive: true });
   mapFrame.addEventListener("load", () => sendStep(true));
+});
+
+// Fit the people frame to its page's content, and keep fitting it as the
+// sentence and source note rewrap (the page is ours, so we can measure it).
+document.querySelectorAll(".people-frame").forEach((frame) => {
+  frame.addEventListener("load", () => {
+    const page = frame.contentDocument.querySelector(".nested");
+    const fit = () => { frame.style.height = Math.ceil(page.getBoundingClientRect().height) + "px"; };
+    new ResizeObserver(fit).observe(page);
+    fit();
+  });
 });
 </script>
 
