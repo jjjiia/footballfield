@@ -1,0 +1,371 @@
+level,cbsa_code,name,women_15_50,women_birth_past_12mo,moe_birth_past_12mo,birth_married,birth_unmarried,birth_age_15_19,birth_age_20_34,birth_age_35_50
+national,,United States,79622525,3971434,36997,2775476,1195958,79108,2662495,1229831
+metro,10180,"Abilene, TX Metro Area",43269,3431,1097,1933,1498,0,2552,879
+metro,10420,"Akron, OH Metro Area",162077,6789,1472,4759,2030,313,5211,1265
+metro,10500,"Albany, GA Metro Area",34274,1924,956,618,1306,0,1620,304
+metro,10540,"Albany, OR Metro Area",29307,1669,595,1339,330,0,1079,590
+metro,10580,"Albany-Schenectady-Troy, NY Metro Area",212278,11200,1794,7513,3687,202,7356,3642
+metro,10740,"Albuquerque, NM Metro Area",216856,7145,1682,4395,2750,274,4884,1987
+metro,10780,"Alexandria, LA Metro Area",32175,2485,879,1503,982,0,2334,151
+metro,10900,"Allentown-Bethlehem-Easton, PA-NJ Metro Area",199838,10523,1703,6684,3839,108,6428,3987
+metro,11020,"Altoona, PA Metro Area",25432,653,325,421,232,0,560,93
+metro,11100,"Amarillo, TX Metro Area",68525,2501,779,1948,553,0,2312,189
+metro,11180,"Ames, IA Metro Area",34026,1178,576,1053,125,0,793,385
+metro,11260,"Anchorage, AK Metro Area",97331,6843,1756,4874,1969,0,5159,1684
+metro,11460,"Ann Arbor, MI Metro Area",97064,3145,968,1827,1318,30,1983,1132
+metro,11500,"Anniston-Oxford, AL Metro Area",27468,961,482,609,352,17,700,244
+metro,11540,"Appleton, WI Metro Area",54456,3491,786,2696,795,0,2834,657
+metro,11700,"Asheville, NC Metro Area",93184,3975,1537,2785,1190,376,1818,1781
+metro,12020,"Athens-Clarke County, GA Metro Area",61484,1756,793,1312,444,0,1176,580
+metro,12060,"Atlanta-Sandy Springs-Roswell, GA Metro Area",1626001,82258,6253,59082,23176,1263,56610,24385
+metro,12100,"Atlantic City-Hammonton, NJ Metro Area",77844,3213,1321,2484,729,0,1842,1371
+metro,12220,"Auburn-Opelika, AL Metro Area",55032,2033,913,1482,551,0,1756,277
+metro,12260,"Augusta-Richmond County, GA-SC Metro Area",146945,8040,1691,4128,3912,181,5621,2238
+metro,12420,"Austin-Round Rock-San Marcos, TX Metro Area",674274,28032,2904,22650,5382,227,19277,8528
+metro,12540,"Bakersfield-Delano, CA Metro Area",225339,14041,1886,8728,5313,446,10563,3032
+metro,12580,"Baltimore-Columbia-Towson, MD Metro Area",684505,29538,3344,21420,8118,63,19014,10461
+metro,12620,"Bangor, ME Metro Area",36125,1700,661,1378,322,32,1203,465
+metro,12940,"Baton Rouge, LA Metro Area",218694,12416,2396,5057,7359,152,9199,3065
+metro,12980,"Battle Creek, MI Metro Area",30456,2010,748,1555,455,54,1706,250
+metro,13020,"Bay City, MI Metro Area",21018,904,396,499,405,0,728,176
+metro,13140,"Beaumont-Port Arthur, TX Metro Area",88709,4275,1300,2942,1333,0,3544,731
+metro,13220,"Beckley, WV Metro Area",21919,1520,581,1171,349,124,1136,260
+metro,13380,"Bellingham, WA Metro Area",58869,1214,614,998,216,97,772,345
+metro,13460,"Bend, OR Metro Area",58097,2611,997,1719,892,16,2075,520
+metro,13740,"Billings, MT Metro Area",43088,2194,861,1875,319,0,1650,544
+metro,13780,"Binghamton, NY Metro Area",53720,3207,995,2661,546,0,2247,960
+metro,13820,"Birmingham, AL Metro Area",281367,16111,2630,12022,4089,316,9706,6089
+metro,13900,"Bismarck, ND Metro Area",31235,1719,771,1640,79,0,1645,74
+metro,13980,"Blacksburg-Christiansburg-Radford, VA Metro Area",48962,1288,569,1054,234,54,879,355
+metro,14010,"Bloomington, IL Metro Area",45807,1930,854,1459,471,0,1394,536
+metro,14020,"Bloomington, IN Metro Area",45221,1439,792,780,659,6,1267,166
+metro,14260,"Boise City, ID Metro Area",199481,9828,1668,7860,1968,133,7446,2249
+metro,14460,"Boston-Cambridge-Newton, MA-NH Metro Area",1233175,51865,3175,38329,13536,511,30312,21042
+metro,14500,"Boulder, CO Metro Area",83645,1638,579,1638,0,0,620,1018
+metro,14540,"Bowling Green, KY Metro Area",47406,2340,891,1971,369,0,2188,152
+metro,14580,"Bozeman, MT Metro Area",33519,1555,681,1187,368,0,1024,531
+metro,14740,"Bremerton-Silverdale-Port Orchard, WA Metro Area",60833,3534,1125,2701,833,189,2432,913
+metro,14860,"Bridgeport-Stamford-Danbury, CT Metro Area",221378,12611,2265,9524,3087,0,6089,6522
+metro,15180,"Brownsville-Harlingen, TX Metro Area",101614,4883,1353,3416,1467,93,4291,499
+metro,15260,"Brunswick-St. Simons, GA Metro Area",26827,1475,758,1290,185,0,926,549
+metro,15380,"Buffalo-Cheektowaga, NY Metro Area",261841,14028,2302,9516,4512,0,8139,5889
+metro,15500,"Burlington, NC Metro Area",44365,1657,926,986,671,0,1370,287
+metro,15540,"Burlington-South Burlington, VT Metro Area",57982,1634,627,1276,358,0,741,893
+metro,15940,"Canton-Massillon, OH Metro Area",86438,3912,947,3166,746,0,2966,946
+metro,15980,"Cape Coral-Fort Myers, FL Metro Area",165345,7912,1724,5148,2764,276,6338,1298
+metro,16020,"Cape Girardeau, MO-IL Metro Area",23018,1001,524,766,235,0,657,344
+metro,16220,"Casper, WY Metro Area",17656,952,495,358,594,0,902,50
+metro,16300,"Cedar Rapids, IA Metro Area",62122,4083,1034,3083,1000,105,2683,1295
+metro,16540,"Chambersburg, PA Metro Area",34126,1158,573,756,402,106,796,256
+metro,16580,"Champaign-Urbana, IL Metro Area",66454,2271,793,1314,957,188,1757,326
+metro,16620,"Charleston, WV Metro Area",42168,1148,623,435,713,296,778,74
+metro,16700,"Charleston-North Charleston, SC Metro Area",210118,11734,2621,8801,2933,126,7881,3727
+metro,16740,"Charlotte-Concord-Gastonia, NC-SC Metro Area",714841,35028,4155,25453,9575,273,23417,11338
+metro,16820,"Charlottesville, VA Metro Area",56208,2988,958,2035,953,0,1559,1429
+metro,16860,"Chattanooga, TN-GA Metro Area",135227,8820,1926,6720,2100,221,6225,2374
+metro,16940,"Cheyenne, WY Metro Area",22681,1594,736,1513,81,0,1356,238
+metro,16980,"Chicago-Naperville-Elgin, IL-IN Metro Area",2267924,104224,6102,75102,29122,897,63595,39732
+metro,17020,"Chico, CA Metro Area",51044,1935,833,981,954,0,1365,570
+metro,17140,"Cincinnati, OH-KY-IN Metro Area",538186,26971,2701,19628,7343,720,18943,7308
+metro,17300,"Clarksville, TN-KY Metro Area",86560,4823,1640,4211,612,0,3503,1320
+metro,17410,"Cleveland, OH Metro Area",479235,24838,3346,13832,11006,168,18913,5757
+metro,17420,"Cleveland, TN Metro Area",30931,1391,637,1338,53,0,856,535
+metro,17660,"Coeur d'Alene, ID Metro Area",40135,2127,649,1587,540,0,1637,490
+metro,17780,"College Station-Bryan, TX Metro Area",81216,3377,1221,2114,1263,397,2398,582
+metro,17820,"Colorado Springs, CO Metro Area",190517,14607,2479,11812,2795,304,11460,2843
+metro,17860,"Columbia, MO Metro Area",59095,3072,1248,2351,721,0,2475,597
+metro,17900,"Columbia, SC Metro Area",214400,7467,1548,5483,1984,154,5695,1618
+metro,17980,"Columbus, GA-AL Metro Area",79461,4701,1152,3055,1646,112,3342,1247
+metro,18140,"Columbus, OH Metro Area",550796,26321,3152,19082,7239,514,17804,8003
+metro,18580,"Corpus Christi, TX Metro Area",104147,5404,1605,2840,2564,599,3371,1434
+metro,18700,"Corvallis, OR Metro Area",25948,581,385,571,10,0,332,249
+metro,18880,"Crestview-Fort Walton Beach-Destin, FL Metro Area",68659,4923,1500,3273,1650,72,3351,1500
+metro,19100,"Dallas-Fort Worth-Arlington, TX Metro Area",2139858,103029,7084,74180,28849,1623,68261,33145
+metro,19140,"Dalton, GA Metro Area",33398,1893,835,1378,515,0,1485,408
+metro,19300,"Daphne-Fairhope-Foley, AL Metro Area",55166,2343,1147,2155,188,109,1798,436
+metro,19340,"Davenport-Moline-Rock Island, IA-IL Metro Area",84222,3033,874,2287,746,119,1701,1213
+metro,19430,"Dayton-Kettering-Beavercreek, OH Metro Area",187965,10153,1942,8012,2141,470,7161,2522
+metro,19460,"Decatur, AL Metro Area",35080,1472,618,723,749,0,1135,337
+metro,19500,"Decatur, IL Metro Area",22712,1266,578,515,751,0,855,411
+metro,19660,"Deltona-Daytona Beach-Ormond Beach, FL Metro Area",146857,8463,1912,5084,3379,315,4780,3368
+metro,19740,"Denver-Aurora-Centennial, CO Metro Area",778597,40561,3910,32138,8423,252,25584,14725
+metro,19780,"Des Moines-West Des Moines, IA Metro Area",183387,10888,2114,8296,2592,567,8113,2208
+metro,19820,"Detroit-Warren-Dearborn, MI Metro Area",995897,49974,4259,33330,16644,1159,35666,13149
+metro,20020,"Dothan, AL Metro Area",34713,1123,422,664,459,228,815,80
+metro,20100,"Dover, DE Metro Area",45197,2581,1058,1271,1310,0,2310,271
+metro,20220,"Dubuque, IA Metro Area",21206,1329,615,995,334,19,988,322
+metro,20260,"Duluth, MN-WI Metro Area",62119,3245,1087,2250,995,7,2241,997
+metro,20500,"Durham-Chapel Hill, NC Metro Area",160456,9014,1611,5643,3371,0,6300,2714
+metro,20740,"Eau Claire, WI Metro Area",41716,1523,688,1223,300,0,1185,338
+metro,20940,"El Centro, CA Metro Area",40513,2145,659,1153,992,135,1724,286
+metro,21340,"El Paso, TX Metro Area",214575,9542,1819,6028,3514,109,7666,1767
+metro,21060,"Elizabethtown, KY Metro Area",30675,1181,550,1181,0,0,1048,133
+metro,21140,"Elkhart-Goshen, IN Metro Area",46997,2450,936,1581,869,0,1767,683
+metro,21420,"Enid, OK Metro Area",14506,835,417,652,183,21,607,207
+metro,21500,"Erie, PA Metro Area",58826,2360,773,1103,1257,358,1544,458
+metro,21660,"Eugene-Springfield, OR Metro Area",91422,2717,947,2316,401,106,1905,706
+metro,21780,"Evansville, IN Metro Area",62188,3293,1051,1731,1562,182,2036,1075
+metro,21820,"Fairbanks-College, AK Metro Area",21580,1691,911,1510,181,0,1515,176
+metro,22020,"Fargo, ND-MN Metro Area",71044,3199,1078,2749,450,79,1860,1260
+metro,22140,"Farmington, NM Metro Area",28250,983,473,629,354,0,607,376
+metro,22180,"Fayetteville, NC Metro Area",96451,6167,1242,4700,1467,250,4757,1160
+metro,22220,"Fayetteville-Springdale-Rogers, AR Metro Area",154900,6956,1278,5747,1209,24,4903,2029
+metro,22380,"Flagstaff, AZ Metro Area",40305,1706,838,1010,696,41,1140,525
+metro,22420,"Flint, MI Metro Area",90491,6539,1791,2259,4280,387,5652,500
+metro,22500,"Florence, SC Metro Area",46950,3533,1219,1235,2298,520,2636,377
+metro,22520,"Florence-Muscle Shoals, AL Metro Area",36731,2525,985,1365,1160,0,2165,360
+metro,22540,"Fond du Lac, WI Metro Area",21776,1243,536,746,497,0,1150,93
+metro,22660,"Fort Collins-Loveland, CO Metro Area",96712,2638,1029,1924,714,0,1882,756
+metro,22900,"Fort Smith, AR-OK Metro Area",52729,3404,1103,2340,1064,320,2021,1063
+metro,23060,"Fort Wayne, IN Metro Area",107635,5579,1292,3893,1686,0,4823,756
+metro,23420,"Fresno, CA Metro Area",292222,13840,2101,7891,5949,429,9038,4373
+metro,23460,"Gadsden, AL Metro Area",23105,2163,839,1630,533,0,1617,546
+metro,23540,"Gainesville, FL Metro Area",98789,3536,1142,2803,733,47,2102,1387
+metro,23580,"Gainesville, GA Metro Area",50147,2394,985,2037,357,44,1198,1152
+metro,23900,"Gettysburg, PA Metro Area",22379,1627,616,1081,546,0,1399,228
+metro,24020,"Glens Falls, NY Metro Area",24520,1861,713,1212,649,0,1210,651
+metro,24140,"Goldsboro, NC Metro Area",27505,1838,929,707,1131,69,1129,640
+metro,24220,"Grand Forks, ND-MN Metro Area",25260,1683,528,1214,469,250,1194,239
+metro,24260,"Grand Island, NE Metro Area",16592,1230,601,766,464,61,899,270
+metro,24340,"Grand Rapids-Wyoming-Kentwood, MI Metro Area",283020,13754,2189,10786,2968,0,9577,4177
+metro,24500,"Great Falls, MT Metro Area",17517,1105,497,756,349,0,833,272
+metro,24540,"Greeley, CO Metro Area",89734,4410,1311,4005,405,67,3095,1248
+metro,24580,"Green Bay, WI Metro Area",75356,6740,1535,3764,2976,0,3624,3116
+metro,24660,"Greensboro-High Point, NC Metro Area",196173,9349,2287,4611,4738,505,5630,3214
+metro,24780,"Greenville, NC Metro Area",52196,1628,700,827,801,0,1371,257
+metro,24860,"Greenville-Anderson-Greer, SC Metro Area",236009,10126,2059,7934,2192,376,6770,2980
+metro,25060,"Gulfport-Biloxi, MS Metro Area",98246,5684,1552,3905,1779,238,4284,1162
+metro,25180,"Hagerstown-Martinsburg, MD-WV Metro Area",70323,4207,1305,1913,2294,0,2990,1217
+metro,25220,"Hammond, LA Metro Area",33589,2260,906,1476,784,0,1851,409
+metro,25260,"Hanford-Corcoran, CA Metro Area",34564,1314,734,1314,0,0,771,543
+metro,25420,"Harrisburg-Carlisle, PA Metro Area",138650,6496,1614,5629,867,211,4239,2046
+metro,25500,"Harrisonburg, VA Metro Area",38148,1605,621,1231,374,0,909,696
+metro,25540,"Hartford-West Hartford-East Hartford, CT Metro Area",272229,11821,2261,9352,2469,0,7018,4803
+metro,25620,"Hattiesburg, MS Metro Area",40956,1235,525,902,333,0,959,276
+metro,25860,"Hickory-Lenoir-Morganton, NC Metro Area",79062,3686,1177,1779,1907,171,2456,1059
+metro,25940,"Hilton Head Island-Bluffton-Port Royal, SC Metro Area",43252,2165,1000,1870,295,0,1665,500
+metro,26300,"Hot Springs, AR Metro Area",20011,1157,761,995,162,0,786,371
+metro,26380,"Houma-Bayou Cane-Thibodaux, LA Metro Area",43360,2585,1008,1353,1232,0,2346,239
+metro,26420,"Houston-Pasadena-The Woodlands, TX Metro Area",1972383,110990,8289,72642,38348,3094,70364,37532
+metro,26580,"Huntington-Ashland, WV-KY-OH Metro Area",79576,4188,1122,2515,1673,742,2335,1111
+metro,26620,"Huntsville, AL Metro Area",129126,6722,1764,5163,1559,0,4340,2382
+metro,26820,"Idaho Falls, ID Metro Area",41612,2792,833,2551,241,30,2365,397
+metro,26900,"Indianapolis-Carmel-Greenwood, IN Metro Area",527270,25527,3006,18003,7524,675,18917,5935
+metro,26980,"Iowa City, IA Metro Area",49925,1847,644,1544,303,0,1278,569
+metro,27100,"Jackson, MI Metro Area",33218,1144,435,656,488,12,947,185
+metro,27140,"Jackson, MS Metro Area",147890,10256,2066,4757,5499,165,8489,1602
+metro,27180,"Jackson, TN Metro Area",42130,940,421,415,525,166,726,48
+metro,27260,"Jacksonville, FL Metro Area",413120,19318,3060,12466,6852,542,11923,6853
+metro,27340,"Jacksonville, NC Metro Area",48266,3508,1050,3266,242,132,2425,951
+metro,27500,"Janesville-Beloit, WI Metro Area",36866,2459,832,1906,553,11,1736,712
+metro,27620,"Jefferson City, MO Metro Area",31983,1535,496,1080,455,118,871,546
+metro,27740,"Johnson City, TN Metro Area",50807,1814,663,1598,216,0,1742,72
+metro,27780,"Johnstown, PA Metro Area",25430,1200,604,737,463,396,702,102
+metro,27860,"Jonesboro, AR Metro Area",35346,2481,857,1739,742,0,1792,689
+metro,27900,"Joplin, MO-KS Metro Area",48322,2269,767,1421,848,150,1704,415
+metro,27980,"Kahului-Wailuku, HI Metro Area",34298,2203,803,1013,1190,0,1283,920
+metro,28020,"Kalamazoo-Portage, MI Metro Area",68704,1058,493,680,378,0,789,269
+metro,28100,"Kankakee, IL Metro Area",23704,1076,467,729,347,96,937,43
+metro,28140,"Kansas City, MO-KS Metro Area",535997,29274,3374,21431,7843,595,19311,9368
+metro,28420,"Kennewick-Richland, WA Metro Area",75100,5839,1372,3928,1911,0,4450,1389
+metro,28450,"Kenosha, WI Metro Area",40062,2304,987,1423,881,0,1953,351
+metro,28660,"Killeen-Temple, TX Metro Area",128024,8296,1802,5914,2382,243,5666,2387
+metro,28700,"Kingsport-Bristol, TN-VA Metro Area",64979,2615,853,1508,1107,18,2334,263
+metro,28740,"Kingston, NY Metro Area",40254,1334,714,476,858,0,773,561
+metro,28880,"Kiryas Joel-Poughkeepsie-Newburgh, NY Metro Area",161828,10114,1885,7692,2422,0,5453,4661
+metro,28940,"Knoxville, TN Metro Area",221380,9838,1905,7624,2214,164,5987,3687
+metro,29020,"Kokomo, IN Metro Area",17910,1342,811,863,479,0,1122,220
+metro,29100,"La Crosse-Onalaska, WI-MN Metro Area",39473,1410,454,1210,200,0,1049,361
+metro,29180,"Lafayette, LA Metro Area",97613,5536,1681,3398,2138,115,4713,708
+metro,29200,"Lafayette-West Lafayette, IN Metro Area",59135,1518,477,1283,235,3,1184,331
+metro,29340,"Lake Charles, LA Metro Area",56705,3456,1181,1838,1618,0,2546,910
+metro,29420,"Lake Havasu City-Kingman, AZ Metro Area",35800,2213,1061,1008,1205,0,1753,460
+metro,29460,"Lakeland-Winter Haven, FL Metro Area",198983,9964,2518,6417,3547,124,6144,3696
+metro,29540,"Lancaster, PA Metro Area",124667,5901,1402,4298,1603,0,4486,1415
+metro,29620,"Lansing-East Lansing, MI Metro Area",120752,4344,1000,2577,1767,0,3827,517
+metro,29700,"Laredo, TX Metro Area",67556,4770,1569,2455,2315,458,2971,1341
+metro,29740,"Las Cruces, NM Metro Area",56509,3167,1050,1361,1806,273,2391,503
+metro,29820,"Las Vegas-Henderson-North Las Vegas, NV Metro Area",575824,25500,3846,13950,11550,347,17321,7832
+metro,30020,"Lawton, OK Metro Area",28419,1412,382,826,586,11,1085,316
+metro,30140,"Lebanon, PA Metro Area",31415,1988,843,1377,611,403,1420,165
+metro,30340,"Lewiston-Auburn, ME Metro Area",26246,1209,571,1019,190,0,617,592
+metro,30500,"Lexington Park, MD Metro Area",48145,3417,1282,3197,220,0,1962,1455
+metro,30460,"Lexington-Fayette, KY Metro Area",134621,7429,1477,5727,1702,342,5105,1982
+metro,30700,"Lincoln, NE Metro Area",88908,5342,1484,4616,726,185,4333,824
+metro,30780,"Little Rock-North Little Rock-Conway, AR Metro Area",184906,11232,2765,8030,3202,102,7297,3833
+metro,30860,"Logan, UT-ID Metro Area",44154,2549,690,2483,66,0,2124,425
+metro,30980,"Longview, TX Metro Area",66015,2762,1051,1855,907,0,2227,535
+metro,31020,"Longview-Kelso, WA Metro Area",24898,1355,649,1020,335,53,1017,285
+metro,31080,"Los Angeles-Long Beach-Anaheim, CA Metro Area",3171734,124721,6786,86913,37808,1015,71526,52180
+metro,31140,"Louisville/Jefferson County, KY-IN Metro Area",323207,15220,2074,8932,6288,933,11150,3137
+metro,31180,"Lubbock, TX Metro Area",96312,4960,1311,3678,1282,143,3376,1441
+metro,31340,"Lynchburg, VA Metro Area",61205,3773,1108,2682,1091,4,2522,1247
+metro,31420,"Macon-Bibb County, GA Metro Area",55741,2126,1110,897,1229,0,1868,258
+metro,31540,"Madison, WI Metro Area",178964,7356,1278,6168,1188,0,4883,2473
+metro,31700,"Manchester-Nashua, NH Metro Area",96873,5445,1501,3734,1711,0,3119,2326
+metro,31740,"Manhattan, KS Metro Area",36606,1630,600,1505,125,45,909,676
+metro,31860,"Mankato, MN Metro Area",27419,829,443,781,48,0,578,251
+metro,31900,"Mansfield, OH Metro Area",25107,1914,832,1567,347,0,1801,113
+metro,32580,"McAllen-Edinburg-Mission, TX Metro Area",226578,11942,2031,6919,5023,477,8454,3011
+metro,32780,"Medford, OR Metro Area",46943,2082,1196,2082,0,0,1865,217
+metro,32820,"Memphis, TN-MS-AR Metro Area",328632,19880,2895,9544,10336,1833,13374,4673
+metro,32900,"Merced, CA Metro Area",73698,3865,1180,2583,1282,0,3166,699
+metro,33100,"Miami-Fort Lauderdale-West Palm Beach, FL Metro Area",1459853,68441,4730,44020,24421,887,37657,29897
+metro,33140,"Michigan City-La Porte, IN Metro Area",21708,898,505,731,167,86,456,356
+metro,33220,"Midland, MI Metro Area",18069,871,422,750,121,0,747,124
+metro,33260,"Midland, TX Metro Area",48136,2717,1117,2249,468,132,2300,285
+metro,33340,"Milwaukee-Waukesha, WI Metro Area",370729,17810,2164,10534,7276,465,11529,5816
+metro,33460,"Minneapolis-St. Paul-Bloomington, MN-WI Metro Area",891830,43749,3813,33220,10529,405,28325,15019
+metro,33500,"Minot, ND Metro Area",17541,1406,704,698,708,0,1219,187
+metro,33540,"Missoula, MT Metro Area",32921,687,409,687,0,0,367,320
+metro,33660,"Mobile, AL Metro Area",98391,7485,1826,3874,3611,113,5211,2161
+metro,33700,"Modesto, CA Metro Area",136954,6082,1367,4143,1939,152,4257,1673
+metro,33740,"Monroe, LA Metro Area",51322,2940,985,1306,1634,705,1693,542
+metro,33780,"Monroe, MI Metro Area",33514,1508,813,1352,156,32,1307,169
+metro,33860,"Montgomery, AL Metro Area",93668,6313,1987,2965,3348,468,4377,1468
+metro,34060,"Morgantown, WV Metro Area",37738,1574,656,1382,192,0,1231,343
+metro,34100,"Morristown, TN Metro Area",27051,1227,800,949,278,0,653,574
+metro,34580,"Mount Vernon-Anacortes, WA Metro Area",27500,1122,718,693,429,0,645,477
+metro,34620,"Muncie, IN Metro Area",29320,834,499,426,408,0,834,0
+metro,34740,"Muskegon-Norton Shores, MI Metro Area",39635,1576,663,961,615,30,1330,216
+metro,34820,"Myrtle Beach-Conway-North Myrtle Beach, SC Metro Area",80060,5420,1733,3027,2393,151,3009,2260
+metro,34900,"Napa, CA Metro Area",28568,950,592,598,352,0,607,343
+metro,34940,"Naples-Marco Island, FL Metro Area",70343,3681,1109,2874,807,0,2914,767
+metro,34980,"Nashville-Davidson--Murfreesboro--Franklin, TN Metro Area",545216,28176,3995,21810,6366,803,20514,6859
+metro,35300,"New Haven, CT Metro Area",136987,4541,1261,3434,1107,0,2922,1619
+metro,35380,"New Orleans-Metairie, LA Metro Area",229865,14431,2377,7150,7281,201,10241,3989
+metro,35620,"New York-Newark-Jersey City, NY-NJ Metro Area",4727482,223867,9782,166118,57749,2150,123704,98013
+metro,35660,"Niles, MI Metro Area",31671,1652,765,1011,641,0,1094,558
+metro,35840,"North Port-Bradenton-Sarasota, FL Metro Area",158321,6777,1977,4332,2445,0,4118,2659
+metro,35980,"Norwich-New London-Willimantic, CT Metro Area",62614,4268,1198,3122,1146,0,2792,1476
+metro,36100,"Ocala, FL Metro Area",82065,4017,1373,2049,1968,0,3494,523
+metro,36220,"Odessa, TX Metro Area",40877,5173,1851,3526,1647,0,4302,871
+metro,36260,"Ogden, UT Metro Area",170201,9069,1436,7454,1615,143,6791,2135
+metro,36420,"Oklahoma City, OK Metro Area",372988,21566,2632,15940,5626,1386,14201,5979
+metro,36500,"Olympia-Lacey-Tumwater, WA Metro Area",72648,4109,1241,3222,887,0,3080,1029
+metro,36540,"Omaha, NE-IA Metro Area",238943,13296,1873,9441,3855,262,9165,3869
+metro,36740,"Orlando-Kissimmee-Sanford, FL Metro Area",736350,32169,3929,22023,10146,869,18831,12469
+metro,36780,"Oshkosh-Neenah, WI Metro Area",40646,1460,580,1040,420,0,805,655
+metro,36980,"Owensboro, KY Metro Area",24805,2509,753,1922,587,240,1821,448
+metro,37100,"Oxnard-Thousand Oaks-Ventura, CA Metro Area",190841,9782,1983,7299,2483,0,5767,4015
+metro,37340,"Palm Bay-Melbourne-Titusville, FL Metro Area",131521,5400,1299,4256,1144,6,3752,1642
+metro,37460,"Panama City-Panama City Beach, FL Metro Area",50429,2557,918,1935,622,0,1677,880
+metro,37620,"Parkersburg-Vienna, WV Metro Area",17569,1490,487,807,683,40,747,703
+metro,37860,"Pensacola-Ferry Pass-Brent, FL Metro Area",120407,5719,1386,4042,1677,0,4133,1586
+metro,37900,"Peoria, IL Metro Area",80014,4494,966,3344,1150,195,3259,1040
+metro,37980,"Philadelphia-Camden-Wilmington, PA-NJ-DE-MD Metro Area",1509372,72085,5446,50805,21280,1259,40392,30434
+metro,38060,"Phoenix-Mesa-Chandler, AZ Metro Area",1232429,57749,4923,39371,18378,345,41000,16404
+metro,38240,"Pinehurst-Southern Pines, NC Metro Area",21956,1643,788,1081,562,0,1141,502
+metro,38300,"Pittsburgh, PA Metro Area",525497,27178,2885,21089,6089,458,19837,6883
+metro,38540,"Pocatello, ID Metro Area",22338,1348,534,1051,297,0,1261,87
+metro,38660,"Ponce, PR Metro Area",59533,2595,1025,818,1777,128,1674,793
+metro,38940,"Port St. Lucie, FL Metro Area",103916,6681,1665,3850,2831,365,4793,1523
+metro,38860,"Portland-South Portland, ME Metro Area",125045,4703,1221,2868,1835,112,3170,1421
+metro,38900,"Portland-Vancouver-Hillsboro, OR-WA Metro Area",628678,28092,3024,21397,6695,414,18447,9231
+metro,39150,"Prescott Valley-Prescott, AZ Metro Area",39662,1337,678,865,472,0,788,549
+metro,39300,"Providence-Warwick, RI-MA Metro Area",392107,15531,2688,10780,4751,226,9345,5960
+metro,39340,"Provo-Orem-Lehi, UT Metro Area",211813,16765,2243,15954,811,150,13818,2797
+metro,39380,"Pueblo, CO Metro Area",37577,1072,503,754,318,0,730,342
+metro,39460,"Punta Gorda, FL Metro Area",30382,983,574,983,0,0,804,179
+metro,39540,"Racine-Mount Pleasant, WI Metro Area",43054,1980,861,1227,753,0,1457,523
+metro,39580,"Raleigh-Cary, NC Metro Area",399780,21921,2788,15661,6260,0,14502,7419
+metro,39660,"Rapid City, SD Metro Area",30995,1922,729,1267,655,158,1223,541
+metro,39740,"Reading, PA Metro Area",99343,3908,1068,2621,1287,0,2813,1095
+metro,39820,"Redding, CA Metro Area",39024,1410,792,1303,107,0,894,516
+metro,39900,"Reno, NV Metro Area",130260,6534,1324,4792,1742,65,4811,1658
+metro,40060,"Richmond, VA Metro Area",331111,15727,3165,11415,4312,361,8668,6698
+metro,40140,"Riverside-San Bernardino-Ontario, CA Metro Area",1158971,57157,4469,38801,18356,791,39361,17005
+metro,40220,"Roanoke, VA Metro Area",68830,3396,1129,1616,1780,0,2450,946
+metro,40340,"Rochester, MN Metro Area",52733,2856,675,2542,314,0,1957,899
+metro,40380,"Rochester, NY Metro Area",239938,12022,2119,8416,3606,0,8436,3586
+metro,40420,"Rockford, IL Metro Area",74157,3985,1064,2240,1745,66,3352,567
+metro,40580,"Rocky Mount, NC Metro Area",32379,2923,1463,1079,1844,0,2339,584
+metro,40660,"Rome, GA Metro Area",24760,1203,618,1153,50,0,874,329
+metro,40900,"Sacramento-Roseville-Folsom, CA Metro Area",593512,25710,3151,21049,4661,292,15969,9449
+metro,40980,"Saginaw, MI Metro Area",42000,2481,784,1252,1229,0,1921,560
+metro,41420,"Salem, OR Metro Area",103314,5925,1523,3332,2593,0,4531,1394
+metro,41500,"Salinas, CA Metro Area",100461,5862,1687,2932,2930,0,3794,2068
+metro,41540,"Salisbury, MD Metro Area",30664,1362,923,1362,0,0,887,475
+metro,41620,"Salt Lake City-Murray, UT Metro Area",342054,14641,2053,11923,2718,29,10382,4230
+metro,41660,"San Angelo, TX Metro Area",29612,1471,631,1242,229,0,1371,100
+metro,41700,"San Antonio-New Braunfels, TX Metro Area",686544,35327,4716,25895,9432,250,23730,11347
+metro,41740,"San Diego-Chula Vista-Carlsbad, CA Metro Area",802050,38690,3165,29499,9191,83,23315,15292
+metro,41860,"San Francisco-Oakland-Fremont, CA Metro Area",1117155,50287,4496,40350,9937,494,25142,24651
+metro,41940,"San Jose-Sunnyvale-Santa Clara, CA Metro Area",490125,18936,2414,15264,3672,222,11628,7086
+metro,41980,"San Juan-BayamÃ³n-Caguas, PR Metro Area",479234,12893,2744,4007,8886,858,9179,2856
+metro,42020,"San Luis Obispo-Paso Robles, CA Metro Area",62806,3691,1157,2675,1016,32,2719,940
+metro,41780,"Sandusky, OH Metro Area",21547,2350,1024,1333,1017,0,1971,379
+metro,42100,"Santa Cruz-Watsonville, CA Metro Area",63158,2076,879,1624,452,0,1015,1061
+metro,42140,"Santa Fe, NM Metro Area",30791,1312,557,1114,198,21,956,335
+metro,42200,"Santa Maria-Santa Barbara, CA Metro Area",108142,6204,1460,2867,3337,149,3665,2390
+metro,42220,"Santa Rosa-Petaluma, CA Metro Area",105841,5537,1376,4340,1197,0,2814,2723
+metro,42340,"Savannah, GA Metro Area",107859,5345,1271,2658,2687,174,3711,1460
+metro,42540,"Scranton--Wilkes-Barre, PA Metro Area",124260,6076,1486,3557,2519,324,3877,1875
+metro,42660,"Seattle-Tacoma-Bellevue, WA Metro Area",1045869,43244,3652,36133,7111,180,27935,15129
+metro,42680,"Sebastian-Vero Beach-West Vero Corridor, FL Metro Area",28369,1666,861,1434,232,0,1059,607
+metro,42700,"Sebring, FL Metro Area",19272,1347,846,992,355,94,643,610
+metro,43100,"Sheboygan, WI Metro Area",25119,1453,638,956,497,90,1014,349
+metro,43300,"Sherman-Denison, TX Metro Area",34154,2419,947,1008,1411,0,2223,196
+metro,43340,"Shreveport-Bossier City, LA Metro Area",89120,4443,1261,2700,1743,81,2641,1721
+metro,43420,"Sierra Vista-Douglas, AZ Metro Area",24788,589,437,517,72,0,552,37
+metro,43580,"Sioux City, IA-NE-SD Metro Area",33597,2798,728,1340,1458,81,2217,500
+metro,43620,"Sioux Falls, SD-MN Metro Area",70820,3966,897,3679,287,0,2885,1081
+metro,43640,"Slidell-Mandeville-Covington, LA Metro Area",62208,2319,918,1192,1127,0,1741,578
+metro,43780,"South Bend-Mishawaka, IN-MI Metro Area",75354,4019,1075,2666,1353,242,2964,813
+metro,43900,"Spartanburg, SC Metro Area",96023,7490,1669,4379,3111,665,5368,1457
+metro,44060,"Spokane-Spokane Valley, WA Metro Area",139941,6413,1481,4713,1700,0,5017,1396
+metro,44100,"Springfield, IL Metro Area",46410,2384,784,1247,1137,0,1890,494
+metro,44140,"Springfield, MA Metro Area",109661,4097,1323,2581,1516,0,2258,1839
+metro,44180,"Springfield, MO Metro Area",119744,9059,1897,7680,1379,57,5883,3119
+metro,44220,"Springfield, OH Metro Area",29093,2013,699,1296,717,61,1446,506
+metro,41060,"St. Cloud, MN Metro Area",49834,3601,1130,1963,1638,0,3008,593
+metro,41100,"St. George, UT Metro Area",44635,2921,992,2674,247,0,2066,855
+metro,41140,"St. Joseph, MO-KS Metro Area",24731,1340,514,1153,187,66,954,320
+metro,41180,"St. Louis, MO-IL Metro Area",648643,27450,2625,19732,7718,233,20112,7105
+metro,44300,"State College, PA Metro Area",40635,1016,546,769,247,155,724,137
+metro,44420,"Staunton-Stuarts Draft, VA Metro Area",29276,1011,476,497,514,111,787,113
+metro,44700,"Stockton-Lodi, CA Metro Area",198981,10979,2050,6994,3985,0,7602,3377
+metro,44940,"Sumter, SC Metro Area",23708,1318,622,641,677,117,993,208
+metro,45060,"Syracuse, NY Metro Area",149964,8399,1682,5120,3279,214,6001,2184
+metro,45220,"Tallahassee, FL Metro Area",107181,4544,1410,2224,2320,80,3801,663
+metro,45300,"Tampa-St. Petersburg-Clearwater, FL Metro Area",777795,33954,3767,24268,9686,306,21508,12140
+metro,45460,"Terre Haute, IN Metro Area",37550,2125,830,1061,1064,0,1560,565
+metro,45500,"Texarkana, TX-AR Metro Area",32113,2783,1065,1029,1754,0,2403,380
+metro,45780,"Toledo, OH Metro Area",141342,7744,1550,4429,3315,234,5998,1512
+metro,45820,"Topeka, KS Metro Area",49364,3480,1084,2738,742,35,2188,1257
+metro,45900,"Traverse City, MI Metro Area",30935,1689,604,1431,258,0,1162,527
+metro,45940,"Trenton-Princeton, NJ Metro Area",92268,4467,1347,3002,1465,0,2626,1841
+metro,46060,"Tucson, AZ Metro Area",247038,10623,2022,7140,3483,133,6849,3641
+metro,46140,"Tulsa, OK Metro Area",249604,14318,1388,10025,4293,185,9652,4481
+metro,46220,"Tuscaloosa, AL Metro Area",76889,2681,1057,1819,862,58,2144,479
+metro,46300,"Twin Falls, ID Metro Area",27887,1632,657,1034,598,314,1155,163
+metro,46340,"Tyler, TX Metro Area",59413,2610,945,1201,1409,0,1956,654
+metro,46520,"Urban Honolulu, HI Metro Area",219705,13742,1958,9950,3792,116,8722,4904
+metro,46540,"Utica-Rome, NY Metro Area",59645,4333,1151,2779,1554,0,3233,1100
+metro,46660,"Valdosta, GA Metro Area",40087,4554,1493,2586,1968,0,3705,849
+metro,46700,"Vallejo, CA Metro Area",103427,5187,1396,3412,1775,47,2768,2372
+metro,47220,"Vineland, NJ Metro Area",33765,3064,1331,2400,664,47,1583,1434
+metro,47260,"Virginia Beach-Chesapeake-Norfolk, VA-NC Metro Area",429692,22924,3010,16674,6250,1139,14120,7665
+metro,47300,"Visalia, CA Metro Area",120182,7710,1683,4752,2958,262,5870,1578
+metro,47380,"Waco, TX Metro Area",75004,2524,847,1898,626,291,1922,311
+metro,47460,"Walla Walla, WA Metro Area",13257,1178,867,859,319,0,1161,17
+metro,47580,"Warner Robins, GA Metro Area",50395,1242,600,955,287,0,912,330
+metro,47900,"Washington-Arlington-Alexandria, DC-VA-MD-WV Metro Area",1597381,80297,5800,61208,19089,1208,44929,34160
+metro,47930,"Waterbury-Shelton, CT Metro Area",100720,8109,1874,5484,2625,0,5036,3073
+metro,47940,"Waterloo-Cedar Falls, IA Metro Area",41119,1891,650,1876,15,0,1454,437
+metro,48060,"Watertown-Fort Drum, NY Metro Area",24470,2095,733,1513,582,0,1878,217
+metro,48140,"Wausau, WI Metro Area",29308,1556,913,684,872,0,1218,338
+metro,48260,"Weirton-Steubenville, WV-OH Metro Area",22962,1200,582,836,364,17,861,322
+metro,48300,"Wenatchee-East Wenatchee, WA Metro Area",26259,1249,526,1059,190,0,654,595
+metro,48540,"Wheeling, WV-OH Metro Area",27289,704,376,502,202,0,353,351
+metro,48660,"Wichita Falls, TX Metro Area",34598,2081,892,1069,1012,0,1595,486
+metro,48620,"Wichita, KS Metro Area",155590,11185,2078,7295,3890,488,7496,3201
+metro,48700,"Williamsport, PA Metro Area",24316,1218,521,719,499,0,1000,218
+metro,48900,"Wilmington, NC Metro Area",102811,5060,1583,2701,2359,98,3296,1666
+metro,49020,"Winchester, VA-WV Metro Area",31392,1458,674,799,659,0,894,564
+metro,49180,"Winston-Salem, NC Metro Area",162408,9074,1664,6997,2077,348,5345,3381
+metro,49340,"Worcester, MA Metro Area",202078,10043,2093,6009,4034,102,6978,2963
+metro,49420,"Yakima, WA Metro Area",59605,3677,1121,2607,1070,0,2532,1145
+metro,49620,"York-Hanover, PA Metro Area",102836,4377,915,3375,1002,27,2814,1536
+metro,49660,"Youngstown-Warren, OH Metro Area",87659,4749,1241,2979,1770,54,4074,621
+metro,49700,"Yuba City, CA Metro Area",42367,2670,1083,2333,337,0,1624,1046

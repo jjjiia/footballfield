@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+  <style>
+html, body{ background: #FAF8F3; color: #000; }
+body{ font-family: 'Inter', Arial, sans-serif; }
+/* <b> is "bolder" than its text, which on light (300) text only reaches 400 */
+b{ font-weight: 700; }
+
+/* top banner, same as the football field page */
+.top-banner{
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  box-sizing: border-box;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  background: #000;
+  color: #FAF8F3;
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: 1px;
+  padding: 0 20px;
+  margin: 0;
+}
+
+.columns{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  padding: 40px 20px;
+}
+
+.job-line{
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1.8;
+  margin: 0 0 16px;
+}
+
+.job-count{ font-weight: 700; }
+
+/* the left side reads as one sentence, all one size: "There are 6,615,929 / teachers living in the United States" */
+.job .job-line, .job .job-count, .job .unit-select{
+  font-size: 40px;
+  line-height: 1.3;
+}
+.job .unit-select{ padding-right: 48px; background-position: right 16px center; }
+.job .combo-input:focus{ min-width: 320px; }
+
+/* dropdowns, same as the football field page */
+.unit-select{
+  -webkit-appearance: none;
+  appearance: none;
+  background: #FAF8F3 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 12px center;
+  color: #000;
+  border: none;
+  border-bottom: 2px solid #000; /* underline (text-decoration doesn't render on a <select>) */
+  border-radius: 0;
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: normal;
+  padding: 0 36px 0 8px;
+  max-width: 100%;
+}
+
+/* searchable dropdown: type in the box to narrow the list */
+.combo{ position: relative; display: inline-block; max-width: 100%; }
+.combo-input{ box-sizing: border-box; cursor: pointer; }
+.combo-input:focus{ outline: none; cursor: text; min-width: 240px; }
+.combo-input::placeholder{ color: #000; opacity: 0.5; }
+.combo-list{
+  position: absolute;
+  left: 0;
+  top: calc(100% + 4px);
+  z-index: 20;
+  box-sizing: border-box;
+  min-width: 100%;
+  width: max-content;
+  max-width: min(480px, calc(100vw - 40px));
+  max-height: 320px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  background: #FAF8F3;
+  border: 2px solid #000;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.3;
+}
+.combo-list li{ padding: 4px 12px; cursor: pointer; }
+.combo-list li.section{ font-weight: 700; font-size: 14px; padding-top: 10px; cursor: default; }
+.combo-list li.disabled{ color: #999; cursor: default; }
+.combo-list li.active{ background: #000; color: #FAF8F3; }
+
+/* the Census occupations grouped into the profession on the left, shown on click */
+.job-details summary{
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 1.5;
+  cursor: pointer;
+  list-style: none; /* no arrow */
+}
+.job-details summary::-webkit-details-marker{ display: none; } /* no arrow in Safari */
+.see-details{ text-decoration: underline; }
+.job-details.single summary{ cursor: default; }
+.job-occupations{
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 1.5;
+  margin: 4px 0 0;
+}
+
+/* right column: other US professions about 1x, 2x, ... the number on the left */
+.ratio-line{
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1.4;
+  margin: 0 0 16px;
+}
+/* line break with extra space between the ratios of the second sentence */
+.clause-gap{ display: block; height: 12px; }
+
+/* hover popup on a profession: the Census occupations grouped into it,
+   same look as the grid note on the football field page */
+.profession{ position: relative; }
+.occ-popup{
+  display: none;
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  z-index: 10;
+  width: max-content;
+  max-width: 320px;
+  padding: 6px 12px;
+  background: #000;
+  color: #FAF8F3;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.4;
+  white-space: pre-line;
+}
+.profession:hover .occ-popup{ display: block; }
+
+.source{
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 0 20px 40px;
+  margin: 0;
+}
+.source a{ color: #000; }
+
+@media (max-width: 700px){
+  .columns{ grid-template-columns: 1fr; }
+  .job-line, .unit-select, .ratio-line, .combo-list{ font-size: 16px; }
+  .job .job-line, .job .job-count, .job .unit-select{ font-size: 28px; }
+  .job .combo-input:focus{ min-width: 240px; }
+}
+  </style>
+</head>
+<body>
+
+<h1 class="top-banner">Jobs</h1>
+
+<div class="columns">
+  <div class="job" data-profession="teacher">
+    <p class="job-line"><b>There are</b> <span class="job-count"></span></p>
+    <p class="job-line"><span class="combo profession-combo"></span> <b>living in the United States</b></p>
+    <details class="job-details">
+      <summary>Counts are people 16 and over by their main job, including self-employed workers and business owners. <span class="see-details">More</span></summary>
+      <p class="job-occupations"></p>
+    </details>
+  </div>
+  <div class="matches"></div>
+</div>
+
+<p class="source">Source: U.S. Census Bureau, <a href="https://www.census.gov/programs-surveys/acs">American Community Survey</a> 2020–2024 5-year estimates, table B24114, Detailed Occupation for the Civilian Employed Population 16 Years and Over. Occupations are grouped into professions in <a href="populations/acs/census_occupation_mapping.json">census_occupation_mapping.json</a>.</p>
+
+<script>
+// People living in the US by profession (their main job), from the Census ACS
+// 2020-2024 5-year table B24114, grouped by populations/acs/census_occupation_mapping.json.
+
+// Profession names are singular in the data; the sentence needs plurals.
+const PLURAL_EXCEPTIONS = { clergy: "clergy", salesperson: "salespeople" };
+function plural(name) {
+  if (PLURAL_EXCEPTIONS[name]) return PLURAL_EXCEPTIONS[name];
+  if (/[^aeiou]y$/.test(name)) return name.slice(0, -1) + "ies";
+  if (/(s|x|ch|sh)$/.test(name)) return name + "es";
+  return name + "s";
+}
+
+// Size the box to its text (plus its padding, which holds the arrow).
+function fitToContent(input) {
+  const probe = document.createElement("span");
+  const cs = getComputedStyle(input);
+  probe.style.cssText = "position:absolute;visibility:hidden;white-space:pre;";
+  probe.style.font = cs.font;
+  probe.style.letterSpacing = cs.letterSpacing;
+  probe.textContent = input.value || input.placeholder;
+  document.body.appendChild(probe);
+  const w = probe.getBoundingClientRect().width;
+  probe.remove();
+  input.style.width = Math.ceil(w + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 4) + "px";
+}
+
+// A dropdown you can type in. items: [{ value, label, section }]. Clicking the
+// box clears it to show the whole list; typing narrows it to labels containing
+// the text. Items for which isDisabled(value) is true are grey and can't be picked.
+function makeCombo(root, label, items, onPick) {
+  const input = Object.assign(document.createElement("input"), { className: "unit-select combo-input", type: "text" });
+  input.setAttribute("aria-label", label);
+  input.setAttribute("autocomplete", "off");
+  input.spellcheck = false;
+  const list = Object.assign(document.createElement("ul"), { className: "combo-list", hidden: true });
+  root.append(input, list);
+  const byValue = new Map(items.map((it) => [it.value, it]));
+  let value = null, shown = [], active = -1;
+  const combo = { isDisabled: () => false };
+
+  function render() {
+    const q = input.value.trim().toLowerCase();
+    list.innerHTML = "";
+    shown = [];
+    let section = null;
+    for (const it of items) {
+      if (q && !it.label.toLowerCase().includes(q)) continue;
+      if (it.section && it.section !== section) {
+        list.append(Object.assign(document.createElement("li"), { className: "section", textContent: it.section }));
+      }
+      section = it.section;
+      const li = Object.assign(document.createElement("li"), { textContent: it.label });
+      if (combo.isDisabled(it.value)) li.className = "disabled";
+      else {
+        li.dataset.i = shown.length;
+        shown.push({ it, li });
+        li.addEventListener("mousedown", (e) => { e.preventDefault(); pick(it.value); });
+      }
+      list.append(li);
+    }
+    setActive(shown.length ? 0 : -1);
+  }
+  function setActive(i) {
+    if (shown[active]) shown[active].li.classList.remove("active");
+    active = i;
+    if (shown[active]) { shown[active].li.classList.add("active"); shown[active].li.scrollIntoView({ block: "nearest" }); }
+  }
+  function pick(v) {
+    input.blur();
+    if (v !== value) { combo.set(v); onPick(v); }
+  }
+  input.addEventListener("focus", () => {
+    input.placeholder = byValue.get(value).label;
+    input.value = "";
+    list.hidden = false;
+    render();
+    list.scrollTop = 0;
+  });
+  input.addEventListener("input", render);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown") { e.preventDefault(); setActive(Math.min(active + 1, shown.length - 1)); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setActive(Math.max(active - 1, 0)); }
+    else if (e.key === "Enter") { e.preventDefault(); if (shown[active]) pick(shown[active].it.value); }
+    else if (e.key === "Escape") input.blur();
+  });
+  input.addEventListener("blur", () => {
+    list.hidden = true;
+    input.value = byValue.get(value).label;
+    input.placeholder = "";
+    fitToContent(input);
+  });
+  combo.set = (v) => { value = v; input.value = byValue.get(v).label; fitToContent(input); };
+  combo.get = () => value;
+  combo.fit = () => { if (document.activeElement !== input) fitToContent(input); };
+  return combo;
+}
+
+// Other US professions whose count, times one of these factors, comes within
+// TOLERANCE of the selected count.
+// Closest relationships first: same, half, twice, a third, 3 times, ...
+const FRACTIONS = ["half", "a third", "a quarter", "a fifth", "a sixth", "a seventh", "an eighth", "a ninth", "a tenth"];
+const RATIOS = [
+  [1, "about"],
+  ...FRACTIONS.flatMap((name, i) => [[1 / (i + 2), name], [i + 2, i === 0 ? "twice" : `${i + 2} times`]]),
+  [20, "20 times"],
+];
+const TOLERANCE = 0.02;
+const SUM_TOLERANCE = 0.01;
+
+Promise.all([
+  fetch("populations/acs/jobs.json").then((r) => r.json()),
+  fetch("populations/acs/census_occupation_mapping.json").then((r) => r.json()),
+]).then(([data, mapping]) => {
+  // profession -> its BLS occupation titles, across all major groups
+  const occupations = {};
+  for (const [p, groups] of Object.entries(mapping)) occupations[p] = Object.values(groups).flat();
+  const us = data.employment.US;
+  const professions = Object.keys(us).sort((a, b) => a.localeCompare(b));
+  const job = document.querySelector(".job");
+  const count = job.querySelector(".job-count");
+  const matches = document.querySelector(".matches");
+  // "More" opens the list of jobs included; with only one job there is nothing to show
+  const details = job.querySelector(".job-details");
+  details.querySelector("summary").addEventListener("click", (e) => {
+    if (occupations[profCombo.get()].length < 2) e.preventDefault();
+  });
+
+  const profCombo = makeCombo(job.querySelector(".profession-combo"), "Occupation",
+    professions.map((p) => ({ value: p, label: plural(p) })), update);
+  // grey out professions with no one counted
+  profCombo.isDisabled = (p) => !us[p];
+  profCombo.set(job.dataset.profession);
+
+  function update() {
+    const n = us[profCombo.get()];
+    count.textContent = n ? n.toLocaleString("en-US") : "Not reported";
+    const jobsIncluded = occupations[profCombo.get()];
+    job.querySelector(".job-occupations").textContent = "Jobs included: " + jobsIncluded.join("; ");
+    details.querySelector(".see-details").hidden = jobsIncluded.length < 2;
+    details.classList.toggle("single", jobsIncluded.length < 2);
+    if (jobsIncluded.length < 2) details.open = false;
+
+    matches.innerHTML = "";
+    if (!n) return;
+    // one clause per ratio: "3 times as many as there are A (n), B (n), or C (n)",
+    // with the ratio and the professions in bold
+    const bold = (text) => Object.assign(document.createElement("b"), { textContent: text });
+    // bold profession name with its hover popup, then its count
+    const named = (p) => {
+      const name = bold(plural(p));
+      name.className = "profession";
+      const popup = document.createElement("span");
+      popup.className = "occ-popup";
+      popup.textContent = occupations[p].join("\n");
+      name.append(popup);
+      return [name, ` (${us[p].toLocaleString("en-US")})`];
+    };
+    const clauses = [];
+    for (const [factor, label] of RATIOS) {
+      const found = professions
+        .filter((p) => p !== profCombo.get())
+        .filter((p) => Math.abs(n / (us[p] * factor) - 1) <= TOLERANCE)
+        .sort((a, b) => us[b] - us[a]);
+      if (!found.length) continue;
+      const clause = [label];
+      found.forEach((p, i) => {
+        if (i > 0) clause.push(found.length > 2 ? ", " : " ");
+        if (i > 0 && i === found.length - 1) clause.push("or ");
+        clause.push(...named(p));
+      });
+      clauses.push(clause);
+    }
+    // "That is <closest> living in the United States." then "And <the rest, one per line, joined by commas>."
+    const lead = (text) => Object.assign(document.createElement("b"), { className: "ratio-lead", textContent: text });
+    if (clauses.length) {
+      const first = document.createElement("p");
+      first.className = "ratio-line";
+      // "That is", "And" and each "half as many as" are bold
+      const [firstLabel, ...firstNames] = clauses[0];
+      first.append(lead(`That is ${firstLabel} as many as`), " there are ", ...firstNames, " living in the United States.");
+      matches.append(first);
+      if (clauses.length > 1) {
+        const rest = document.createElement("p");
+        rest.className = "ratio-line";
+        rest.append(lead("And"), " ");
+        // each multiplier on its own line, still one sentence
+        clauses.slice(1).forEach(([label, ...names], i) =>
+          rest.append(...(i > 0 ? [",", Object.assign(document.createElement("span"), { className: "clause-gap" })] : []), lead(`${label} as many as`), " there are ", ...names));
+        rest.append(".");
+        matches.append(rest);
+      }
+    }
+
+    // "That's about the same as all the A and B added together." and "Or all the A, B, and C ..."
+    const sums = [bestSum(n, 2), bestSum(n, 3)].filter(Boolean);
+    sums.forEach((parts, i) => {
+      const line = document.createElement("p");
+      line.className = "ratio-line";
+      line.append(lead(i === 0 ? "That’s about the same as all the" : "Or all the"), " ");
+      parts.forEach((p, k) => {
+        if (k > 0) line.append(parts.length > 2 ? ", " : " ");
+        if (k > 0 && k === parts.length - 1) line.append("and ");
+        line.append(...named(p));
+      });
+      line.append(" added together.");
+      matches.append(line);
+    });
+  }
+
+  // The `size` other professions whose counts add up closest to n (within SUM_TOLERANCE).
+  // Each part must be between 10% and 80% of n, so no one group does all the work.
+  function bestSum(n, size) {
+    const parts = professions
+      .filter((p) => p !== profCombo.get() && us[p] >= 0.1 * n && us[p] <= 0.8 * n)
+      .sort((a, b) => us[a] - us[b]);
+    const v = parts.map((p) => us[p]);
+    // index of the first count >= target, from `from` on
+    const search = (target, from) => {
+      let lo = from, hi = v.length;
+      while (lo < hi) { const mid = (lo + hi) >> 1; if (v[mid] < target) lo = mid + 1; else hi = mid; }
+      return lo;
+    };
+    let best = null, bestGap = Infinity;
+    const consider = (idx) => {
+      const gap = Math.abs(idx.reduce((t, k) => t + v[k], 0) - n);
+      if (gap < bestGap) { bestGap = gap; best = idx; }
+    };
+    for (let i = 0; i < v.length; i++) {
+      if (size === 2) {
+        const k = search(n - v[i], i + 1);
+        for (const c of [k - 1, k]) if (c > i && c < v.length) consider([i, c]);
+      } else {
+        for (let j = i + 1; j < v.length; j++) {
+          const k = search(n - v[i] - v[j], j + 1);
+          for (const c of [k - 1, k]) if (c > j && c < v.length) consider([i, j, c]);
+        }
+      }
+    }
+    return best && bestGap <= SUM_TOLERANCE * n ? best.map((k) => parts[k]) : null;
+  }
+  document.fonts.ready.then(() => profCombo.fit());
+  update();
+});
+</script>
+</body>
+</html>

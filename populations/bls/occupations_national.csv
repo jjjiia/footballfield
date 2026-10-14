@@ -1,0 +1,317 @@
+profession,employment
+manager,10271110
+supervisor,7313440
+teacher,5507860
+nurse,4410930
+salesperson,4325630
+home health aide,4305810
+office clerk,4098050
+fast food worker,3854050
+truck driver,3501400
+secretary,3284590
+cashier,3089410
+mover,2973760
+stocker,2833810
+sales representative,2830790
+cook,2651110
+IT specialist,2640140
+customer service representative,2595750
+waiter,2564810
+janitor,2226970
+software developer,2037050
+management analyst,1985370
+bookkeeper,1967140
+machine operator,1940630
+maintenance worker,1876940
+assembler,1801640
+engineer,1800740
+HR specialist,1638140
+teaching assistant,1584440
+nursing assistant,1536870
+security guard,1476660
+accountant,1449500
+professor,1370560
+shipping clerk,1358000
+social worker,1321510
+construction laborer,1174410
+project manager,1066670
+landscaper,1048480
+counselor,1035300
+medical assistant,1005030
+auto mechanic,1000100
+medical technician,997800
+food prep worker,978230
+receptionist,910180
+marketing specialist,899580
+housekeeper,860670
+police officer,829520
+electrician,820850
+therapist,816160
+doctor,804160
+forklift operator,774420
+bartender,756390
+lawyer,754500
+financial analyst,737340
+carpenter,691770
+school administrator,637590
+quality inspector,597370
+bus driver,562170
+packer,559820
+machinist,557580
+buyer,547240
+plumber,543220
+busser,542750
+industrial mechanic,541070
+financial sales agent,525510
+construction equipment operator,522220
+childcare worker,518910
+pharmacy technician,511210
+postal worker,507740
+insurance agent,479100
+dishwasher,477450
+correctional officer,451190
+production worker,449660
+welder,447810
+firefighter,445130
+paralegal,439640
+host,432690
+amusement attendant,420450
+compliance officer,417070
+HVAC technician,409670
+counter clerk,400810
+engineering technician,390870
+dental assistant,387790
+vehicle cleaner,380430
+science technician,361930
+farmworker,356940
+butcher,352080
+designer,344380
+claims adjuster,335790
+lab technician,332940
+recreation worker,331490
+bank teller,329480
+fitness trainer,322930
+pharmacist,321970
+hairdresser,313780
+dispatcher,305310
+financial advisor,294570
+paramedic,293750
+food processing worker,291140
+diesel mechanic,289960
+taxi driver,289580
+electronics repairer,287390
+PR specialist,283380
+mason,281890
+loan officer,274330
+animal caretaker,266910
+data scientist,262440
+hotel desk clerk,261420
+veterinary technician,255720
+logistician,251040
+telecom installer,249780
+coach,248950
+real estate agent,239470
+baker,236200
+painter,234250
+medical records specialist,232820
+instructional coordinator,227760
+cost estimator,224220
+laundry worker,224160
+dental hygienist,222740
+therapy assistant,216180
+heavy equipment mechanic,214470
+chief executive,204350
+printing worker,201280
+chef,200040
+woodworker,199910
+medical scientist,184430
+drafter,176050
+tutor,175070
+safety specialist,171200
+biologist,166090
+window dresser,165220
+physician assistant,162150
+psychologist,159540
+bill collector,158830
+lifeguard,157550
+aircraft mechanic,156920
+highway maintenance worker,154960
+library assistant,154210
+manicurist,152770
+pilot,151190
+detective,150010
+garbage collector,147240
+railroad worker,147000
+building inspector,146720
+phlebotomist,143540
+producer,143120
+casino worker,142960
+event planner,142860
+dentist,141610
+roofer,141520
+parking attendant,137880
+librarian,133790
+gas station attendant,133310
+flight attendant,131650
+power line installer,131070
+water treatment operator,128490
+architect,126370
+audio/video technician,125770
+usher,121770
+sheet metal worker,119770
+ticket agent,118710
+web designer,113330
+oil and gas worker,111300
+fundraiser,111040
+dietitian,109130
+surveyor,108840
+operations research analyst,108510
+sewing worker,107070
+insurance underwriter,105420
+pest control worker,102620
+miner,99860
+massage therapist,98790
+editor,96270
+drywall installer,95920
+clergy,95120
+crossing guard,94360
+writer,93440
+optician,92190
+advertising sales agent,91700
+chemist,91240
+probation officer,89390
+environmental scientist,89250
+residential advisor,84760
+veterinarian,83900
+instrument repairer,83730
+ironworker,82180
+plant operator,81880
+textile worker,78690
+school bus monitor,78420
+flooring installer,76990
+tax preparer,76480
+esthetician,72890
+small engine mechanic,72790
+power plant operator,71240
+insulation worker,70100
+courier,68640
+material moving machine operator,65950
+health educator,65690
+health practitioner,63640
+funeral worker,63050
+community health worker,61660
+personal care worker,60420
+glazier,58480
+telemarketer,58430
+appraiser,57070
+tax examiner,56610
+travel agent,55110
+actor,55000
+tour guide,53500
+art director,53070
+interpreter,52060
+photographer,51760
+hazardous materials removal worker,51710
+airport security screener,50290
+concierge,49240
+musician,48720
+title examiner,48580
+crane operator,45490
+urban planner,44230
+optometrist,42790
+artist,42700
+medical transcriptionist,41550
+florist,40590
+judge,40400
+sailor,40070
+chiropractor,39630
+ship captain,39330
+journalist,39250
+telephone operator,38910
+computer scientist,37200
+social scientist,37100
+forester,36380
+dental lab technician,34410
+statistician,33740
+appliance repairer,32150
+semiconductor technician,31460
+solar installer,31350
+septic tank servicer,30650
+athletic trainer,30500
+geologist,29320
+logger,28960
+bellhop,28510
+passenger attendant,27110
+actuary,26670
+vending machine servicer,26410
+film editor,25610
+audiologist,24930
+transportation inspector,24500
+curator,24460
+elevator installer,23790
+rigger,22530
+air traffic controller,22510
+jeweler,22440
+scientist,22300
+camera operator,21550
+broadcaster,21240
+orthotist,20670
+physicist,20430
+upholsterer,20140
+media worker,19590
+meter reader,19430
+plasterer,19310
+animal trainer,18770
+economist,17790
+fire inspector,16580
+entertainer,16550
+referee,15780
+airfield operations specialist,15190
+athlete,15070
+locksmith,15040
+barber,15000
+agricultural inspector,14410
+cartographer,14260
+tailor,13920
+transportation worker,13550
+law clerk,13290
+court reporter,12870
+talent agent,12620
+bicycle repairer,12170
+animal control officer,12070
+dancer,10990
+shoemaker,10730
+subway operator,10200
+boilermaker,10190
+meteorologist,10000
+wind turbine technician,9980
+podiatrist,9680
+mediator,9210
+parking enforcement officer,9050
+anthropologist,8990
+survey researcher,8290
+archivist,7970
+DJ,7920
+traffic technician,7860
+acupuncturist,7830
+costume attendant,6510
+farmer,6500
+forest worker,6050
+game warden,5770
+mathematician,5750
+political scientist,5540
+photo lab worker,4800
+model,3780
+genetic counselor,3740
+historian,3450
+commercial diver,3450
+desktop publisher,3350
+bridge tender,3040
+mobile home installer,3020
+street vendor,2760
+makeup artist,2340
+sociologist,2260
+astronomer,2120
+projectionist,1480
+geographer,1400
+farm labor contractor,310
