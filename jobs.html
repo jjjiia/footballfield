@@ -8,8 +8,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
+  <script>
+    // jobs.html?embed -- shown inside another page (scrolly.html): no banner
+    if (new URLSearchParams(location.search).has("embed")) document.documentElement.classList.add("embed");
+  </script>
   <style>
 html, body{ background: #FAF8F3; color: #000; }
+.embed .top-banner{ display: none; }
 body{ font-family: 'Inter', Arial, sans-serif; }
 /* <b> is "bolder" than its text, which on light (300) text only reaches 400 */
 b{ font-weight: 700; }
@@ -153,16 +158,28 @@ b{ font-weight: 700; }
 }
 .profession:hover .occ-popup{ display: block; }
 
+/* sources, always on screen at the bottom of the left column (the right
+   column can run long); as wide as that column: (100vw - 2*20px gutter - 40px gap) / 2 */
 .source{
-  font-size: 14px;
-  font-weight: 300;
-  line-height: 1.5;
-  padding: 0 20px 40px;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 25;
+  box-sizing: border-box;
+  width: calc(50vw - 20px);
   margin: 0;
+  padding: 6px 0 12px 20px;
+  background: #FAF8F3;
+  font-size: 11px;
+  font-weight: 300;
+  line-height: 1.3;
 }
 .source a{ color: #000; }
+body{ padding-bottom: 72px; } /* room for the fixed sources */
 
 @media (max-width: 700px){
+  body{ padding-bottom: 140px; }
+  .source{ width: 100%; padding-right: 20px; } /* one column on phones */
   .columns{ grid-template-columns: 1fr; }
   .job-line, .unit-select, .ratio-line, .combo-list{ font-size: 16px; }
   .job .job-line, .job .job-count, .job .unit-select{ font-size: 28px; }
@@ -177,20 +194,23 @@ b{ font-weight: 700; }
 <div class="columns">
   <div class="job" data-profession="teacher">
     <p class="job-line"><b>There are</b> <span class="job-count"></span></p>
-    <p class="job-line"><span class="combo profession-combo"></span> <b>living in the United States</b></p>
+    <p class="job-line"><span class="combo profession-combo"></span> <b class="job-verb">living in</b> <span class="combo area-combo"></span></p>
     <details class="job-details">
-      <summary>Counts are people 16 and over by their main job, including self-employed workers and business owners. <span class="see-details">More</span></summary>
+      <summary><span class="job-note"></span> <span class="see-details">More</span></summary>
       <p class="job-occupations"></p>
     </details>
   </div>
   <div class="matches"></div>
 </div>
 
-<p class="source">Source: U.S. Census Bureau, <a href="https://www.census.gov/programs-surveys/acs">American Community Survey</a> 2020–2024 5-year estimates, table B24114, Detailed Occupation for the Civilian Employed Population 16 Years and Over. Occupations are grouped into professions in <a href="populations/acs/census_occupation_mapping.json">census_occupation_mapping.json</a>.</p>
+<p class="source"><b>Sources:</b> United States: U.S. Census Bureau, <a href="https://www.census.gov/programs-surveys/acs">American Community Survey</a> 2020–2024 5-year estimates, table B24114, Detailed Occupation for the Civilian Employed Population 16 Years and Over; occupations are grouped into professions in <a href="populations/acs/census_occupation_mapping.json">census_occupation_mapping.json</a>. States and metro areas: U.S. Bureau of Labor Statistics, <a href="https://www.bls.gov/oes/tables.htm">Occupational Employment and Wage Statistics</a>, May 2025 state and metropolitan area estimates; occupations are grouped into professions in <a href="populations/bls/occupation_mapping.json">occupation_mapping.json</a>. Not all areas have published numbers for all occupations.</p>
 
 <script>
-// People living in the US by profession (their main job), from the Census ACS
-// 2020-2024 5-year table B24114, grouped by populations/acs/census_occupation_mapping.json.
+// The United States: people living there by profession (their main job), from the
+// Census ACS 2020-2024 5-year table B24114. States and metro areas: wage and salary
+// jobs located there, from BLS OEWS May 2025. Each source has its own grouping of
+// occupations into professions (populations/acs/ and populations/bls/), and the
+// comparisons on the right use the US numbers from the same source as the left.
 
 // Profession names are singular in the data; the sentence needs plurals.
 const PLURAL_EXCEPTIONS = { clergy: "clergy", salesperson: "salespeople" };
@@ -298,15 +318,36 @@ const RATIOS = [
 const TOLERANCE = 0.02;
 const SUM_TOLERANCE = 0.01;
 
+const SOURCES = {
+  acs: {
+    verb: "living in",
+    note: "Census count of people 16 and over living here, by their main job, including self-employed workers and business owners.",
+  },
+  bls: {
+    verb: "working in",
+    note: "BLS count of wage and salary jobs located here; does not include self-employed workers or business owners.",
+  },
+};
+
 Promise.all([
   fetch("populations/acs/jobs.json").then((r) => r.json()),
   fetch("populations/acs/census_occupation_mapping.json").then((r) => r.json()),
-]).then(([data, mapping]) => {
-  // profession -> its BLS occupation titles, across all major groups
-  const occupations = {};
-  for (const [p, groups] of Object.entries(mapping)) occupations[p] = Object.values(groups).flat();
-  const us = data.employment.US;
-  const professions = Object.keys(us).sort((a, b) => a.localeCompare(b));
+  fetch("populations/bls/jobs.json").then((r) => r.json()),
+  fetch("populations/bls/occupation_mapping.json").then((r) => r.json()),
+]).then(([acsData, acsMapping, blsData, blsMapping]) => {
+  // profession -> its occupation titles, across all major groups
+  const titles = (mapping) => Object.fromEntries(Object.entries(mapping).map(([p, groups]) => [p, Object.values(groups).flat()]));
+  SOURCES.acs.us = acsData.employment.US;
+  SOURCES.acs.occupations = titles(acsMapping);
+  SOURCES.bls.us = blsData.employment.US;
+  SOURCES.bls.occupations = titles(blsMapping);
+  // the United States from the Census, states and metro areas from BLS
+  const sourceOf = (area) => (area === "US" ? "acs" : "bls");
+  const countsIn = (area) => (area === "US" ? acsData.employment.US : blsData.employment[area]);
+  const areaList = [["US", "United States", "country"], ...blsData.areas.filter(([code]) => code !== "US")];
+  const allProfessions = [...new Set([...Object.keys(SOURCES.acs.us), ...Object.keys(SOURCES.bls.us)])].sort((a, b) => a.localeCompare(b));
+  // set from the selected area's source in update()
+  let us, occupations, professions;
   const job = document.querySelector(".job");
   const count = job.querySelector(".job-count");
   const matches = document.querySelector(".matches");
@@ -317,13 +358,25 @@ Promise.all([
   });
 
   const profCombo = makeCombo(job.querySelector(".profession-combo"), "Occupation",
-    professions.map((p) => ({ value: p, label: plural(p) })), update);
-  // grey out professions with no one counted
-  profCombo.isDisabled = (p) => !us[p];
+    allProfessions.map((p) => ({ value: p, label: plural(p) })), update);
+  // United States, then a section for states and one for metro areas
+  const sections = { state: "States", metro: "Metro areas" };
+  const areaCombo = makeCombo(job.querySelector(".area-combo"), "Area",
+    areaList.map(([code, title, kind]) => ({ value: code, label: title, section: sections[kind] })), update);
+  // grey out professions not counted in this place, and places that don't count this profession
+  profCombo.isDisabled = (p) => !countsIn(areaCombo.get())[p];
+  areaCombo.isDisabled = (a) => !countsIn(a)[profCombo.get()];
   profCombo.set(job.dataset.profession);
+  areaCombo.set("US");
 
   function update() {
-    const n = us[profCombo.get()];
+    const area = areaCombo.get();
+    const source = SOURCES[sourceOf(area)];
+    ({ us, occupations } = source);
+    professions = Object.keys(us).sort((a, b) => a.localeCompare(b));
+    const n = countsIn(area)[profCombo.get()];
+    job.querySelector(".job-verb").textContent = source.verb;
+    job.querySelector(".job-note").textContent = source.note;
     count.textContent = n ? n.toLocaleString("en-US") : "Not reported";
     const jobsIncluded = occupations[profCombo.get()];
     job.querySelector(".job-occupations").textContent = "Jobs included: " + jobsIncluded.join("; ");
@@ -349,7 +402,7 @@ Promise.all([
     const clauses = [];
     for (const [factor, label] of RATIOS) {
       const found = professions
-        .filter((p) => p !== profCombo.get())
+        .filter((p) => !(p === profCombo.get() && area === "US"))
         .filter((p) => Math.abs(n / (us[p] * factor) - 1) <= TOLERANCE)
         .sort((a, b) => us[b] - us[a]);
       if (!found.length) continue;
@@ -361,14 +414,14 @@ Promise.all([
       });
       clauses.push(clause);
     }
-    // "That is <closest> living in the United States." then "And <the rest, one per line, joined by commas>."
+    // "That is <closest> living/working in the United States." then "And <the rest, one per line, joined by commas>."
     const lead = (text) => Object.assign(document.createElement("b"), { className: "ratio-lead", textContent: text });
     if (clauses.length) {
       const first = document.createElement("p");
       first.className = "ratio-line";
       // "That is", "And" and each "half as many as" are bold
       const [firstLabel, ...firstNames] = clauses[0];
-      first.append(lead(`That is ${firstLabel} as many as`), " there are ", ...firstNames, " living in the United States.");
+      first.append(lead(`That is ${firstLabel} as many as`), " there are ", ...firstNames, ` ${source.verb} the United States.`);
       matches.append(first);
       if (clauses.length > 1) {
         const rest = document.createElement("p");
@@ -402,7 +455,7 @@ Promise.all([
   // Each part must be between 10% and 80% of n, so no one group does all the work.
   function bestSum(n, size) {
     const parts = professions
-      .filter((p) => p !== profCombo.get() && us[p] >= 0.1 * n && us[p] <= 0.8 * n)
+      .filter((p) => !(p === profCombo.get() && areaCombo.get() === "US") && us[p] >= 0.1 * n && us[p] <= 0.8 * n)
       .sort((a, b) => us[a] - us[b]);
     const v = parts.map((p) => us[p]);
     // index of the first count >= target, from `from` on
@@ -429,7 +482,7 @@ Promise.all([
     }
     return best && bestGap <= SUM_TOLERANCE * n ? best.map((k) => parts[k]) : null;
   }
-  document.fonts.ready.then(() => profCombo.fit());
+  document.fonts.ready.then(() => { profCombo.fit(); areaCombo.fit(); });
   update();
 });
 </script>
