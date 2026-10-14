@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Football Field Embed</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../site.css">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <style>
+/* Scrolly version of footballfield.html, made to be embedded in scrolly.html:
+   football field unit only, Levi's Stadium then 2 more places, no search or zoom.
+   The embedding page sends the step (0-2) as it scrolls, via postMessage.
+   Opened on its own, the page scrolls through the steps itself. */
+
+.map-wrapper{
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+.map{
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+}
+/* first view is black and white; the later places are in color */
+.map.grayscale .mapboxgl-canvas{ filter: grayscale(1); }
+
+.labels{
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  z-index: 20;
+  pointer-events: none;
+}
+.map-line{
+  font-size: 20px;
+  font-weight: 300;
+  color: #000;
+  font-family: 'Inter', Arial, sans-serif;
+  background: #FAF8F3;
+  padding: 6px 12px;
+}
+.map-line b{ font-weight: 700; }
+
+/* cross-fade shown while the camera jumps between places */
+.fade-overlay{
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 15;
+  transition: opacity 0.45s ease;
+}
+.fade-overlay.visible{ opacity: 1; }
+
+.grid-btn{
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 20;
+  border: none;
+  cursor: pointer;
+  line-height: normal;
+}
+/* hover popup explaining the grid, to the right of the button */
+.grid-btn::after{
+  content: "The grid is rectangles the size of the unit being used (football field).";
+  display: none;
+  position: absolute;
+  left: calc(100% + 10px);
+  bottom: 0;
+  width: max-content;
+  max-width: 280px;
+  padding: 6px 12px;
+  background: #000;
+  color: #FAF8F3;
+  font-size: 16px;
+  font-weight: 300;
+  text-align: left;
+}
+.grid-btn:hover::after{ display: block; }
+
+.mapboxgl-ctrl-logo,
+.mapboxgl-ctrl-attrib{ display: none !important; }
+
+/* only used when the page is opened on its own: one screen of scrolling per step */
+.scroll-steps{ display: none; }
+.standalone .scroll-steps{ display: block; position: relative; z-index: 1; pointer-events: none; }
+.scroll-step{ height: 100vh; }
+.standalone .map-wrapper{ margin-bottom: -100vh; }
+
+/* phones: slightly smaller text */
+@media (max-width: 600px){
+  .map-line{ font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="map-wrapper">
+  <div class="map grayscale"></div>
+  <div class="fade-overlay"></div>
+  <div class="labels">
+    <span class="map-line">This white outline is a <b>football field</b>.</span>
+    <span class="map-line place-line"></span>
+    <span class="map-line area-text"></span>
+  </div>
+  <button class="map-line grid-btn" type="button">Show grid</button>
+</div>
+
+<div class="scroll-steps">
+  <section class="scroll-step" data-index="0"></section>
+  <section class="scroll-step" data-index="1"></section>
+  <section class="scroll-step" data-index="2"></section>
+</div>
+
+<script>
+mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ";
+
+const STYLE = "mapbox://styles/jjjiia123/cmmb9euid00at01qr9mbfapn7";
+const HOME = {
+  center: [-121.96979950341608, 37.403187791716775],
+  zoom: 17,
+  bearing: -29,
+  html: "You are at <b>Levi's Stadium</b>, site of the 2025 American Super Bowl."
+};
+
+// football field, 160 x 360 ft (as in ../units.json)
+const FIELD_W_M = 160 * 0.3048;
+const FIELD_H_M = 360 * 0.3048;
+const FIELD_AREA_M2 = FIELD_W_M * FIELD_H_M;
+
+// ---- small-area meter<->degree helpers ----
+function metersPerDeg(lat) {
+  return { mPerDegLat: 111132.92, mPerDegLng: 111320.0 * Math.cos(lat * Math.PI / 180) };
+}
+
+// Local east/north meter offsets -> lng/lat around `center`, turned by -bearing
+// so shapes stay upright on screen however the map is rotated.
+function localToLngLat(center, points, bearing) {
+  const [lng0, lat0] = center;
+  const { mPerDegLat, mPerDegLng } = metersPerDeg(lat0);
+  const t = -bearing * Math.PI / 180;
+  const cosT = Math.cos(t), sinT = Math.sin(t);
+  return points.map(([x, y]) => [
+    lng0 + (x * cosT - y * sinT) / mPerDegLng,
+    lat0 + (x * sinT + y * cosT) / mPerDegLat
+  ]);
+}
+
+function fieldFeature(map) {
+  const c = map.getCenter();
+  const hw = FIELD_W_M / 2, hh = FIELD_H_M / 2;
+  const ring = localToLngLat([c.lng, c.lat], [[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh], [-hw, -hh]], map.getBearing());
+  return { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [ring] } };
+}
+
+// Lines tiling football fields across the view, lined up with the center one.
+function gridFeatures(map) {
+  const c = map.getCenter();
+  const { mPerDegLat, mPerDegLng } = metersPerDeg(c.lat);
+  const b = map.getBounds();
+  const reach = Math.max(...[b.getNorthWest(), b.getNorthEast(), b.getSouthEast(), b.getSouthWest()]
+    .map((p) => Math.hypot((p.lng - c.lng) * mPerDegLng, (p.lat - c.lat) * mPerDegLat)));
+  const nx = Math.ceil(reach / FIELD_W_M) + 1;
+  const ny = Math.ceil(reach / FIELD_H_M) + 1;
+  if (nx + ny > 1000) return [];
+
+  const lines = [];
+  for (let i = -nx; i <= nx; i++) {
+    const x = FIELD_W_M / 2 + i * FIELD_W_M;
+    lines.push([[x, -reach], [x, reach]]);
+  }
+  for (let j = -ny; j <= ny; j++) {
+    const y = FIELD_H_M / 2 + j * FIELD_H_M;
+    lines.push([[-reach, y], [reach, y]]);
+  }
+  const bearing = map.getBearing();
+  return lines.map((line) => ({
+    type: "Feature",
+    properties: {},
+    geometry: { type: "LineString", coordinates: localToLngLat([c.lng, c.lat], line, bearing) }
+  }));
+}
+
+// Ground area of the view, in football fields.
+function fieldsInView(map) {
+  const canvas = map.getCanvas();
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  const R = 6378137;
+  const merc = (p) => [R * p.lng * Math.PI / 180, R * Math.log(Math.tan(Math.PI / 4 + p.lat * Math.PI / 360))];
+  const ring = [[0, 0], [w, 0], [w, h], [0, h]].map((px) => merc(map.unproject(px)));
+  let area2 = 0;
+  for (let i = 0; i < ring.length; i++) {
+    const [x1, y1] = ring[i], [x2, y2] = ring[(i + 1) % ring.length];
+    area2 += x1 * y2 - x2 * y1;
+  }
+  const cosLat = Math.cos(map.getCenter().lat * Math.PI / 180);
+  return (Math.abs(area2) / 2) * cosLat * cosLat / FIELD_AREA_M2;
+}
+
+function formatNumber(n) {
+  const abs = Math.abs(n);
+  if (abs < 1000) return (Math.round(n * 10) / 10).toString();
+  if (abs < 1_000_000) return (n / 1_000).toFixed(1) + "K";
+  if (abs < 1_000_000_000) return (n / 1_000_000).toFixed(1) + "M";
+  return (n / 1_000_000_000).toFixed(1) + "B";
+}
+
+function pickRandom(list, n) {
+  const arr = list.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, n);
+}
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const mapDiv = document.querySelector(".map");
+const fadeOverlay = document.querySelector(".fade-overlay");
+const placeLine = document.querySelector(".place-line");
+const areaText = document.querySelector(".area-text");
+const gridBtn = document.querySelector(".grid-btn");
+
+placeLine.innerHTML = HOME.html;
+
+const map = new mapboxgl.Map({
+  container: mapDiv,
+  style: STYLE,
+  center: HOME.center,
+  zoom: HOME.zoom,
+  bearing: HOME.bearing,
+  pitch: 0,
+  bearingSnap: 0,
+  interactive: false // no dragging or zooming; scrolling the page moves between places
+});
+
+function updateAreaText() {
+  areaText.innerHTML = "The total map area you see on screen is about " +
+    formatNumber(fieldsInView(map)) + " <b>football fields</b>.";
+}
+
+let gridOn = false;
+function redraw() {
+  map.getSource("field").setData({ type: "FeatureCollection", features: [fieldFeature(map)] });
+  if (gridOn) map.getSource("grid").setData({ type: "FeatureCollection", features: gridFeatures(map) });
+}
+
+// step 0 is Levi's Stadium in black and white (darkened); steps 1-2 are other places in color
+function setColor(on) {
+  mapDiv.classList.toggle("grayscale", !on);
+  if (map.getLayer("tint")) map.setLayoutProperty("tint", "visibility", on ? "none" : "visible");
+}
+
+let stops = [HOME];
+let currentStep = 0;
+let moveId = 0;
+
+async function goToStep(index) {
+  index = Math.max(0, Math.min(stops.length - 1, index));
+  if (index === currentStep) return;
+  currentStep = index;
+  const stop = stops[index];
+  const id = ++moveId;
+
+  fadeOverlay.classList.add("visible");
+  await wait(450);
+  if (id !== moveId) return; // a newer step took over during the fade
+
+  // hidden behind the overlay: jump to the new spot at the old zoom, then ease to its own
+  map.jumpTo({ center: stop.center, bearing: stop.bearing, zoom: map.getZoom() });
+  placeLine.innerHTML = stop.html;
+  setColor(index > 0);
+  fadeOverlay.classList.remove("visible");
+  map.easeTo({ zoom: stop.zoom, duration: 1400, essential: true });
+}
+
+map.on("load", () => {
+  const world = { type: "Feature", geometry: { type: "Polygon", coordinates: [[[-180, -85], [180, -85], [180, 85], [-180, 85], [-180, -85]]] } };
+  map.addSource("tint", { type: "geojson", data: world });
+  map.addLayer({ id: "tint", type: "fill", source: "tint", paint: { "fill-color": "#000", "fill-opacity": 0.4 } });
+
+  map.addSource("grid", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+  map.addLayer({ id: "grid", type: "line", source: "grid", layout: { visibility: "none" }, paint: { "line-color": "#fff", "line-width": 1.5 } });
+
+  map.addSource("field", { type: "geojson", data: { type: "FeatureCollection", features: [fieldFeature(map)] } });
+  map.addLayer({ id: "field-shadow", type: "line", source: "field", paint: { "line-color": "#000", "line-width": 20, "line-opacity": 0.4, "line-blur": 6 } });
+  map.addLayer({ id: "field-outline", type: "line", source: "field", paint: { "line-color": "#fff", "line-width": 8 } });
+
+  let raf = null;
+  map.on("move", () => {
+    if (raf) return;
+    raf = requestAnimationFrame(() => { raf = null; redraw(); });
+  });
+  map.on("moveend", updateAreaText);
+  updateAreaText();
+});
+
+gridBtn.addEventListener("click", () => {
+  gridOn = !gridOn;
+  gridBtn.textContent = gridOn ? "Hide grid" : "Show grid";
+  map.setLayoutProperty("grid", "visibility", gridOn ? "visible" : "none");
+  redraw();
+});
+
+// two more places, picked at random from this short list (names as in places.json)
+const RANDOM_PLACES = ["the Hoover Dam", "Niagara Falls", "Central Park", "the Grand Canyon"];
+fetch("../places.json").then((r) => r.json()).then((places) => {
+  const pool = places.filter((p) => RANDOM_PLACES.includes(p.name));
+  stops = [HOME, ...pickRandom(pool, 2).map((p) => ({
+    center: [p.lng, p.lat],
+    zoom: p.zoom ?? 15,
+    bearing: p.bearing || 0,
+    html: "You are at <b>" + p.name + "</b>."
+  }))];
+  if (pendingStep !== null) goToStep(pendingStep);
+});
+
+// --- which step to show ---
+let pendingStep = null;
+function requestStep(index) {
+  if (stops.length < 3) { pendingStep = index; return; } // places not loaded yet
+  goToStep(index);
+}
+
+if (window.parent !== window) {
+  // embedded: the page around us sends { footballStep: n } as it scrolls
+  window.addEventListener("message", (e) => {
+    if (e.data && typeof e.data.footballStep === "number") requestStep(e.data.footballStep);
+  });
+} else {
+  // opened on its own: scroll through the steps here
+  document.documentElement.classList.add("standalone");
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) requestStep(Number(entry.target.dataset.index));
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll(".scroll-step").forEach((s) => observer.observe(s));
+}
+</script>
+</body>
+</html>

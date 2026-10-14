@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sports Fields Embed</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../site.css">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <style>
+/* Like football_embed1.html, but it stays at Niagara Falls, in color, and
+   scrolling changes the unit instead: football field, then 2 other sports
+   units, then a park, from units.json. The dropdown offers every unit. No search or zoom.
+   The embedding page sends the step (0-2) as it scrolls, via postMessage.
+   Opened on its own, the page scrolls through the steps itself. */
+
+.map-wrapper{
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+.map{
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+}
+.labels{
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  z-index: 20;
+  pointer-events: none;
+}
+.map-line{
+  font-size: 20px;
+  font-weight: 300;
+  color: #000;
+  font-family: 'Inter', Arial, sans-serif;
+  background: #FAF8F3;
+  padding: 6px 12px;
+}
+.map-line b{ font-weight: 700; }
+
+/* sports-unit dropdown, as on footballfield.html */
+.unit-select{
+  pointer-events: auto;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #FAF8F3 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 12px center;
+  color: #000;
+  border: none;
+  border-bottom: 2px solid #000;
+  border-radius: 0;
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: normal;
+  padding: 0 36px 0 8px;
+}
+
+.grid-btn{
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 20;
+  border: none;
+  cursor: pointer;
+  line-height: normal;
+}
+/* hover popup explaining the grid, to the right of the button */
+.grid-btn::after{
+  content: attr(data-tip);
+  display: none;
+  position: absolute;
+  left: calc(100% + 10px);
+  bottom: 0;
+  width: max-content;
+  max-width: 280px;
+  padding: 6px 12px;
+  background: #000;
+  color: #FAF8F3;
+  font-size: 16px;
+  font-weight: 300;
+  text-align: left;
+}
+.grid-btn:hover::after{ display: block; }
+
+.mapboxgl-ctrl-logo,
+.mapboxgl-ctrl-attrib{ display: none !important; }
+
+/* only used when the page is opened on its own: one screen of scrolling per step */
+.scroll-steps{ display: none; }
+.standalone .scroll-steps{ display: block; position: relative; z-index: 1; pointer-events: none; }
+.scroll-step{ height: 100vh; }
+.standalone .map-wrapper{ margin-bottom: -100vh; }
+
+/* phones: slightly smaller text */
+@media (max-width: 600px){
+  .map-line, .unit-select{ font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="map-wrapper">
+  <div class="map"></div>
+  <div class="labels">
+    <span class="map-line">This white outline is a <select class="unit-select" aria-label="Unit"></select>.</span>
+    <span class="map-line place-line"></span>
+    <span class="map-line area-text"></span>
+  </div>
+  <button class="map-line grid-btn" type="button">Show grid</button>
+</div>
+
+<div class="scroll-steps">
+  <section class="scroll-step" data-index="0"></section>
+  <section class="scroll-step" data-index="1"></section>
+  <section class="scroll-step" data-index="2"></section>
+  <section class="scroll-step" data-index="3"></section>
+</div>
+
+<script>
+mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ";
+
+const STYLE = "mapbox://styles/jjjiia123/cmmb9euid00at01qr9mbfapn7";
+// Niagara Falls, as in ../places.json
+const HOME = {
+  center: [-79.0760266014956, 43.07900427674076],
+  zoom: 16.5,
+  bearing: 0,
+  html: "You are at <b>Niagara Falls</b>."
+};
+
+// Current unit's footprint; set from ../units.json (sports units only).
+// A "diamond" (baseball diamond) is a FIELD_W_M-sided square standing on a corner.
+let unit = { singular: "football field", plural: "football fields" };
+let FIELD_W_M = 160 * 0.3048;
+let FIELD_H_M = 360 * 0.3048;
+let FIELD_AREA_M2 = FIELD_W_M * FIELD_H_M;
+
+// ---- small-area meter<->degree helpers ----
+function metersPerDeg(lat) {
+  return { mPerDegLat: 111132.92, mPerDegLng: 111320.0 * Math.cos(lat * Math.PI / 180) };
+}
+
+// Local east/north meter offsets -> lng/lat around `center`, turned by -bearing
+// so shapes stay upright on screen however the map is rotated.
+function localToLngLat(center, points, bearing) {
+  const [lng0, lat0] = center;
+  const { mPerDegLat, mPerDegLng } = metersPerDeg(lat0);
+  const t = -bearing * Math.PI / 180;
+  const cosT = Math.cos(t), sinT = Math.sin(t);
+  return points.map(([x, y]) => [
+    lng0 + (x * cosT - y * sinT) / mPerDegLng,
+    lat0 + (x * sinT + y * cosT) / mPerDegLat
+  ]);
+}
+
+function fieldFeature(map) {
+  const c = map.getCenter();
+  const hw = FIELD_W_M / 2, hh = FIELD_H_M / 2;
+  const d = FIELD_W_M / Math.SQRT2; // diamond: center to corner
+  const R5 = FIELD_W_M / (2 * Math.sin(Math.PI / 5)); // pentagon: center to corner
+  const corners = unit.shape === "diamond"
+    ? [[0, d], [d, 0], [0, -d], [-d, 0], [0, d]]
+    : unit.shape === "pentagon"
+    ? [0, 1, 2, 3, 4, 0].map((k) => [R5 * Math.cos(Math.PI / 2 + k * 2 * Math.PI / 5), R5 * Math.sin(Math.PI / 2 + k * 2 * Math.PI / 5)])
+    : [[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh], [-hw, -hh]];
+  const ring = localToLngLat([c.lng, c.lat], corners, map.getBearing());
+  return { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [ring] } };
+}
+
+// Lines tiling the unit across the view, lined up with the center one
+// (turned 45° for a diamond).
+function gridFeatures(map) {
+  const c = map.getCenter();
+  const { mPerDegLat, mPerDegLng } = metersPerDeg(c.lat);
+  const b = map.getBounds();
+  const reach = Math.max(...[b.getNorthWest(), b.getNorthEast(), b.getSouthEast(), b.getSouthWest()]
+    .map((p) => Math.hypot((p.lng - c.lng) * mPerDegLng, (p.lat - c.lat) * mPerDegLat)));
+  const nx = Math.ceil(reach / FIELD_W_M) + 1;
+  const ny = Math.ceil(reach / FIELD_H_M) + 1;
+  if (nx + ny > 1000) return [];
+
+  const lines = [];
+  for (let i = -nx; i <= nx; i++) {
+    const x = FIELD_W_M / 2 + i * FIELD_W_M;
+    lines.push([[x, -reach], [x, reach]]);
+  }
+  for (let j = -ny; j <= ny; j++) {
+    const y = FIELD_H_M / 2 + j * FIELD_H_M;
+    lines.push([[-reach, y], [reach, y]]);
+  }
+  const rot = unit.shape === "diamond" ? Math.PI / 4 : 0;
+  const turn = ([x, y]) => [x * Math.cos(rot) - y * Math.sin(rot), x * Math.sin(rot) + y * Math.cos(rot)];
+  const bearing = map.getBearing();
+  return lines.map((line) => ({
+    type: "Feature",
+    properties: {},
+    geometry: { type: "LineString", coordinates: localToLngLat([c.lng, c.lat], line.map(turn), bearing) }
+  }));
+}
+
+// Ground area of the view, in units.
+function fieldsInView(map) {
+  const canvas = map.getCanvas();
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  const R = 6378137;
+  const merc = (p) => [R * p.lng * Math.PI / 180, R * Math.log(Math.tan(Math.PI / 4 + p.lat * Math.PI / 360))];
+  const ring = [[0, 0], [w, 0], [w, h], [0, h]].map((px) => merc(map.unproject(px)));
+  let area2 = 0;
+  for (let i = 0; i < ring.length; i++) {
+    const [x1, y1] = ring[i], [x2, y2] = ring[(i + 1) % ring.length];
+    area2 += x1 * y2 - x2 * y1;
+  }
+  const cosLat = Math.cos(map.getCenter().lat * Math.PI / 180);
+  return (Math.abs(area2) / 2) * cosLat * cosLat / FIELD_AREA_M2;
+}
+
+function formatNumber(n) {
+  const abs = Math.abs(n);
+  if (abs < 1000) return (Math.round(n * 10) / 10).toString();
+  if (abs < 1_000_000) return (n / 1_000).toFixed(1) + "K";
+  if (abs < 1_000_000_000) return (n / 1_000_000).toFixed(1) + "M";
+  return (n / 1_000_000_000).toFixed(1) + "B";
+}
+
+function pickRandom(list, n) {
+  const arr = list.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, n);
+}
+
+const mapDiv = document.querySelector(".map");
+const placeLine = document.querySelector(".place-line");
+const areaText = document.querySelector(".area-text");
+const gridBtn = document.querySelector(".grid-btn");
+const unitSelect = document.querySelector(".unit-select");
+
+// A <select> is normally as wide as its longest option -- size it to the chosen one.
+function fitSelectToContent(selectEl) {
+  const probe = document.createElement("span");
+  const cs = getComputedStyle(selectEl);
+  probe.style.cssText = "position:absolute;visibility:hidden;white-space:pre;";
+  probe.style.font = cs.font;
+  probe.style.letterSpacing = cs.letterSpacing;
+  probe.textContent = selectEl.options[selectEl.selectedIndex]?.text || "";
+  document.body.appendChild(probe);
+  const w = probe.getBoundingClientRect().width;
+  probe.remove();
+  selectEl.style.width = Math.ceil(w + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)) + "px";
+}
+
+placeLine.innerHTML = HOME.html;
+
+const map = new mapboxgl.Map({
+  container: mapDiv,
+  style: STYLE,
+  center: HOME.center,
+  zoom: HOME.zoom,
+  bearing: HOME.bearing,
+  pitch: 0,
+  bearingSnap: 0,
+  interactive: false // no dragging or zooming; scrolling the page changes the unit
+});
+
+function updateAreaText() {
+  areaText.innerHTML = "The total map area you see on screen is about " +
+    formatNumber(fieldsInView(map)) + " <b>" + unit.plural + "</b>.";
+  gridBtn.dataset.tip = "The grid is rectangles the size of the unit being used (" + unit.singular + ").";
+}
+
+let gridOn = false;
+function redraw() {
+  map.getSource("field").setData({ type: "FeatureCollection", features: [fieldFeature(map)] });
+  if (gridOn) map.getSource("grid").setData({ type: "FeatureCollection", features: gridFeatures(map) });
+}
+
+// each step is a different unit at the same place
+let currentStep = 0;
+function goToStep(index) {
+  index = Math.max(0, Math.min(stepUnitKeys.length - 1, index));
+  if (index === currentStep) return;
+  currentStep = index;
+  const stepUnit = allUnits.find((u) => u.key === stepUnitKeys[index]);
+  if (stepUnit) useUnit(stepUnit);
+}
+
+map.on("load", () => {
+  map.addSource("grid", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+  map.addLayer({ id: "grid", type: "line", source: "grid", layout: { visibility: "none" }, paint: { "line-color": "#fff", "line-width": 1.5 } });
+
+  map.addSource("field", { type: "geojson", data: { type: "FeatureCollection", features: [fieldFeature(map)] } });
+  map.addLayer({ id: "field-shadow", type: "line", source: "field", paint: { "line-color": "#000", "line-width": 20, "line-opacity": 0.4, "line-blur": 6 } });
+  map.addLayer({ id: "field-outline", type: "line", source: "field", paint: { "line-color": "#fff", "line-width": 8 } });
+
+  let raf = null;
+  map.on("move", () => {
+    if (raf) return;
+    raf = requestAnimationFrame(() => { raf = null; redraw(); });
+  });
+  map.on("moveend", updateAreaText);
+  updateAreaText();
+});
+
+gridBtn.addEventListener("click", () => {
+  gridOn = !gridOn;
+  gridBtn.textContent = gridOn ? "Hide grid" : "Show grid";
+  map.setLayoutProperty("grid", "visibility", gridOn ? "visible" : "none");
+  redraw();
+});
+
+// All units from units.json go in the dropdown, grouped by category.
+// Scrolling: step 0 the football field, steps 1-2 two other sports units at
+// random, step 3 a park at random.
+const CATEGORY_LABELS = { squares: "Squares", parks: "Parks", sports: "Sports", buildings: "Buildings", homes: "Homes" };
+// only on this page, not in units.json: a 1,000 sq ft apartment, drawn as a square
+const SQFT_1000_SIDE_FT = Math.sqrt(1000);
+const APARTMENT = {
+  key: "my-apartment", category: "homes", label: "Size of my apartment",
+  singular: "my apartment", plural: "my apartments",
+  widthFt: SQFT_1000_SIDE_FT, lengthFt: SQFT_1000_SIDE_FT
+};
+let allUnits = [];
+let stepUnitKeys = ["football-field"];
+fetch("../units.json").then((r) => r.json()).then((units) => {
+  units = [...units, APARTMENT];
+  allUnits = units;
+  const sports = units.filter((u) => u.category === "sports");
+  stepUnitKeys = [
+    "football-field",
+    ...pickRandom(sports.filter((u) => u.key !== "football-field"), 2).map((u) => u.key),
+    pickRandom(units.filter((u) => u.category === "parks"), 1)[0].key
+  ];
+  ["squares", "parks", "sports", "buildings", "homes"].forEach((cat) => {
+    const inCategory = units.filter((u) => u.category === cat);
+    if (!inCategory.length) return;
+    const group = document.createElement("optgroup");
+    group.label = CATEGORY_LABELS[cat];
+    inCategory.forEach((u) => {
+      const option = document.createElement("option");
+      option.value = u.key;
+      option.textContent = u.label;
+      group.appendChild(option);
+    });
+    unitSelect.appendChild(group);
+  });
+  unitSelect.value = "football-field";
+  fitSelectToContent(unitSelect);
+  document.fonts.ready.then(() => fitSelectToContent(unitSelect));
+
+  unitSelect.addEventListener("change", () => {
+    useUnit(units.find((u) => u.key === unitSelect.value));
+  });
+  useUnit(sports.find((u) => u.key === "football-field") || sports[0]);
+  if (pendingStep !== null) goToStep(pendingStep);
+});
+
+function useUnit(u) {
+  unit = u;
+  unitSelect.value = u.key;
+  const ft = u.widthFt != null;
+  FIELD_W_M = ft ? u.widthFt * 0.3048 : u.widthM;
+  FIELD_H_M = ft ? u.lengthFt * 0.3048 : u.lengthM;
+  FIELD_AREA_M2 = u.shape === "pentagon"
+    ? (1 / 4) * Math.sqrt(5 * (5 + 2 * Math.sqrt(5))) * FIELD_W_M * FIELD_W_M
+    : FIELD_W_M * FIELD_H_M;
+  fitSelectToContent(unitSelect);
+  if (map.getSource("field")) { redraw(); updateAreaText(); }
+  // Niagara's own zoom, or further out if the unit (e.g. Central Park) wouldn't fit
+  map.easeTo({ zoom: Math.min(HOME.zoom, unitFitZoom()), duration: 1400, essential: true });
+}
+
+// Most-zoomed-in level at which the whole unit fits in the window, with a small margin.
+function unitFitZoom() {
+  const canvas = map.getCanvas();
+  const [wM, hM] = unit.shape === "pentagon"
+    ? [FIELD_W_M * 1.618, FIELD_W_M * 1.539]
+    : unit.shape === "diamond"
+    ? [FIELD_W_M * Math.SQRT2, FIELD_W_M * Math.SQRT2]
+    : [FIELD_W_M, FIELD_H_M];
+  const mPerPx = Math.max(wM / (0.9 * canvas.clientWidth), hM / (0.9 * canvas.clientHeight));
+  return Math.log2(78271.517 * Math.cos(map.getCenter().lat * Math.PI / 180) / mPerPx);
+}
+
+// --- which step to show ---
+let pendingStep = null;
+function requestStep(index) {
+  if (!allUnits.length) { pendingStep = index; return; } // units not loaded yet
+  goToStep(index);
+}
+
+if (window.parent !== window) {
+  // embedded: the page around us sends { footballStep: n } as it scrolls
+  window.addEventListener("message", (e) => {
+    if (e.data && typeof e.data.footballStep === "number") requestStep(e.data.footballStep);
+  });
+} else {
+  // opened on its own: scroll through the steps here
+  document.documentElement.classList.add("standalone");
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) requestStep(Number(entry.target.dataset.index));
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll(".scroll-step").forEach((s) => observer.observe(s));
+}
+</script>
+</body>
+</html>

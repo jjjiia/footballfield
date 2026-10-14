@@ -12,8 +12,15 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.css" rel="stylesheet" />
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
+  <script>
+    // footballfield.html?embed -- shown inside another page (scrolly.html): no banner, map fills the frame
+    if (new URLSearchParams(location.search).has("embed")) document.documentElement.classList.add("embed");
+  </script>
   <style>
     html, body { height: 100%; }
+
+.embed .top-banner{ display: none; }
+.embed .map-wrapper{ height: 100vh; }
 
 /* top banner, calculators' font, off-white on black */
 .top-banner{
@@ -656,6 +663,26 @@ function initMapExperience(root, options) {
   fitSelectToContent(placeSelect);
   document.fonts.ready.then(() => fitSelectToContent(placeSelect));
 
+  // Most-zoomed-in level at which the whole current unit still fits in the
+  // window (with a small margin) -- a unit bigger than the window zooms out to this.
+  function unitFitZoom() {
+    const canvas = map.getCanvas();
+    // on-screen width and height of the shape, in meters
+    const [wM, hM] = currentUnit.shape === "pentagon"
+      ? [widthM * 1.618, widthM * 1.539] // regular pentagon: diagonal wide, side x 1.539 tall
+      : currentUnit.shape === "diamond"
+      ? [widthM * Math.SQRT2, widthM * Math.SQRT2] // corner-to-corner
+      : [widthM, heightM];
+    const mPerPx = Math.max(wM / (0.9 * canvas.clientWidth), hM / (0.9 * canvas.clientHeight));
+    const lat = map.getCenter().lat;
+    return Math.log2(78271.517 * Math.cos(lat * Math.PI / 180) / mPerPx);
+  }
+  // Zoom out only if the unit doesn't fit at the current zoom.
+  function zoomOutToFitUnit() {
+    const fit = unitFitZoom();
+    if (map.getZoom() > fit) map.easeTo({ zoom: fit, duration: 1400, essential: true });
+  }
+
   let currentUnit = DEFAULT_UNIT;
   let { widthM, heightM } = unitFootprintMeters(currentUnit);
 
@@ -672,12 +699,13 @@ function initMapExperience(root, options) {
 
   map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "bottom-right");
 
-  // Mouse drags the map; the wheel zooms around the center (where the
-  // rectangle is). Other gestures stay off.
+  // Mouse or finger drags the map; the wheel, pinch and double-tap zoom
+  // around the center (where the rectangle is). Rotating and tilting stay off.
   map.scrollZoom.enable({ around: "center" });
+  map.touchZoomRotate.enable({ around: "center" });
+  map.touchZoomRotate.disableRotation();
+  map.doubleClickZoom.enable();
   map.dragRotate.disable();
-  map.doubleClickZoom.disable();
-  map.touchZoomRotate.disable();
   map.touchPitch.disable();
   map.keyboard.disable();
   map.boxZoom.disable();
@@ -699,6 +727,8 @@ function initMapExperience(root, options) {
   // A searched place has no entry in the place dropdown -- add (or reuse)
   // one so "You are at ..." names it.
   geocoder.on("result", (e) => {
+    // after the search's own fly-to, zoom out if the current unit doesn't fit
+    map.once("moveend", zoomOutToFitUnit);
     let option = placeSelect.querySelector('option[value="search"]');
     if (!option) {
       option = document.createElement("option");
@@ -827,9 +857,10 @@ function initMapExperience(root, options) {
       placeSelect.value = placeValue;
       placeShown();
 
-      // fade back in, then ease from the old zoom to this place's own (in or out)
+      // fade back in, then ease from the old zoom to this place's own (in or out),
+      // or further out if the current unit wouldn't fit at the place's zoom
       fadeOverlay.classList.remove("visible");
-      map.easeTo({ zoom: target.zoom, duration: ZOOM_IN_MS, essential: true });
+      map.easeTo({ zoom: Math.min(target.zoom, unitFitZoom()), duration: ZOOM_IN_MS, essential: true });
     }
 
     function showColor() {
@@ -838,7 +869,7 @@ function initMapExperience(root, options) {
     }
 
     if (unitSelect) {
-      // Stay where we are, at the same zoom: just redraw the shape.
+      // Stay where we are: redraw the shape, zooming out only if it no longer fits.
       function useUnit(unit) {
         showColor();
         currentUnit = unit;
@@ -847,6 +878,7 @@ function initMapExperience(root, options) {
         ({ widthM, heightM } = unitFootprintMeters(currentUnit));
         update();
         updateFieldsText();
+        zoomOutToFitUnit();
       }
 
       // The unit made in the popup: a square of the chosen area, or a drawn shape.
