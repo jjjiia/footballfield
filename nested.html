@@ -39,6 +39,7 @@ b{ font-weight: 700; }
 }
 
 .nested{ padding: 40px 20px; }
+.embed .nested{ padding-top: 0; padding-bottom: 0; display: flow-root; } /* embedded: the text around it is on the embedding page; flow-root keeps margins inside its height */
 
 .nest-line{
   font-size: 40px;
@@ -108,6 +109,7 @@ b{ font-weight: 700; }
 .combo-list li.active{ background: #000; color: #FAF8F3; }
 
 .nest-map{ display: block; width: 100%; height: 60vh; }
+.embed .nest-map{ height: 480px; } /* embedded: the frame fits its content, so not a share of the frame */
 .nest-map .outer{ fill: none; stroke: #000; stroke-width: 1.5; }
 .nest-map .inner-shape{ fill: #000; stroke: none; }
 
@@ -148,6 +150,13 @@ b{ font-weight: 700; }
     <a href="nested_data_source.html">All areas and sources</a>.
     Shapes are drawn to the same scale on an equal-area projection centered on each place.
   </p>
+<script>
+// nested.html?embed&note=N -- the sources are note N at the end of the embedding page, so none here
+{
+  const note = new URLSearchParams(location.search).get("note");
+  if (note) document.querySelector(".source").remove();
+}
+</script>
 </div>
 
 <script>

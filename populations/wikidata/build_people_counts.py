@@ -10,11 +10,18 @@ Left out:
   with 398 passengers a year)
 - items with no English name (the old page showed their ID, e.g. "Q36159")
 
+Followers are Instagram followers, fetched from Wikidata for the people the old
+page listed: each person's social media followers (P8687) statements with an
+Instagram username (P2003) qualifier, the latest by point in time (P585).
+People with no Instagram count in Wikidata are left out.
+
 Usage: python populations/wikidata/build_people_counts.py
 """
 import json
 import os
 import re
+import urllib.parse
+import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..", "..")
@@ -27,12 +34,40 @@ data, _ = json.JSONDecoder().raw_decode(text[start:])
 SECTIONS = [
     ("population", "Country populations"),
     ("languages", "Language speakers"),
-    ("followers", "Social media followers"),
+    ("followers", "Instagram followers"),
     ("visitors", "Visitors and passengers per year"),
     ("venues", "Venue capacity"),
     ("other", "Other"),
 ]
 data["other"] = data["subscribers"] + data["deaths"] + data["registered_users"]
+
+
+def instagram_followers(qids):
+    """{qid: latest Instagram follower count} from Wikidata, for those that have one."""
+    out = {}
+    for i in range(0, len(qids), 50):
+        url = "https://www.wikidata.org/w/api.php?" + urllib.parse.urlencode({
+            "action": "wbgetentities", "ids": "|".join(qids[i:i + 50]), "props": "claims", "format": "json"})
+        req = urllib.request.Request(url, headers={"User-Agent": "footballfield-people-counts/0.1"})
+        entities = json.load(urllib.request.urlopen(req))["entities"]
+        for q, e in entities.items():
+            best = None
+            for c in e.get("claims", {}).get("P8687", []):
+                quals = c.get("qualifiers", {})
+                if c["rank"] == "deprecated" or "P2003" not in quals:
+                    continue
+                when = quals["P585"][0]["datavalue"]["value"]["time"] if "P585" in quals else ""
+                n = float(c["mainsnak"]["datavalue"]["value"]["amount"])
+                if best is None or when > best[0]:
+                    best = (when, n)
+            if best:
+                out[q] = best[1]
+    return out
+
+
+ig = instagram_followers([d["q"] for d in data["followers"]])
+print(f"Instagram followers: {len(ig)} of {len(data['followers'])} people")
+data["followers"] = [{**d, "v": ig[d["q"]], "p": "Instagram followers"} for d in data["followers"] if d["q"] in ig]
 
 out = []
 for key, section in SECTIONS:

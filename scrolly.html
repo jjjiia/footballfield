@@ -51,6 +51,12 @@ html, body{ background: #FAF8F3; } /* match the maps' off-white */
   color: #000;
   padding: 64px 20px;
 }
+/* text right above an embed: no room below, so the last line sits just above it */
+.text-block.before-embed{ padding-bottom: 0; }
+.before-embed p:last-child{ margin-bottom: 8px; }
+.before-embed .quote-title:last-child{ margin-bottom: 16px; }
+/* a subhead opening a text block: the block's own padding is room enough above it */
+.text-block .quote-title:first-child{ margin-top: 0; }
 .text-block-inner{
   max-width: 700px;
   margin: 0 auto;
@@ -89,25 +95,71 @@ html, body{ background: #FAF8F3; } /* match the maps' off-white */
   margin: 64px calc(50% - min(500px, 50vw - 20px)) 0;
 }
 
+/* the heights scroller (height_scrolly.html): one screen tall and the full window wide,
+   so scrolling anywhere on it goes through its own slides (its slides line up with the text) */
+.heights-frame{
+  display: block;
+  width: 100%;
+  height: 100vh;
+  border: 0;
+}
+/* the "you" calculators grid (you-grid-2.html) and the atom counter (count_atoms.html):
+   each fills exactly one window, so the full window */
+.you-grid-frame, .atoms-frame{
+  display: block;
+  width: 100%;
+  height: 100vh;
+  border: 0;
+}
+/* a narrow stand-in, as wide as the narrow embeds, outlined for now */
+.narrow-placeholder{
+  box-sizing: border-box;
+  width: min(480px, 100% - 40px);
+  height: 480px;
+  margin: 0 auto;
+  background: transparent;
+  border: 1px solid #000;
+  text-align: center;
+}
+
 /* the football field map (embed pages/football_embed1.html) stays on screen
    for three screens of scrolling, one per place, then the page moves on */
 .map-scrolly{ height: 300vh; }
-/* the jobs page (jobs.html), one screen tall */
-.jobs-frame, .nested-frame{
+/* the jobs page (jobs.html), one screen tall; as wide as the nesting and people pages */
+.jobs-frame{
   display: block;
-  width: min(700px, 100% - 40px); /* same as the text column */
+  width: min(480px, 100% - 40px);
   margin: 0 auto;
   height: 100vh;
   border: 0;
 }
-/* the people page (nested_people.html): as tall as its content, set by the script below */
-.people-frame{
+/* the stairs calculator (steps.html): as wide as the narrow embeds, as tall as its content, set by the script below */
+.steps-frame{
   display: block;
-  width: min(700px, 100% - 40px); /* same as the text column */
+  width: min(480px, 100% - 40px);
+  margin: 0 auto;
+  height: 300px;
+  border: 0;
+}
+/* the nesting page (nested.html): narrower than the text, as wide as the people page;
+   as tall as its content, set by the script below */
+.nested-frame{
+  display: block;
+  width: min(480px, 100% - 40px);
   margin: 0 auto;
   height: 480px;
   border: 0;
 }
+/* the people page (nested_people.html): narrower than the text, and a fixed height
+   with room for an open dropdown list, so it never changes size */
+.people-frame{
+  display: block;
+  width: min(480px, 100% - 40px);
+  margin: 0 auto;
+  height: 480px;
+  border: 0;
+}
+@media (max-width: 520px){ .people-frame{ height: 520px; } } /* phones: the sentence wraps more */
 /* last step: every map and calculator, each a small live preview linking to its page */
 .tool-grid{
   display: grid;
@@ -153,6 +205,15 @@ html, body{ background: #FAF8F3; } /* match the maps' off-white */
   height: 100vh;
   border: 0;
 }
+/* notes at the end: the sources of the embedded pages, numbered as marked in each */
+.notes{
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 24px 0 0;
+  padding-left: 20px;
+}
+.notes li{ margin-bottom: 12px; }
 </style>
 </head>
 <body>
@@ -184,39 +245,79 @@ html, body{ background: #FAF8F3; } /* match the maps' off-white */
   <iframe class="map-frame" src="embed%20pages/football_embed2.html" title="Sports fields map"></iframe>
 </div>
 
-<section class="text-block">
+<section class="text-block before-embed">
   <div class="text-block-inner">
-    <h2 class="section-title">“The size of Texas”</h2>
+    <h2 class="section-title quote-title">“The size of Texas”</h2>
+    <p>Some measurements are vague on purpose, they are concepts rather than units of measurements. An asteroid or an iceberg is often a Texas.</p>
   </div>
 </section>
 
-<iframe class="nested-frame" src="nested.html?embed" title="Nesting map"></iframe>
+<iframe class="nested-frame" src="nested.html?embed&note=1" title="Nesting map"></iframe>
 
-<section class="text-block">
+<section class="text-block before-embed" style="padding-top: 96px;">
   <div class="text-block-inner">
-    <p>But maybe we don’t care about the size of things, we care about how many people are in them.</p>
+    <p style="margin-bottom: 32px;">And some comparisons stick, but don’t bring us closer to the object of comparison.</p>
   </div>
 </section>
 
-<iframe class="people-frame" src="nested_people.html?embed" title="Population nesting"></iframe>
+<iframe class="people-frame" src="nested_people.html?embed&note=2" title="Population nesting"></iframe>
 
-<section class="text-block">
+<section class="text-block before-embed" style="padding-top: 40px;">
   <div class="text-block-inner">
-    <p>And how many people do what.</p>
-    <h2 class="section-title">There are as many air traffic controllers as economists</h2>
+    <p>Part of having a lot of data at our fingertips, and standardized units, is that when we measure with the same unit, we can make comparisons to things that fall into very different categories.</p>
+    <h2 class="section-title quote-title" style="max-width: 480px; margin-left: auto; margin-right: auto; margin-bottom: 40px; text-wrap: balance;">There are as many teachers in Washington, DC as DJs in the whole United States</h2>
+    <p>We can connect them in many ways in an attempt to generate a single meaningful connection.</p>
   </div>
 </section>
 
-<iframe class="jobs-frame" src="jobs.html?embed" title="Jobs"></iframe>
+<iframe class="jobs-frame" src="jobs.html?embed&note=3" title="Jobs"></iframe>
 
-<section class="text-block">
+<section class="text-block before-embed">
   <div class="text-block-inner">
-    <h2 class="section-title">The Statue of Liberty is about 9 giraffes</h2>
-    <p>Or you want to know how tall something is.</p>
+    <p>We can generate context until 1 clicks</p>
   </div>
 </section>
 
-<div class="placeholder">Heights map</div>
+<div class="placeholder narrow-placeholder">Endless context placeholder</div>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <p>Or instead of endless context, we can start with a thing we can touch.</p>
+    <h2 class="section-title quote-title">The Statue of Liberty is about 9 giraffes</h2>
+  </div>
+</section>
+
+<iframe class="heights-frame" src="height_scrolly.html?embed" title="Heights"></iframe>
+
+<section class="text-block before-embed">
+  <div class="text-block-inner">
+    <h2 class="section-title quote-title">Find a staircase</h2>
+  </div>
+</section>
+
+<iframe class="steps-frame" src="steps.html?embed&note=4" title="Steps"></iframe>
+
+<section class="text-block before-embed">
+  <div class="text-block-inner">
+    <h2 class="section-title quote-title">Find a thing that you can do, touch, feel</h2>
+  </div>
+</section>
+
+<iframe class="you-grid-frame" src="you-grid-2.html" title="You grid"></iframe>
+
+<section class="text-block before-embed">
+  <div class="text-block-inner">
+    <h2 class="section-title quote-title">Find a thing to count by saying tick tock or Mississippi out loud</h2>
+  </div>
+</section>
+
+<iframe class="atoms-frame" src="count_atoms.html" title="Count atoms"></iframe>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <h2 class="section-title quote-title">To be continued …</h2>
+  </div>
+</section>
 
 <section class="text-block">
   <div class="text-block-inner">
@@ -233,6 +334,18 @@ html, body{ background: #FAF8F3; } /* match the maps' off-white */
   <a class="tool" href="count_atoms.html"><div class="tool-preview"><iframe src="count_atoms.html" title="Count atoms" loading="lazy" tabindex="-1"></iframe></div><span>Count atoms</span></a>
   <a class="tool" href="you.html"><div class="tool-preview"><iframe src="you.html" title="You" loading="lazy" tabindex="-1"></iframe></div><span>You</span></a>
 </div>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <h2 class="section-title">Notes</h2>
+    <ol class="notes">
+      <li id="note-1"><b>Nesting map.</b> Areas are land area, leaving out water; lakes and reservoirs are water surface area. US states and metropolitan statistical areas: U.S. Census Bureau, 2024 cartographic boundary files (land area). Countries: <a href="https://data.worldbank.org/indicator/AG.LND.TOTL.K2">World Bank, Land area (sq. km)</a>, 2024, and World Bank Official Boundaries. Lakes and reservoirs of 5,000 km² or more: <a href="https://www.hydrosheds.org/products/hydrolakes">HydroLAKES</a> (Messager et al. 2016). <a href="nested_data_source.html">All areas and sources</a>. Shapes are drawn to the same scale on an equal-area projection centered on each place.</li>
+      <li id="note-2"><b>Population nesting.</b> Counts of people from <a href="https://www.wikidata.org/">Wikidata</a>: country populations, language speakers, Instagram followers, yearly visitors and passengers, venue capacity, and a few others. Each count under a dropdown links to its Wikidata entry. Wikidata is edited by volunteers, so dates and methods vary from count to count. Left out: visitor and passenger counts under 1,000 a year (wrong in Wikidata), entries with no name, and vaccination and view counts (they count doses and views, not people). Data: <a href="populations/wikidata/people_counts.json">people_counts.json</a>.</li>
+      <li id="note-3"><b>Jobs.</b> United States: U.S. Census Bureau, <a href="https://www.census.gov/programs-surveys/acs">American Community Survey</a> 2020–2024 5-year estimates, table B24114, Detailed Occupation for the Civilian Employed Population 16 Years and Over; occupations are grouped into professions in <a href="populations/acs/census_occupation_mapping.json">census_occupation_mapping.json</a>. States and metro areas: U.S. Bureau of Labor Statistics, <a href="https://www.bls.gov/oes/tables.htm">Occupational Employment and Wage Statistics</a>, May 2025 state and metropolitan area estimates; occupations are grouped into professions in <a href="populations/bls/occupation_mapping.json">occupation_mapping.json</a>. Not all areas have published numbers for all occupations.</li>
+      <li id="note-4"><b>Stairs.</b> Depths, from <a href="height_data.html">the heights data</a>: average ocean depth 3,682 m (12,080 ft), <a href="https://oceanservice.noaa.gov/facts/oceandepth.html">NOAA</a>; Grand Canyon at its deepest 1,857 m (6,093 ft), <a href="https://en.wikipedia.org/wiki/Grand_Canyon">Wikipedia</a>.</li>
+    </ol>
+  </div>
+</section>
 
 <script>
 // Tell each embedded map which step to show (0, 1, 2, ...), from how far we've
@@ -252,11 +365,11 @@ document.querySelectorAll(".map-scrolly").forEach((mapScrolly) => {
   mapFrame.addEventListener("load", () => sendStep(true));
 });
 
-// Fit the people frame to its page's content, and keep fitting it as the
-// sentence and source note rewrap (the page is ours, so we can measure it).
-document.querySelectorAll(".people-frame").forEach((frame) => {
+// Fit the nesting and stairs frames to their page's content, and keep fitting them
+// as the sentences rewrap (the pages are ours, so we can measure them).
+document.querySelectorAll(".nested-frame, .steps-frame").forEach((frame) => {
   frame.addEventListener("load", () => {
-    const page = frame.contentDocument.querySelector(".nested");
+    const page = frame.contentDocument.querySelector(".nested, .steps");
     const fit = () => { frame.style.height = Math.ceil(page.getBoundingClientRect().height) + "px"; };
     new ResizeObserver(fit).observe(page);
     fit();

@@ -15,10 +15,9 @@
   <style>
 html, body{ background: #FAF8F3; color: #000; }
 .embed .top-banner{ display: none; }
-/* embedded (scrolly.html sizes the frame to .nested): a shorter open list,
-   and just enough height under the dropdowns for it */
-.embed .nested{ min-height: 340px; box-sizing: border-box; }
-.embed .combo-list{ max-height: 220px; }
+/* embedded (scrolly.html gives the frame a fixed size, with room for the open list) */
+.embed .nested{ padding-top: 0; padding-bottom: 0; }
+.embed .combo-list{ max-height: 240px; max-width: min(320px, calc(100vw - 40px)); }
 body{ font-family: 'Inter', Arial, sans-serif; }
 b{ font-weight: 700; }
 
@@ -49,11 +48,10 @@ b{ font-weight: 700; }
   line-height: 1.3;
   margin: 0 0 16px;
 }
-/* the dropdown line: smaller, with room under it for each count */
-/* line-height leaves room for the captions when the line wraps onto two lines */
-.nest-pick{ font-size: 20px; line-height: 2.5; margin-bottom: 24px; }
+/* the dropdown line: same size as the sentence under it, with room under each
+   box for its count when the line wraps */
+.nest-pick{ line-height: calc(1.3em + 28px); margin-bottom: 24px; }
 .nest-pick .combo{ line-height: normal; } /* captions sit right under the box */
-.nest-pick .unit-select{ font-size: 20px; padding: 0 36px 0 8px; background-position: right 12px center; }
 /* each count, under its dropdown's underline */
 .combo-area{
   position: absolute;
@@ -121,7 +119,6 @@ b{ font-weight: 700; }
 @media (max-width: 700px){
   .nest-line, .unit-select{ font-size: 28px; }
   .unit-select{ padding-right: 36px; background-position: right 12px center; }
-  .nest-pick, .nest-pick .unit-select{ font-size: 16px; }
   .combo-input:focus{ min-width: 240px; }
   .combo-list{ font-size: 16px; }
 }
@@ -138,11 +135,18 @@ b{ font-weight: 700; }
   </p>
   <p class="nest-line" id="result"></p>
   <p class="source">
-    Counts of people from <a href="https://www.wikidata.org/">Wikidata</a>: country populations, language speakers, social media followers, yearly visitors and passengers, venue capacity, and a few others. Each count under a dropdown links to its Wikidata entry.
+    Counts of people from <a href="https://www.wikidata.org/">Wikidata</a>: country populations, language speakers, Instagram followers, yearly visitors and passengers, venue capacity, and a few others. Each count under a dropdown links to its Wikidata entry.
     Wikidata is edited by volunteers, so dates and methods vary from count to count.
     Left out: visitor and passenger counts under 1,000 a year (wrong in Wikidata), entries with no name, and vaccination and view counts (they count doses and views, not people).
     Data: <a href="populations/wikidata/people_counts.json">people_counts.json</a>.
   </p>
+<script>
+// nested_people.html?embed&note=N -- the sources are note N at the end of the embedding page, so none here
+{
+  const note = new URLSearchParams(location.search).get("note");
+  if (note) document.querySelector(".source").remove();
+}
+</script>
 </div>
 
 <script>
@@ -159,7 +163,7 @@ function phrases(name, property) {
   switch (property) {
     case "population": return ["people in " + the, "person in " + the];
     case "number of speakers, writers, or signers": return [name + " speakers", name + " speaker"];
-    case "social media followers": return [name + " followers", name + " follower"];
+    case "Instagram followers": return [name + " followers", name + " follower"];
     case "visitors per year": return ["yearly visitors to " + name, "yearly visitor to " + name];
     case "patronage": return ["yearly passengers at " + name, "yearly passenger at " + name];
     case "maximum capacity": return ["people who fit in " + name, "person who fits in " + name];
@@ -292,7 +296,8 @@ fetch("populations/wikidata/people_counts.json").then(r => r.json()).then(sectio
   document.getElementById("thing").append(thingCount);
   document.getElementById("unit").append(unitCount);
   thing.set("population|Q30");   // people in the United States
-  unit.set("venues|Q3531421");   // people who fit in Narendra Modi Stadium
+  // embedded: Cristiano Ronaldo's social media followers; on its own: people who fit in Narendra Modi Stadium
+  unit.set(document.documentElement.classList.contains("embed") ? "followers|Q11571" : "venues|Q3531421");
 
   function showCount(el, p) {
     el.innerHTML = "";
