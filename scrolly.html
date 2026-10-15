@@ -3,18 +3,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Title TK</title>
+  <title>Experiments in Understanding Scale</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
   <style>
+html, body{ background: #FAF8F3; } /* match the maps' off-white */
+
 /* intro header, before the map */
 #intro{
-  background: #fff;
+  background: #FAF8F3;
   color: #000;
-  padding: 100px 20px 24px; /* little room below, so the heading sits just above the map */
+  padding: 100px 20px 0; /* no room below, so the last line sits just above the map */
 }
+#intro p:last-child{ margin-bottom: 8px; }
 #intro-inner{
   max-width: 700px;
   margin: 0 auto;
@@ -36,9 +39,15 @@
   margin: 0 0 1em;
 }
 
+#intro a, .text-block a{ color: #000; }
+/* room between a subheader and the text that follows it */
+.section-title + p{ margin-top: 24px; }
+/* the quote in the intro: 20px in from the text on each side, more room below */
+.section-title.quote-title{ margin: 64px 20px 40px; }
+
 /* text between maps, same look as the intro text */
 .text-block{
-  background: #fff;
+  background: #FAF8F3;
   color: #000;
   padding: 64px 20px;
 }
@@ -86,22 +95,61 @@
 /* the jobs page (jobs.html), one screen tall */
 .jobs-frame, .nested-frame{
   display: block;
-  width: 100%;
+  width: min(700px, 100% - 40px); /* same as the text column */
+  margin: 0 auto;
   height: 100vh;
   border: 0;
 }
 /* the people page (nested_people.html): as tall as its content, set by the script below */
 .people-frame{
   display: block;
-  width: 100%;
+  width: min(700px, 100% - 40px); /* same as the text column */
+  margin: 0 auto;
   height: 480px;
   border: 0;
+}
+/* last step: every map and calculator, each a small live preview linking to its page */
+.tool-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px 100px;
+}
+.tool{
+  display: block;
+  color: #000;
+  text-decoration: none;
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+}
+.tool span{ display: block; margin-top: 8px; }
+/* the page is drawn at desktop size (1200 x 800) and scaled down to the tile, set by the script below */
+.tool-preview{
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+}
+.tool-preview iframe{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1200px;
+  height: 800px;
+  border: 0;
+  transform-origin: 0 0;
+  pointer-events: none; /* clicks go to the link */
 }
 .map-frame{
   position: sticky;
   top: 0;
   display: block;
-  width: 100%;
+  width: min(700px, 100% - 40px); /* same as the text column */
+  margin: 0 auto;
   height: 100vh;
   border: 0;
 }
@@ -111,12 +159,14 @@
 
 <header id="intro">
   <div id="intro-inner">
-    <h1>Title TK</h1>
-    <p>I started thinking differently about how to understand scale when my son asked how many seconds it was until the weekend. The length of one second was a tangible thing to a child, equivalent to a tick tock sound he can make on his own.</p>
-    <p>Making use of colloquial and biological units in digital measurements and maps is one way for us to understand things that are impossibly large(like the number atoms in a grain of sand)  and constantly growing still(like the wealth of the wealthiest people).</p>
-    <p>There is a long tradition of measuring things with ones’ own body, at arms lengths, by foot, a hair, a nose, a nail, a step. We can also measure things using what we already know first hand, the size of our living rooms, the length of our commutes, the cost of our labor, the number of people in this room.</p>
-    <p>Let’s start with this football field. This is a map that measures the area that is in view in football fields.</p>
-    <h2 class="section-title">A football field</h2>
+    <h1>Experiments in Understanding Scale</h1>
+    <p>I changed the way I think about scale when my son asked how many seconds it was until the weekend. The length of one second was a tangible thing to a child, equivalent to a tick tock sound he can make on his own. Similarly, explanations of large numbers often worked only when they started with the small and personal — the size of his room, the distance walked every morning to school, the height at the top of the slide at his playground.</p>
+    <p>Every time I trimmed my son’s nails, I had the habit of holding up a sliver of baby fingernail and saying “this is how much the tectonic plates have moved since we last cut your nails”. All because I had read in a decade-old article that “<a href="https://www.nytimes.com/2016/07/23/science/continental-drift-tectonic-plates.html">Continents Split Up at the Same Speed Finger Nails Grow</a>.” That factoid stays with me because the sentence connected this global phenomenon so effectively to my literal fingertip. It reminds me that nothing is too big or small to be felt and seen if only we had the right unit of measurement.</p>
+    <h2 class="section-title quote-title">“the correlation of some target to some comparator or unit”</h2>
+    <p>Many units of measurement originate in our own bodies -  hand, foot, hair, nose, thumb, finger, arm, step. In some cultures they still persist against standards, it is perhaps not only more intuitive but also logical to use our biological attributes as units. After all, part of the world we aim to measure - our built environment, grows out of the human body as its base unit.</p>
+    <p>Standardized units and systems of measurement are about human communication. While they often have to separate from their human origins in order to function properly, a shared unit builds connection between 2 acts of measurement. It does not matter how different the things we measure are. In loosely calling units in the following experiments colloquial, my intention is not to erase the systems and standards. Instead, I would like to think more about the colloquial unit as a narrative manipulation of standardized units, where straightforward conversions and the world of arms, hairs, and nails coexist.</p>
+    <h2 class="section-title quote-title" style="text-transform: none;">Let’s Start With a Football Field</h2>
+    <p>This is a map that measures the area that is in view in football fields.</p>
   </div>
 </header>
 
@@ -170,9 +220,19 @@
 
 <section class="text-block">
   <div class="text-block-inner">
-    <h2 class="section-title">1,800,740 engineers in the US ≈ 1,801,640 assemblers in the US</h2>
+    <h2 class="section-title">All the maps and calculators</h2>
   </div>
 </section>
+
+<div class="tool-grid">
+  <a class="tool" href="footballfield.html"><div class="tool-preview"><iframe src="footballfield.html?embed" title="Football field map" loading="lazy" tabindex="-1"></iframe></div><span>Football field</span></a>
+  <a class="tool" href="nested.html"><div class="tool-preview"><iframe src="nested.html?embed" title="Nesting map" loading="lazy" tabindex="-1"></iframe></div><span>Nesting</span></a>
+  <a class="tool" href="nested_people.html"><div class="tool-preview"><iframe src="nested_people.html?embed" title="Population nesting" loading="lazy" tabindex="-1"></iframe></div><span>Population nesting</span></a>
+  <a class="tool" href="jobs.html"><div class="tool-preview"><iframe src="jobs.html?embed" title="Jobs" loading="lazy" tabindex="-1"></iframe></div><span>Jobs</span></a>
+  <a class="tool" href="height_scrolly.html"><div class="tool-preview"><iframe src="height_scrolly.html" title="Heights" loading="lazy" tabindex="-1"></iframe></div><span>Heights</span></a>
+  <a class="tool" href="count_atoms.html"><div class="tool-preview"><iframe src="count_atoms.html" title="Count atoms" loading="lazy" tabindex="-1"></iframe></div><span>Count atoms</span></a>
+  <a class="tool" href="you.html"><div class="tool-preview"><iframe src="you.html" title="You" loading="lazy" tabindex="-1"></iframe></div><span>You</span></a>
+</div>
 
 <script>
 // Tell each embedded map which step to show (0, 1, 2, ...), from how far we've
@@ -201,6 +261,14 @@ document.querySelectorAll(".people-frame").forEach((frame) => {
     new ResizeObserver(fit).observe(page);
     fit();
   });
+});
+
+// Scale each grid preview's desktop-sized page down to fit its tile.
+document.querySelectorAll(".tool-preview").forEach((preview) => {
+  const frame = preview.querySelector("iframe");
+  new ResizeObserver(() => {
+    frame.style.transform = `scale(${preview.clientWidth / 1200})`;
+  }).observe(preview);
 });
 </script>
 
