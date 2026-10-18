@@ -174,13 +174,9 @@ html, body{ background: #FAF8F3; }
   border: 0;
 }
 
-/* the heights scroller (height_scrolly.html?driven): 80% of the window tall and the full window wide, pinned in the
-   middle of the window while the page scrolls through a tall section, 60% of a window per step (the script below sets
-   the section's height from the number of steps and tells the page which step to show), so it can't be scrolled past */
-.heights-scrolly{ height: 600vh; }
+/* the heights calculator (height_scrolly.html?calculator): its "measure some things in" chart alone, 80% of the window
+   tall and the full window wide */
 .heights-frame{
-  position: sticky;
-  top: 10vh;
   display: block;
   width: 100%;
   height: 80vh;
@@ -388,9 +384,12 @@ html, body{ background: #FAF8F3; }
 </section>
 
 <!-- Map 7 - measuring tall things in giraffes calculator -->
-<div class="heights-scrolly">
-  <iframe class="heights-frame" src="height_scrolly.html?embed&amp;driven" title="Heights"></iframe>
-</div>
+<!-- the first two steps of the heights page, as pictures, then its "measure some things in" chart, live -->
+<a class="shot" href="height_scrolly.html"><img src="scrolly2_images/giraffes-step1.jpg" alt="The slide at Travers Park is 14ft: lines for you, 48 inches, and the slide, 14 feet"></a>
+<div class="gap"></div>
+<a class="shot" href="height_scrolly.html"><img src="scrolly2_images/giraffes-step2.jpg" alt="When you are standing at the top of the slide, you are a little bit taller than Michael James the giraffe: you on the slide, 18 feet, and the giraffe, 17 feet"></a>
+<div class="gap"></div>
+<iframe class="heights-frame" src="height_scrolly.html?embed&amp;calculator" title="Measure some things in giraffes"></iframe>
 
 <section class="text-block">
   <div class="text-block-inner">
@@ -610,31 +609,6 @@ document.querySelectorAll("iframe").forEach((frame) => {
   sizeEmbedText(frame); // in case it has already loaded
 });
 window.addEventListener("resize", () => document.querySelectorAll("iframe").forEach(sizeEmbedText));
-
-// The heights scroller: the section is as tall as its steps need, 60% of a window each, plus its own height; scrolling
-// through it tells the page which step to show
-{
-  const section = document.querySelector(".heights-scrolly");
-  const frame = section.querySelector(".heights-frame");
-  const STEP_VH = 60;
-  let steps = 0, sent = null;
-  const sendStep = () => {
-    if (!steps) return;
-    const scrolled = -section.getBoundingClientRect().top;
-    const step = Math.max(0, Math.min(steps - 1, Math.floor(scrolled / (innerHeight * STEP_VH / 100) + 0.5)));
-    if (step === sent) return;
-    sent = step;
-    frame.contentWindow.postMessage({ heightsStep: step }, "*");
-  };
-  window.addEventListener("message", (e) => {
-    if (e.source !== frame.contentWindow || !e.data || typeof e.data.heightsSteps !== "number") return;
-    steps = e.data.heightsSteps;
-    section.style.height = (steps - 1) * STEP_VH + 100 + "vh"; // the last step stays on screen for its last stretch
-    sent = null;
-    sendStep();
-  });
-  window.addEventListener("scroll", sendStep, { passive: true });
-}
 
 // Tell each embedded map which step to show (0, 1, 2, ...), from how far we've scrolled through it.
 // data-steps says how many steps a map has; as in scrolly.html

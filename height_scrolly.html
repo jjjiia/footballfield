@@ -15,12 +15,19 @@
     // height_scrolly.html?embed&driven -- the embedding page (index.html) scrolls past it and tells it which step
     // to show, so it does not scroll itself
     if (new URLSearchParams(location.search).has("driven")) document.documentElement.classList.add("driven");
+    // height_scrolly.html?embed&calculator -- just the last step, the "measure some things in" chart, on its own
+    if (new URLSearchParams(location.search).has("calculator")) document.documentElement.classList.add("calculator");
   </script>
   <style>
     /* scrolly: each step is a full-screen slide that snaps into place */
     html{ scroll-snap-type: y mandatory; }
     /* driven by the embedding page: no scrolling of its own, so a scroll over it scrolls that page */
     html.driven{ scroll-snap-type: none; overflow: hidden; }
+    /* embedded, no progress dots */
+    html.embed .progress{ display: none; }
+    /* just the calculator: the other steps hidden, and no scrolling of its own */
+    html.calculator{ scroll-snap-type: none; overflow: hidden; }
+    html.calculator .slide:not(.axis){ display: none; }
     /* and it moves from step to step by sliding its steps up, not by scrolling: on phones, scrolling a page inside
        another scrolls the outer one too, which would carry the embedding page along with it */
     html.driven .inner{ transition: transform 0.6s cubic-bezier(0.33, 0, 0.2, 1); }
