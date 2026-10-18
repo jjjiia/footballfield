@@ -558,6 +558,7 @@
       });
     }
     function watchEntrances() {
+      if (document.documentElement.classList.contains("single")) return; // a step shown on its own just sits still
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => { if (entry.isIntersecting && upright(entry.target)) playEntrance(entry.target); });
       }, { threshold: 0.6, rootMargin: "0px 0px -30px 0px" }); // 30px further into view before it starts
