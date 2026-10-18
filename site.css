@@ -27,3 +27,6 @@ body{ font-family: 'Open Sans', sans-serif; }
   letter-spacing: 0.5px;
 }
 .site-nav a:hover{ text-decoration: underline; }
+
+/* square corners on every form control: phones (iOS especially) round inputs, dropdowns and buttons by default */
+input, select, textarea, button{ border-radius: 0; }
