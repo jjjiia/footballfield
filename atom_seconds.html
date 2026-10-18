@@ -21,6 +21,20 @@
       max-width: 640px;
     }
     .sentence b{ font-weight: 800; } /* extra bold, between bold and the heaviest */
+    /* the "across the width of" dropdown in the sentence: drawn by the page, square, with its own arrow */
+    .measure{
+      font: inherit;
+      font-weight: 700;
+      color: #000;
+      border: 2px solid #000;
+      border-radius: 0;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+      max-width: 100%;
+      padding: 0 32px 0 0.2em;
+      background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 10px center;
+    }
     .circle{
       position: fixed;
       top: 0;
@@ -66,7 +80,12 @@
 <body>
   <svg class="circle" aria-hidden="true"><g class="pen"></g></svg>
   <p class="sentence mississippi"><span class="count">1 Mississippi</span><span class="counting-since"></span><span class="hairs-counted"></span></p>
-  <p class="sentence about">If you count 1 atom per second, it would take 11 days, 13 hours, 46 minutes and 40 seconds to count all the atoms across the width of a hair. <b>You will have counted 1 hair width of atoms by <span class="done-at"></span>.</b><span class="save-note">You can save your unique URL to this page and come back to check its progress.</span></p>
+  <p class="sentence about">If you count 1 atom per second, it would take <span class="count-time">11 days, 13 hours, 46 minutes and 40 seconds</span> to count all the atoms across the width of <select class="measure across" aria-label="Across the width of">
+        <option value="hair" selected>a hair</option>
+        <option value="blood-cell">a red blood cell</option>
+        <option value="visible">the smallest thing you can see</option>
+        <option value="sand">a grain of sand</option>
+      </select>. <b>You will have counted 1 <span class="width-word">hair width</span> of atoms by <span class="done-at"></span>.</b><span class="save-note">You can save your unique URL to this page and come back to check its progress.</span></p>
 
   <script>
     const svg = document.querySelector(".circle");
@@ -166,13 +185,50 @@
     const circleStart = performance.now() - (Date.now() - startedAt); // a count already under way carries on where it is
     const when = { weekday: "long", month: "long", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit" };
     document.querySelector(".counting-since").textContent = "since " + new Date(startedAt).toLocaleString(undefined, when);
-    // a hair's width is a million atoms, so a million seconds after the count started: said as today or tomorrow
+    // ---- what is being counted across: on the scale of a hair being about a million atoms wide (about 100
+    // micrometers, so an atom is about a tenth of a nanometer), each thing's width in atoms ----
+    const ACROSS = {
+      hair: { atoms: 1e6, one: "hair width", many: "hair widths" },
+      "blood-cell": { atoms: 75000, one: "red blood cell width", many: "red blood cell widths" }, // about 7.5 micrometers
+      // about 40 micrometers, about the least the eye can see
+      visible: { atoms: 400000, one: "width of the smallest thing you can see", many: "widths of the smallest thing you can see" },
+      sand: { atoms: 5e6, one: "grain of sand width", many: "grain of sand widths" }, // about half a millimeter
+    };
+    const acrossSelect = document.querySelector(".across");
+    let across = ACROSS.hair;
+    // seconds -> "11 days, 13 hours, 46 minutes and 40 seconds"
+    function spelledOut(seconds) {
+      const parts = [[86400, "day"], [3600, "hour"], [60, "minute"], [1, "second"]].map(([size, word]) => {
+        const n = Math.floor(seconds / size);
+        seconds -= n * size;
+        return n ? n.toLocaleString() + " " + word + (n === 1 ? "" : "s") : null;
+      }).filter(Boolean);
+      return parts.length > 1 ? parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1] : parts[0];
+    }
+    // the time it takes, and when it will be done: the count's start plus that many seconds, said as today or tomorrow
     // at a time when it is that soon, and as a full date when it is further off
-    const doneAt = new Date(startedAt + 1e6 * 1000);
-    const daysAway = Math.round((new Date(doneAt).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)) / 86400000);
-    const atTime = doneAt.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
-    document.querySelector(".done-at").textContent =
-      daysAway === 0 ? "today at " + atTime : daysAway === 1 ? "tomorrow at " + atTime : doneAt.toLocaleString(undefined, when);
+    function describeCount() {
+      document.querySelector(".count-time").textContent = spelledOut(across.atoms);
+      document.querySelector(".width-word").textContent = across.one;
+      const doneAt = new Date(startedAt + across.atoms * 1000);
+      const daysAway = Math.round((new Date(doneAt).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)) / 86400000);
+      const atTime = doneAt.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+      document.querySelector(".done-at").textContent =
+        daysAway === 0 ? "today at " + atTime : daysAway === 1 ? "tomorrow at " + atTime : doneAt.toLocaleString(undefined, when);
+    }
+    // a dropdown is as wide as its longest option; size it to the one picked instead
+    const sizer = document.createElement("span");
+    sizer.style.cssText = "position:absolute;visibility:hidden;white-space:pre;left:-9999px;top:0";
+    document.body.appendChild(sizer);
+    function fitSelect() {
+      sizer.style.font = getComputedStyle(acrossSelect).font;
+      sizer.textContent = acrossSelect.selectedOptions[0].textContent;
+      acrossSelect.style.width = Math.ceil(sizer.getBoundingClientRect().width) + 44 + "px"; // room for the arrow
+    }
+    acrossSelect.addEventListener("change", () => { across = ACROSS[acrossSelect.value]; describeCount(); fitSelect(); });
+    describeCount();
+    fitSelect();
+    if (document.fonts) document.fonts.ready.then(fitSelect);
 
     // a count already under way: lay down the circles from the last few seconds, as if they had been drawn,
     // each with its own wobble for the second it was drawn in and faded for its age
@@ -208,12 +264,12 @@
       const elapsed = counted % CIRCLE_MS;
       const progress = elapsed / CIRCLE_MS;
       drawPen(1 - (1 - progress) ** 3); // eases out: fast at the start of the second, slow at the end
-      // a hair is a million atoms: at a million the count starts over, and the hairs counted so far go up by one
+      // at the width picked (a million atoms for a hair) the count starts over, and the widths counted so far go up by one
       const count = document.querySelector(".mississippi");
-      const hairs = Math.floor((n - 1) / 1e6);
+      const hairs = Math.floor((n - 1) / across.atoms);
       // Mississippi for the first three seconds, to set the pace, then it is atoms being counted
-      count.querySelector(".count").textContent = (((n - 1) % 1e6) + 1).toLocaleString() + (n <= 3 ? " Mississippi" : " atoms");
-      count.querySelector(".hairs-counted").textContent = hairs ? hairs.toLocaleString() + (hairs === 1 ? " hair width" : " hair widths") + " of atoms counted" : "";
+      count.querySelector(".count").textContent = (((n - 1) % across.atoms) + 1).toLocaleString() + (n <= 3 ? " Mississippi" : " atoms");
+      count.querySelector(".hairs-counted").textContent = hairs ? hairs.toLocaleString() + " " + (hairs === 1 ? across.one : across.many) + " of atoms counted" : "";
       count.querySelector(".count").style.opacity = Math.min(1, elapsed / FADE_MS); // only the count fades in each second
       document.querySelector(".save-note").classList.toggle("shown", n > 10); // once 10 Mississippis have passed
       requestAnimationFrame(tick);

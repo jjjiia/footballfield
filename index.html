@@ -3,71 +3,664 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Index</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="site.css">
+  <title>Scrolly 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
   <style>
-    /* same look as the newer pages: Inter, black on off-white */
-    html, body{ background: #FAF8F3; color: #000; }
-    body{ font-family: 'Inter', Arial, sans-serif; }
-    h1{
-      font-weight: 700;
-      font-size: 28px;
-      margin: 0 0 24px;
-    }
-    h2{
-      font-weight: 700;
-      font-size: 22px;
-      margin: 40px 0 12px;
-    }
-    ul{
-      list-style: none;
-      font-size: 22px;
-      font-weight: 300;
-      line-height: 1.4;
-      padding: 0;
-      margin: 0;
-    }
-    a{ display: block; padding: 6px 0; color: #000; text-decoration: none; }
+/* the same look as scrolly.html: Open Sans text in a 700px column, Inter subheads, off-white throughout,
+   with a screenshot of each map or calculator in place of the live page, linked to it */
+html, body{ background: #FAF8F3; }
+
+.text-block{
+  background: #FAF8F3;
+  color: #000;
+  padding: 64px 20px;
+}
+.text-block:first-child{ padding-top: 100px; }
+.text-block-inner{
+  max-width: 700px;
+  margin: 0 auto;
+}
+.text-block p{
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.6;
+  margin: 0 0 1em;
+}
+.text-block a{ color: #000; }
+
+/* the title at the top, like scrolly.html's */
+.page-title{
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 40px;
+  text-align: center;
+  margin: 0 0 24px;
+}
+
+/* a quoted line set apart from the paragraphs around it: italic, and in from both sides */
+.text-block p.pull-quote{
+  font-style: italic;
+  max-width: 520px;
+  margin: 2em auto;
+}
+
+/* subheads, as written, in Inter like scrolly.html's, lined up on the left with the text */
+.section-title{
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-size: 32px;
+  line-height: 1.25;
+  text-align: left;
+  margin: 112px 0 40px; /* plenty of room above its bar */
+}
+.text-block .section-title:first-child{ margin-top: 48px; } /* with the block's own 64px, the same room above the bar */
+/* a black bar across the text column above each subhead, dividing the sections */
+.section-title{ border-top: 80px solid #000; padding-top: 20px; } /* a thick bar, the same as before the headings grew */
+/* the same bar on its own, with no heading under it, to start a new section */
+.section-bar{ border: 0; border-top: 80px solid #000; margin: 112px 0 40px; }
+.text-block .section-bar:first-child{ margin-top: 48px; }
+@media (max-width: 760px){ .section-title{ font-size: 26px; } } /* phones: a little smaller, so long ones wrap less */
+
+/* a screenshot of a map or calculator, as wide as the subheads can go, linked to the page itself */
+.shot{
+  display: block;
+  width: min(1000px, 100% - 40px);
+  margin: 0 auto;
+}
+.shot img{
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #ddd;
+}
+
+/* the football field map (embed pages/football_embed1.html) stays on screen for a screen of scrolling per place
+   (Levi's Stadium, the Hoover Dam, the White House, the Pentagon, the Great Pyramid of Giza), and one more on the
+   last place, then the page moves on */
+.map-scrolly{ height: 600vh; }
+/* the sports fields map (embed pages/football_embed2.html) at the Great Pyramid: a screen per unit (football field,
+   soccer field, Central Park), and one more on the last */
+.units-scrolly{ height: 400vh; }
+.map-frame{
+  position: sticky;
+  top: 0;
+  display: block;
+  width: min(700px, 100% - 40px); /* same as the text column, as in scrolly.html */
+  margin: 0 auto;
+  height: 100vh;
+  border: 0;
+}
+
+/* the nesting calculator (nested.html): narrower than the text, as tall as its content, set by the script below;
+   as in scrolly.html */
+.nested-frame{
+  display: block;
+  width: min(480px, 100% - 40px);
+  margin: 0 auto;
+  height: 480px;
+  border: 0;
+}
+
+/* the people calculator (nested_people.html): narrower than the text, and a fixed height with room for an open
+   dropdown list, so it never changes size; as in scrolly.html */
+.people-frame{
+  display: block;
+  width: min(480px, 100% - 40px);
+  margin: 0 auto;
+  height: 480px;
+  border: 0;
+}
+@media (max-width: 520px){ .people-frame{ height: 520px; } } /* phones: the sentence wraps more */
+
+/* the stairs calculator (stairs.html): as wide as the narrow embeds, as tall as its content, set by the script below;
+   as in scrolly.html */
+.steps-frame{
+  display: block;
+  width: min(480px, 100% - 40px);
+  margin: 0 auto;
+  height: 300px;
+  border: 0;
+}
+
+/* the people-in-the-room calculator (people_in_the_room.html): one centered sentence, as wide as the text column,
+   with room for it to wrap */
+.room-frame{
+  display: block;
+  width: min(700px, 100% - 40px);
+  margin: 0 auto;
+  height: 320px;
+  border: 0;
+}
+
+/* the grid of calculators (you-grid-2.html?cols=2): two columns, as wide as the subheads can go, as tall as all its
+   cells, set by the script below */
+.grid-frame{
+  display: block;
+  width: min(1000px, 100% - 40px);
+  margin: 0 auto;
+  height: 100vh;
+  border: 0;
+}
+
+/* the atoms-in-steps map (embed pages/atom_step.html): one screen tall and the full window wide, like the steps map */
+.atom-step-frame{
+  display: block;
+  width: 100%;
+  height: 100vh;
+  border: 0;
+}
+
+/* the atom counter (embed pages/atom_seconds.html): fills exactly one window, so the full window; as in scrolly.html */
+.atoms-frame{
+  display: block;
+  width: 100%;
+  height: 100vh;
+  border: 0;
+}
+
+/* the jobs calculator (jobs.html), one screen tall; as wide as the nesting and people calculators, as in scrolly.html */
+.jobs-frame{
+  display: block;
+  width: min(480px, 100% - 40px);
+  margin: 0 auto;
+  height: 100vh;
+  border: 0;
+}
+
+/* the heights scroller (height_scrolly.html?driven): 80% of the window tall and the full window wide, pinned in the
+   middle of the window while the page scrolls through a tall section, 60% of a window per step (the script below sets
+   the section's height from the number of steps and tells the page which step to show), so it can't be scrolled past */
+.heights-scrolly{ height: 600vh; }
+.heights-frame{
+  position: sticky;
+  top: 10vh;
+  display: block;
+  width: 100%;
+  height: 80vh;
+  border: 0;
+}
+
+/* the steps-across map (steps_across.html): one screen tall and the full window wide, like the heights scroller */
+.steps-across-frame{
+  display: block;
+  width: 100%;
+  height: 100vh;
+  border: 0;
+}
+
+/* notes at the end: the sources of the embedded maps, in the order they appear; as in scrolly.html */
+.notes{
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 24px 0 0;
+  padding-left: 20px;
+}
+.notes li{ margin-bottom: 12px; }
+
+/* room between two screenshots in a row */
+.gap{ height: 64px; }
+
+/* the tape measure photo: a product picture, so smaller than the map screenshots and with no border */
+.shot.tape-measure{ width: min(480px, 100% - 40px); }
+.shot.tape-measure img{ border: 1px solid #000; }
+
+/* the chapters menu: a button pinned in the bottom right corner that opens a list of the section headings above it,
+   lined up on the right; clicking one scrolls to it */
+.chapters{
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column-reverse; /* the list above the button */
+  align-items: flex-end;
+  z-index: 100;
+  font-family: 'Inter', Arial, sans-serif;
+}
+.chapters-toggle{
+  all: unset;
+  cursor: pointer;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  background: #FAF8F3;
+  border: 1px solid #000;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.chapters-list{
+  margin: 0 0 8px;
+  padding: 8px 0;
+  list-style: none;
+  background: #FAF8F3;
+  border: 1px solid #000;
+  width: min(320px, calc(100vw - 32px));
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+.chapters-list[hidden]{ display: none; }
+.section-title{ scroll-margin-top: 32px; } /* a heading jumped to lands a little below the top of the window */
+.chapters-list a{
+  display: block;
+  padding: 6px 14px;
+  color: #000;
+  text-decoration: none;
+  font-size: 15px;
+  line-height: 1.35;
+}
+.chapters-list a:hover{ background: #eee; }
+
+/* the maps list at the end: one link per map and calculator */
+.maps-list{
+  font-family: 'Open Sans', sans-serif;
+  font-size: 18px;
+  line-height: 1.6;
+  margin: 0;
+  padding-left: 20px;
+}
+
+/* the references at the end, as on references.html, grouped under small subheads */
+.ref-group{
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 1px;
+  margin: 32px 0 12px;
+}
+.references{
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  padding-left: 20px;
+}
+.references li{ margin-bottom: 10px; }
+
+/* stand-in for a map or image still to be made, as in scrolly.html */
+.placeholder{
+  width: min(1000px, 100% - 40px);
+  aspect-ratio: 16 / 10;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: #eee;
+  color: #000;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
   </style>
 </head>
 <body>
-  <div class="inner">
-    <h1>Index</h1>
-    <ul>
+
+<nav class="chapters" aria-label="Sections">
+  <button type="button" class="chapters-toggle" aria-expanded="false" aria-controls="chapters-list">Sections</button>
+  <ol class="chapters-list" id="chapters-list" hidden></ol>
+</nav>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <h1 class="page-title">Title TBD</h1>
+    <p>I changed the way I think about scale when my son asked how many seconds it was until the weekend. The length of one second is a tangible thing to a child, equivalent to a tick-tock sound he can make on his own. Similarly, explanations of large numbers usually worked only when they started with the small and personal — the size of his room, the distance walked every morning to school, the height of scaffolding he likes to climb.</p>
+    <p>When I trim my son’s nails, I like to hold up a sliver of baby fingernail and say, “this is how much the tectonic plates have moved since we last cut your nails,” all because I read in a decade-old article that “Continents Split Up at the Same Speed Finger Nails Grow.” That factoid stayed with me because the sentence connected this global phenomenon so effectively to my literal fingertip. It reminds me that nothing would be too big or small to build a relationship with, if only we had the right unit of measurement.</p>
+    <p class="pull-quote">Measurement is “the correlation of some target to some comparator or unit.”</p>
+    <p>Many units of measurement originate in our own bodies: hand, foot, hair, nose, thumb, finger, arm, step. In some cultures they still persist against standards. It is perhaps not only more intuitive but also logical to use our biological attributes as units. After all, part of the world we aim to measure — our built environment — grows out of the human body as its base unit.</p>
+    <p>Standardized units and systems of measurement are about human communication. While units often have to separate from their human origins in order to function properly, a shared unit builds connection between two acts of measurement. It does not matter how different the things we measure are. By measuring them we push them to exist in the same system and space.</p>
+    <p>A colloquial unit both precedes and follows systems of standardized units. Older humanistic units persist today because of their ability to manipulate the narrative of standards and not resist them. These units live where straightforward conversions and the world of feet, hairs, and nails coexist.</p>
+    <h2 class="section-title">Let’s start with a football field.</h2>
+    <p>This is a map that measures the area that is in view in football fields.</p>
+  </div>
+</section>
+
+<!-- Map 1 - measures everything in football fields: the live map, one screen of scrolling per place -->
+<div class="map-scrolly" data-steps="5">
+  <iframe class="map-frame" src="embed%20pages/football_embed1.html?places=the%20Hoover%20Dam|the%20White%20House|the%20Pentagon|the%20Great%20Pyramid%20of%20Giza" title="Football field map"></iframe>
+</div>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <p>Maybe your game is baseball, or soccer instead. Maybe your base unit is a place you know really well.</p>
+  </div>
+</section>
+
+<!-- Map 2 - allows entering or drawing own units, and preset with sizes of things: the live map at the Great Pyramid,
+     one screen of scrolling per unit -->
+<div class="map-scrolly units-scrolly" data-steps="3">
+  <iframe class="map-frame" src="embed%20pages/football_embed2.html?place=the%20Great%20Pyramid%20of%20Giza&amp;units=football-field|soccer-field|central-park" title="Sports fields map"></iframe>
+</div>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <h2 class="section-title">“The size of Texas”</h2>
+    <p>Some measurements are vague on purpose. They are concepts rather than units of measurements. For example, an asteroid or an iceberg is often a Texas.</p>
+  </div>
+</section>
+
+<!-- Map 3 - a map that counts Texas in Rhode Islands or vice versa using boundary data from the census and world bank -->
+<iframe class="nested-frame" src="nested.html?embed&amp;note=1" title="Nesting map"></iframe>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <p>Sometimes comparisons can stick, but they remain trivia, and may not bring us any closer to the object of comparison.</p>
+  </div>
+</section>
+
+<!-- Map 4 - a calculator that uses people counts from the people data in wikipedia -->
+<iframe class="people-frame" src="nested_people.html?embed&amp;note=2" title="Population nesting"></iframe>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <h2 class="section-title">There are as many teachers in Abilene, Texas as there are DJs in the whole United States.</h2>
+    <p>Part of having a lot of data at our fingertips today is that we have so much capacity to keep adding context by incorporating more datasets. We can connect them in endless ways in an attempt to generate a single meaningful connection. We can keep generating context until one clicks and becomes part of our experience.</p>
+  </div>
+</section>
+
+<!-- Map 5 - a calculator that compares occupations in the ACS and BLS dataset -->
+<iframe class="jobs-frame" src="jobs.html?embed&amp;note=3" title="Jobs"></iframe>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <h2 class="section-title">Giraffes</h2>
+    <p>When expanding and going outwards fail, though, another way is to rest and start from the small again. There are analog tools that people use to measure and record. For example, this tape measure is used by carpenters to write notes to themselves of what they have measured.</p>
+  </div>
+</section>
+
+<!-- Image of tape measure: FastCap ProCarpenter Story Pole tape measure -->
+<a class="shot tape-measure" href="https://www.fastcap.com/product/procarpenter-tape-measure"><img src="scrolly2_images/tape-measure.jpg" alt="A FastCap ProCarpenter Story Pole tape measure, with a strip along the tape that says Write here!"></a>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <p>When my son stands at the top of the slide, it is the highest point he can get to in the park, and he is just a little taller than the adult male giraffe Michael George, one of the tallest giraffes living in the Bronx zoo.</p>
+  </div>
+</section>
+
+<!-- Map 7 - measuring tall things in giraffes calculator -->
+<div class="heights-scrolly">
+  <iframe class="heights-frame" src="height_scrolly.html?embed&amp;driven" title="Heights"></iframe>
+</div>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <h2 class="section-title">Steps</h2>
+    <p>When we walk to school, it is 3 city blocks that take about 600 steps, and anywhere between 6 and 30 minutes depending on the day.</p>
+    <p>And if you do it every day, where will you end up at the end of the year?</p>
+  </div>
+</section>
+
+<!-- Map 8 - here is your height, and your steps, and you will walk across the map area on screen -->
+<iframe class="steps-across-frame" src="steps_across.html?embed" title="Steps across" allow="geolocation"></iframe>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <h2 class="section-title">Find a staircase</h2>
+    <p>Measure a stair. If it is 8 inches tall, then it would be 18,120 steps down to the bottom of the ocean, or 9,139 to the deepest part of the Grand Canyon.</p>
+  </div>
+</section>
+
+<!-- Map 10 - steps down to the ocean and grand canyon calculator -->
+<iframe class="steps-frame" src="stairs.html?embed&amp;note=4" title="Stairs"></iframe>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <h2 class="section-title">Count the people in this room</h2>
+  </div>
+</section>
+
+<!-- Map 11 - measure people capacity of rooms and fill stadiums, airports, attendance -->
+<iframe class="room-frame" src="people_in_the_room.html" title="People in the room"></iframe>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <h2 class="section-title">Find a thing you already do.</h2>
+    <p>And grow it in scale.</p>
+  </div>
+</section>
+
+<!-- Map 12 - grid of calculators -->
+<iframe class="grid-frame" src="you-grid-2.html?cols=2" title="Grid of calculators"></iframe>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <h2 class="section-title">The size of an atom</h2>
+    <p>Yet all these analogies and translations did not prepare me for when, one afternoon last spring, my son asked me about the size of an atom. It is too small, and I never knew how small. I can say there are a million atoms across a strand of hair, but it doesn’t mean a lot, not even to me. So we started with what we knew how to connect with, a second and a step.</p>
+  </div>
+</section>
+
+<!-- Map 13 - if an atom is counted as a second - live - seconds to the weekend -->
+<iframe class="atoms-frame" src="embed%20pages/atom_seconds.html" title="Count atoms"></iframe>
+<div class="gap"></div>
+<!-- Map 14 - if an atom is a step: the live map, centered on downtown Milwaukee -->
+<iframe class="atom-step-frame" src="embed%20pages/atom_step.html" title="Atoms in steps"></iframe>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <hr class="section-bar">
+    <!-- Map 15 - if an atom is a dollar (atom_dollar.html) -->
+    <p>If an atom was a dollar, then a grain of sand would be all the money in the world × 35,000.</p>
+    <!-- Map 16 - if an atom is a person (atom_person.html) -->
+    <p>If an atom is a person, then the population of the world would fit in a grain of sand a million times.</p>
+    <!-- one hair per dollar, about 100,000 hairs on a head: median US household net worth $192,900 (Federal Reserve,
+         Survey of Consumer Finances 2022) is about 2 heads; Elon Musk's net worth about $970 billion (Bloomberg $966.5B,
+         Forbes about $977B, October 13, 2026) is about 9.7 million heads; Hungary is about 9.5 million people (KSH
+         estimate for the end of 2025, about 9.6 million by UN figures) -->
+    <p>If $1 was a hair, then the average American's wealth would be about 2 heads of hair, and Elon Musk's would be a head of hair for everyone in Hungary.</p>
+    <p>These are absurd comparisons. But the problem here is not the atom. It is the vast discrepancies that exist in supposedly human scaled numbers. These are absurdities of wealth, the scales of war, things that will only seem more alien as more dots are connected.</p>
+  </div>
+</section>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <p>End</p>
+  </div>
+</section>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <h2 class="section-title">Maps list</h2>
+    <ul class="maps-list">
       <li><a href="footballfield.html">Football field</a></li>
-      <li><a href="nested.html">Nested</a></li>
-      <li><a href="nested_people.html">Nested people</a></li>
-      <li><a href="scrolly.html">Scrolly</a></li>
-      <li><a href="scrolly2.html">Scrolly 2</a></li>
-      <li><a href="you.html">You</a></li>
-      <li><a href="you-grid.html">You (grid)</a></li>
-      <li><a href="you-grid-2.html">You (grid, one screen)</a></li>
+      <li><a href="embed%20pages/football_embed2.html">Sports fields</a></li>
+      <li><a href="nested.html">Nesting</a></li>
+      <li><a href="nested_people.html">Population nesting</a></li>
+      <li><a href="jobs.html">Jobs</a></li>
       <li><a href="height_scrolly.html">Heights</a></li>
-      <li><a href="height_data.html">Height data</a></li>
-      <li><a href="nested_data_source.html">Nested data source</a></li>
-      <li><a href="infinitecontext.html">Infinite Facts</a></li>
+      <li><a href="steps_across.html">Steps across</a></li>
+      <li><a href="stairs.html">Stairs</a></li>
+      <li><a href="people_in_the_room.html">People in the room</a></li>
+      <li><a href="you-grid-2.html">Things you can do</a></li>
       <li><a href="atom_seconds.html">Atoms in seconds</a></li>
       <li><a href="atom_step.html">Atoms in steps</a></li>
-      <li><a href="atom_person.html">Atoms as people</a></li>
-      <li><a href="atom_dollar.html">Atoms as dollars</a></li>
-      <li><a href="wealth_area.html">Wealth as area</a></li>
-      <li><a href="people_in_the_room.html">People in the room</a></li>
-      <li><a href="steps_across.html">Steps across</a></li>
-      <li><a href="references.html">References</a></li>
-      <li><a href="football_tester.html">Football tester</a></li>
-      <li><a href="unit_tester.html">Unit tester</a></li>
-    </ul>
-
-    <h2>Embeds</h2>
-    <ul>
-      <li><a href="embed%20pages/football_embed1.html">Football field map</a></li>
-      <li><a href="embed%20pages/football_embed2.html">Sports fields map</a></li>
-      <li><a href="embed%20pages/atom_seconds.html">Atoms in seconds</a></li>
-      <li><a href="embed%20pages/atom_step.html">Atoms in steps (Milwaukee)</a></li>
     </ul>
   </div>
+</section>
+
+<!-- Maps list: a link to each map and calculator -->
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <h2 class="section-title">Notes – UNFINISHED</h2>
+    <ol class="notes">
+      <li id="note-1"><b>Map 3, nesting.</b> Areas are land area, leaving out water; lakes and reservoirs are water surface area. US states and metropolitan statistical areas: U.S. Census Bureau, 2024 cartographic boundary files (land area). Countries: <a href="https://data.worldbank.org/indicator/AG.LND.TOTL.K2">World Bank, Land area (sq. km)</a>, 2024, and World Bank Official Boundaries. Lakes and reservoirs of 5,000 km² or more: <a href="https://www.hydrosheds.org/products/hydrolakes">HydroLAKES</a> (Messager et al. 2016). <a href="nested_data_source.html">All areas and sources</a>. Shapes are drawn to the same scale on an equal-area projection centered on each place.</li>
+      <li id="note-2"><b>Map 4, population nesting.</b> Counts of people from <a href="https://www.wikidata.org/">Wikidata</a>: country populations, language speakers, Instagram followers, yearly visitors and passengers, venue capacity, and a few others. Each count under a dropdown links to its Wikidata entry. Wikidata is edited by volunteers, so dates and methods vary from count to count. Left out: visitor and passenger counts under 1,000 a year (wrong in Wikidata), entries with no name, and vaccination and view counts (they count doses and views, not people). Data: <a href="populations/wikidata/people_counts.json">people_counts.json</a>.</li>
+      <li id="note-3"><b>Map 5, jobs.</b> United States: U.S. Census Bureau, <a href="https://www.census.gov/programs-surveys/acs">American Community Survey</a> 2020–2024 5-year estimates, table B24114, Detailed Occupation for the Civilian Employed Population 16 Years and Over; occupations are grouped into professions in <a href="populations/acs/census_occupation_mapping.json">census_occupation_mapping.json</a>. States and metro areas: U.S. Bureau of Labor Statistics, <a href="https://www.bls.gov/oes/tables.htm">Occupational Employment and Wage Statistics</a>, May 2025 state and metropolitan area estimates; occupations are grouped into professions in <a href="populations/bls/occupation_mapping.json">occupation_mapping.json</a>. Not all areas have published numbers for all occupations.</li>
+      <li id="note-4"><b>Map 10, stairs.</b> Depths, from <a href="height_data.html">the heights data</a>: average ocean depth 3,682 m (12,080 ft), <a href="https://oceanservice.noaa.gov/facts/oceandepth.html">NOAA</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="text-block">
+  <div class="text-block-inner">
+    <h2 class="section-title">References</h2>
+    <ol class="references">
+      <li><a href="https://giorgialupi.com/data-humanism-my-manifesto-for-a-new-data-wold/" target="_blank" rel="noopener">Giorgia Lupi, "Data Humanism, My Manifesto for a New Data Wold"</a></li>
+      <li><a href="https://www.not-ship.com/large-numbers/" target="_blank" rel="noopener">Not a Ship, "Large Numbers"</a></li>
+      <li><a href="https://www.worldometers.info/" target="_blank" rel="noopener">Worldometer</a></li>
+      <li><a href="https://oddsofdying.com/" target="_blank" rel="noopener">Odds of Dying</a></li>
+      <li><a href="https://www.stat.berkeley.edu/~aldous/Real-World/million.html" target="_blank" rel="noopener">David Aldous, "What really has a 1 in a million chance?"</a></li>
+      <li><a href="https://www.kickstarter.com/projects/cwandt/time-since-launch" target="_blank" rel="noopener">CW&amp;T, "Time Since Launch," Kickstarter</a></li>
+    </ol>
+
+    <h3 class="ref-group">Units</h3>
+    <ol class="references">
+      <li><a href="https://www.usgs.gov/faqs/how-fast-do-tectonic-plates-move" target="_blank" rel="noopener">USGS, "How fast do tectonic plates move?"</a></li>
+      <li><a href="https://www.nytimes.com/2016/07/23/science/continental-drift-tectonic-plates.html" target="_blank" rel="noopener">The New York Times, on continental drift and tectonic plates (2016)</a></li>
+      <li><a href="https://www.youtube.com/watch?v=0fKBhvDjuy0" target="_blank" rel="noopener">Charles and Ray Eames, "Powers of Ten" (1977)</a></li>
+      <li><a href="https://www.joshworth.com/dev/pixelspace/pixelspace_solarsystem.html" target="_blank" rel="noopener">Josh Worth, "If the Moon Were Only 1 Pixel"</a></li>
+      <li><a href="https://lordofmaps.com/products/highest-mountains" target="_blank" rel="noopener">Lord of Maps, "Highest Mountains"</a></li>
+      <li><a href="https://www.kedm.org/louisiana-news/2015-03-03/why-do-we-measure-wetlands-loss-in-football-fields" target="_blank" rel="noopener">KEDM, "Why do we measure wetlands loss in football fields?" (2015)</a>: “Louisiana loses a football field of land every hour to coastal erosion.”</li>
+      <li><a href="https://www.merriam-webster.com/dictionary/cubit" target="_blank" rel="noopener">Merriam-Webster, "Cubit"</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Biblical_and_Talmudic_units_of_measurement" target="_blank" rel="noopener">Wikipedia, "Biblical and Talmudic units of measurement"</a></li>
+      <li><a href="https://digital.library.cornell.edu/catalog/ss:39357742" target="_blank" rel="noopener">Cornell University Library Digital Collections</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Hair%27s_breadth" target="_blank" rel="noopener">Wikipedia, "Hair's breadth"</a></li>
+      <li><a href="https://penelope.uchicago.edu/Thayer/E/Roman/Texts/secondary/SMIGRA*/Milliare.html" target="_blank" rel="noopener">William Smith, "Milliare," A Dictionary of Greek and Roman Antiquities (1875)</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Barleycorn_(unit)" target="_blank" rel="noopener">Wikipedia, "Barleycorn (unit)"</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/List_of_human-based_units_of_measurement" target="_blank" rel="noopener">Wikipedia, "List of human-based units of measurement"</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Category:Units_of_measurement" target="_blank" rel="noopener">Wikipedia, "Category: Units of measurement"</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/List_of_non-coherent_units_of_measurement" target="_blank" rel="noopener">Wikipedia, "List of non-coherent units of measurement"</a></li>
+      <li><a href="https://www.science.org/doi/10.1126/science.adf1936" target="_blank" rel="noopener">Kaaronen, Manninen, and Eronen, "Body-based units of measure in cultural evolution," Science (2023)</a></li>
+      <li><a href="https://himommy.beehiiv.com/p/comparing-your-baby-s-size-to-animals-a-delightful-guide-to-fetal-development" target="_blank" rel="noopener">HiMommy, "Comparing Your Baby's Size to Animals: A Delightful Guide to Fetal Development"</a></li>
+      <li><a href="https://www.nano.gov/about-nanotechnology/just-how-small-is-nano/" target="_blank" rel="noopener">National Nanotechnology Initiative, "Just How Small Is 'Nano'?"</a>: “A human hair is approximately 80,000–100,000 nanometers wide.” “A single gold atom is about a third of a nanometer in diameter.”<sup>*</sup><br><small><sup>*</sup> 1,000,000 atoms across a hair is a high estimate of atoms.</small></li>
+    </ol>
+
+    <h3 class="ref-group">Money</h3>
+    <ol class="references">
+      <li><a href="https://www.washingtonpost.com/graphics/2020/politics/wealth-comparison/" target="_blank" rel="noopener">The Washington Post, wealth comparison graphic (2020)</a></li>
+      <li><a href="https://www.nytimes.com/interactive/2022/04/07/magazine/jeff-bezos-net-worth.html" target="_blank" rel="noopener">Mona Chalabi, "9 Ways to Imagine Jeff Bezos' Wealth," The New York Times Magazine (2022)</a></li>
+      <li><a href="https://whatselonworth.com/" target="_blank" rel="noopener">Elon's net worth today</a></li>
+      <li><a href="https://neal.fun/" target="_blank" rel="noopener">neal.fun</a></li>
+      <li><a href="https://wealth.ronnycoste.com/" target="_blank" rel="noopener">Ronny Coste, "Wealth, shown to scale"</a></li>
+    </ol>
+
+    <h3 class="ref-group">Objects</h3>
+    <ol class="references">
+      <li><a href="https://www.fastcap.com/product/procarpenter-tape-measure" target="_blank" rel="noopener">FastCap, "Pro Carpenter Tape Measures"</a></li>
+    </ol>
+
+  </div>
+</section>
+
+<script>
+// The chapters menu: one link per section heading, in page order; each heading gets an id to jump to
+{
+  const toggle = document.querySelector(".chapters-toggle");
+  const list = document.querySelector(".chapters-list");
+  const setOpen = (open) => {
+    list.hidden = !open;
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.textContent = open ? "Close" : "Sections";
+  };
+  document.querySelectorAll(".section-title").forEach((heading, i) => {
+    heading.id = heading.id || "chapter-" + (i + 1);
+    const link = Object.assign(document.createElement("a"), { href: "#" + heading.id, textContent: heading.textContent.trim() });
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      heading.scrollIntoView({ behavior: "smooth", block: "start" });
+      history.replaceState(null, "", "#" + heading.id);
+      setOpen(false);
+    });
+    const item = document.createElement("li");
+    item.appendChild(link);
+    list.appendChild(item);
+  });
+  toggle.addEventListener("click", () => setOpen(list.hidden));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+  // a click anywhere outside the menu closes it too; a click inside an embedded map never reaches this page, but it
+  // takes the focus away from the page, so that closes it as well
+  document.addEventListener("click", (e) => { if (!list.hidden && !e.target.closest(".chapters")) setOpen(false); });
+  window.addEventListener("blur", () => { if (!list.hidden) setOpen(false); });
+}
+
+// Every embed's sentences at one size, the same as the text pages': 28px, or 22px on phones. The embedded pages are
+// ours, so a style can be added to each as it loads; this changes them only here, not on their own pages or scrolly.html
+const EMBED_TEXT = [
+  ".map-line", ".map-line .unit-select",            // the football maps
+  ".nest-line", ".nest-line .unit-select",          // nesting and people
+  ".job .job-line", ".job .job-count", ".job .unit-select", // jobs, its main sentence
+  ".step-line",                                     // stairs
+  ".madlib",                                        // the calculator grid
+  ".sentence:not(.mississippi)",                    // heights, steps, the room, atoms
+].join(", ");
+function sizeEmbedText(frame) {
+  const doc = frame.contentDocument;
+  if (!doc || !doc.head) return;
+  let style = doc.getElementById("scrolly2-text-size");
+  if (!style) {
+    style = Object.assign(doc.createElement("style"), { id: "scrolly2-text-size" });
+    doc.head.appendChild(style);
+  }
+  style.textContent = `${EMBED_TEXT}{ font-size: ${innerWidth <= 760 ? 22 : 28}px !important; }`;
+}
+document.querySelectorAll("iframe").forEach((frame) => {
+  frame.addEventListener("load", () => sizeEmbedText(frame));
+  sizeEmbedText(frame); // in case it has already loaded
+});
+window.addEventListener("resize", () => document.querySelectorAll("iframe").forEach(sizeEmbedText));
+
+// The heights scroller: the section is as tall as its steps need, 60% of a window each, plus its own height; scrolling
+// through it tells the page which step to show
+{
+  const section = document.querySelector(".heights-scrolly");
+  const frame = section.querySelector(".heights-frame");
+  const STEP_VH = 60;
+  let steps = 0, sent = null;
+  const sendStep = () => {
+    if (!steps) return;
+    const scrolled = -section.getBoundingClientRect().top;
+    const step = Math.max(0, Math.min(steps - 1, Math.floor(scrolled / (innerHeight * STEP_VH / 100) + 0.5)));
+    if (step === sent) return;
+    sent = step;
+    frame.contentWindow.postMessage({ heightsStep: step }, "*");
+  };
+  window.addEventListener("message", (e) => {
+    if (e.source !== frame.contentWindow || !e.data || typeof e.data.heightsSteps !== "number") return;
+    steps = e.data.heightsSteps;
+    section.style.height = (steps - 1) * STEP_VH + 100 + "vh"; // the last step stays on screen for its last stretch
+    sent = null;
+    sendStep();
+  });
+  window.addEventListener("scroll", sendStep, { passive: true });
+}
+
+// Tell each embedded map which step to show (0, 1, 2, ...), from how far we've scrolled through it.
+// data-steps says how many steps a map has; as in scrolly.html
+document.querySelectorAll(".map-scrolly").forEach((mapScrolly) => {
+  const mapFrame = mapScrolly.querySelector(".map-frame");
+  const lastStep = Number(mapScrolly.dataset.steps || 3) - 1;
+  let sentStep = null;
+  function sendStep(force) {
+    const scrolled = -mapScrolly.getBoundingClientRect().top;
+    const step = Math.max(0, Math.min(lastStep, Math.floor(scrolled / window.innerHeight + 0.5)));
+    if (step === sentStep && !force) return;
+    sentStep = step;
+    mapFrame.contentWindow.postMessage({ footballStep: step }, "*");
+  }
+  window.addEventListener("scroll", () => sendStep(false), { passive: true });
+  mapFrame.addEventListener("load", () => sendStep(true));
+});
+
+// Fit the nesting, stairs and calculator grid frames to their page's content, and keep fitting them as the sentences rewrap
+// (the pages are ours, so we can measure them); as in scrolly.html
+document.querySelectorAll(".nested-frame, .steps-frame, .grid-frame").forEach((frame) => {
+  frame.addEventListener("load", () => {
+    const page = frame.contentDocument.querySelector(".nested, .steps, .inner");
+    const fit = () => { frame.style.height = Math.ceil(page.getBoundingClientRect().height) + "px"; };
+    new ResizeObserver(fit).observe(page);
+    fit();
+  });
+});
+</script>
 </body>
 </html>

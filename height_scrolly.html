@@ -12,10 +12,15 @@
     // height_scrolly.html?embed -- shown full width inside another page (scrolly.html),
     // with its slides in a column the width of that page's text
     if (new URLSearchParams(location.search).has("embed")) document.documentElement.classList.add("embed");
+    // height_scrolly.html?embed&driven -- the embedding page (index.html) scrolls past it and tells it which step
+    // to show, so it does not scroll itself
+    if (new URLSearchParams(location.search).has("driven")) document.documentElement.classList.add("driven");
   </script>
   <style>
     /* scrolly: each step is a full-screen slide that snaps into place */
     html{ scroll-snap-type: y mandatory; }
+    /* driven by the embedding page: no scrolling of its own, so a scroll over it scrolls that page */
+    html.driven{ scroll-snap-type: none; overflow: hidden; }
     body{ font-family: 'Inter', Arial, sans-serif; background: #FAF8F3; color: #000; }
     .inner{ max-width: none; padding: 0; }
     .slide{
@@ -132,7 +137,17 @@
       border: 2px solid #000;
       padding: 0 0.2em;
     }
-    select.measure{ max-width: 100%; }
+    /* the dropdown drawn by the page, not the browser, so it is square everywhere (phones round the browser's corners),
+       with its own arrow, as on the football field page */
+    select.measure{
+      max-width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      border-radius: 0;
+      cursor: pointer;
+      padding-right: 32px;
+      background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 10px center;
+    }
     input.measure{ width: 2.6em; text-align: center; -moz-appearance: textfield; appearance: textfield; }
     input.measure::-webkit-inner-spin-button, input.measure::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
     /* number boxes get a − before and a + after, inside one outlined box */
@@ -213,17 +228,12 @@
   </div>
   <nav class="progress" aria-label="Steps"></nav>
   <div class="inner">
-    <section class="slide" data-names="S|J" data-labels="You|Me">
-      <p class="sentence">You are <span class="h" data-m="1.22 m">48 inches</span> tall. I am <span class="h" data-m="1.80 m">5'11"</span>.</p>
-      <div class="stage"></div>
-    </section>
-
-    <section class="slide" data-names="S|J|Slide at Travers Park" data-labels="You|Me|Slide">
+    <section class="slide" data-names="S|Slide at Travers Park" data-labels="You|Slide">
       <p class="sentence">The slide at Travers Park is <span class="h" data-m="4.27 m">14ft</span>.</p>
       <div class="stage"></div>
     </section>
 
-    <section class="slide" data-names="S|J|Slide at Travers Park|Michael James, giraffe" data-labels="You|Me|Slide|Michael James&#10;giraffe">
+    <section class="slide" data-names="S|Slide at Travers Park|Michael James, giraffe" data-labels="You|Slide|Michael James&#10;giraffe">
       <p class="sentence">The giraffe at the Bronx Zoo is <span class="h" data-m="5.18 m">17ft</span>.</p>
       <div class="stage"></div>
     </section>
@@ -259,7 +269,6 @@
           <option value="Statue of Liberty, statue alone" data-plural="Statues of Liberty">Statues of Liberty</option>
           <option value="Empire State Building, to the tip" data-plural="Empire State Buildings">Empire State Buildings</option>
           <option value="S" data-plural="of you">you</option>
-          <option value="J" data-plural="Moms">Moms</option>
           <option value="Robert Wadlow" data-plural="Robert Wadlows">Robert Wadlows</option>
         </select>.</p>
       <div class="stage"></div>
@@ -668,6 +677,18 @@
         window.addEventListener("resize", drawSlides);
         watchUnitSteps();
         watchEntrances();
+        // driven by the embedding page: say how many steps there are, and go to whichever one it asks for
+        if (document.documentElement.classList.contains("driven")) {
+          const slides = [...document.querySelectorAll(".slide")];
+          parent.postMessage({ heightsSteps: slides.length }, "*");
+          let shown = 0;
+          window.addEventListener("message", (e) => {
+            const step = e.data && e.data.heightsStep;
+            if (typeof step !== "number" || step === shown || !slides[step]) return;
+            shown = step;
+            slides[step].scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+        }
         watchProgress();
       });
   </script>
