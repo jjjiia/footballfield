@@ -194,12 +194,15 @@ html, body{ background: #FAF8F3; }
 .shot.tape-measure{ width: min(480px, 100% - 40px); }
 .shot.tape-measure img{ border: 0; }
 
-/* the chapters menu: a button pinned in the top left corner that opens a list of the section headings;
-   clicking one scrolls to it */
+/* the chapters menu: a button pinned in the top right corner that opens a list of the section headings below it,
+   lined up on the right; clicking one scrolls to it */
 .chapters{
   position: fixed;
   top: 16px;
-  left: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   z-index: 100;
   font-family: 'Inter', Arial, sans-serif;
 }
@@ -292,7 +295,7 @@ html, body{ background: #FAF8F3; }
 
 <section class="text-block">
   <div class="text-block-inner">
-    <h1 class="page-title">TBD</h1>
+    <h1 class="page-title">Title TBD</h1>
     <p>I changed the way I think about scale when my son asked how many seconds it was until the weekend. The length of one second is a tangible thing to a child, equivalent to a tick-tock sound he can make on his own. Similarly, explanations of large numbers usually worked only when they started with the small and personal — the size of his room, the distance walked every morning to school, the height of scaffolding he likes to climb.</p>
     <p>When I trim my son’s nails, I like to hold up a sliver of baby fingernail and say, “this is how much the tectonic plates have moved since we last cut your nails,” all because I read in a decade-old article that “Continents Split Up at the Same Speed Finger Nails Grow.” That factoid stayed with me because the sentence connected this global phenomenon so effectively to my literal fingertip. It reminds me that nothing would be too big or small to build a relationship with, if only we had the right unit of measurement.</p>
     <h2 class="section-title">“the correlation of some target to some comparator or unit.”</h2>
@@ -358,7 +361,7 @@ html, body{ background: #FAF8F3; }
 </section>
 
 <!-- Image of tape measure: FastCap ProCarpenter Story Pole tape measure -->
-<a class="shot tape-measure" href="https://www.fastcap.com/product/procarpenter-tape-measure"><img src="scrolly2_images/tape-measure.png" alt="A FastCap ProCarpenter Story Pole tape measure, with a strip along the tape that says Write here!" loading="lazy"></a>
+<a class="shot tape-measure" href="https://www.fastcap.com/product/procarpenter-tape-measure"><img src="scrolly2_images/tape-measure.png" alt="A FastCap ProCarpenter Story Pole tape measure, with a strip along the tape that says Write here!"></a>
 
 <section class="text-block">
   <div class="text-block-inner">
@@ -446,18 +449,18 @@ html, body{ background: #FAF8F3; }
 
 <!-- Grid of maps: each map and calculator, its screenshot linking to the page itself -->
 <div class="tool-grid">
-  <a class="tool" href="footballfield.html"><img src="scrolly2_images/map01-football-field.jpg" alt="" loading="lazy"><span>Football field</span></a>
-  <a class="tool" href="embed%20pages/football_embed2.html"><img src="scrolly2_images/map02-sports-fields.jpg" alt="" loading="lazy"><span>Sports fields</span></a>
-  <a class="tool" href="nested.html"><img src="scrolly2_images/map03-nesting.jpg" alt="" loading="lazy"><span>Nesting</span></a>
-  <a class="tool" href="nested_people.html"><img src="scrolly2_images/map04-population-nesting.jpg" alt="" loading="lazy"><span>Population nesting</span></a>
-  <a class="tool" href="jobs.html"><img src="scrolly2_images/map05-jobs.jpg" alt="" loading="lazy"><span>Jobs</span></a>
-  <a class="tool" href="height_scrolly.html"><img src="scrolly2_images/map07-heights.jpg" alt="" loading="lazy"><span>Heights</span></a>
-  <a class="tool" href="steps_across.html"><img src="scrolly2_images/map08-steps-across.jpg" alt="" loading="lazy"><span>Steps across</span></a>
-  <a class="tool" href="stairs.html"><img src="scrolly2_images/map10-stairs.jpg" alt="" loading="lazy"><span>Stairs</span></a>
-  <a class="tool" href="people_in_the_room.html"><img src="scrolly2_images/map11-people-in-the-room.jpg" alt="" loading="lazy"><span>People in the room</span></a>
-  <a class="tool" href="you-grid-2.html"><img src="scrolly2_images/map12-you-grid.jpg" alt="" loading="lazy"><span>Things you can do</span></a>
-  <a class="tool" href="atom_seconds.html"><img src="scrolly2_images/map13-atom-seconds.jpg" alt="" loading="lazy"><span>Atoms in seconds</span></a>
-  <a class="tool" href="atom_step.html"><img src="scrolly2_images/map14-atom-step.jpg" alt="" loading="lazy"><span>Atoms in steps</span></a>
+  <a class="tool" href="footballfield.html"><img src="scrolly2_images/map01-football-field.jpg" alt=""><span>Football field</span></a>
+  <a class="tool" href="embed%20pages/football_embed2.html"><img src="scrolly2_images/map02-sports-fields.jpg" alt=""><span>Sports fields</span></a>
+  <a class="tool" href="nested.html"><img src="scrolly2_images/map03-nesting.jpg" alt=""><span>Nesting</span></a>
+  <a class="tool" href="nested_people.html"><img src="scrolly2_images/map04-population-nesting.jpg" alt=""><span>Population nesting</span></a>
+  <a class="tool" href="jobs.html"><img src="scrolly2_images/map05-jobs.jpg" alt=""><span>Jobs</span></a>
+  <a class="tool" href="height_scrolly.html"><img src="scrolly2_images/map07-heights.jpg" alt=""><span>Heights</span></a>
+  <a class="tool" href="steps_across.html"><img src="scrolly2_images/map08-steps-across.jpg" alt=""><span>Steps across</span></a>
+  <a class="tool" href="stairs.html"><img src="scrolly2_images/map10-stairs.jpg" alt=""><span>Stairs</span></a>
+  <a class="tool" href="people_in_the_room.html"><img src="scrolly2_images/map11-people-in-the-room.jpg" alt=""><span>People in the room</span></a>
+  <a class="tool" href="you-grid-2.html"><img src="scrolly2_images/map12-you-grid.jpg" alt=""><span>Things you can do</span></a>
+  <a class="tool" href="atom_seconds.html"><img src="scrolly2_images/map13-atom-seconds.jpg" alt=""><span>Atoms in seconds</span></a>
+  <a class="tool" href="atom_step.html"><img src="scrolly2_images/map14-atom-step.jpg" alt=""><span>Atoms in steps</span></a>
 </div>
 
 <section class="text-block">
@@ -508,6 +511,32 @@ html, body{ background: #FAF8F3; }
   document.addEventListener("click", (e) => { if (!list.hidden && !e.target.closest(".chapters")) setOpen(false); });
   window.addEventListener("blur", () => { if (!list.hidden) setOpen(false); });
 }
+
+// Every embed's sentences at one size, the same as the text pages': 28px, or 22px on phones. The embedded pages are
+// ours, so a style can be added to each as it loads; this changes them only here, not on their own pages or scrolly.html
+const EMBED_TEXT = [
+  ".map-line", ".map-line .unit-select",            // the football maps
+  ".nest-line", ".nest-line .unit-select",          // nesting and people
+  ".job .job-line", ".job .job-count", ".job .unit-select", // jobs, its main sentence
+  ".step-line",                                     // stairs
+  ".madlib",                                        // the calculator grid
+  ".sentence:not(.mississippi)",                    // heights, steps, the room, atoms
+].join(", ");
+function sizeEmbedText(frame) {
+  const doc = frame.contentDocument;
+  if (!doc || !doc.head) return;
+  let style = doc.getElementById("scrolly2-text-size");
+  if (!style) {
+    style = Object.assign(doc.createElement("style"), { id: "scrolly2-text-size" });
+    doc.head.appendChild(style);
+  }
+  style.textContent = `${EMBED_TEXT}{ font-size: ${innerWidth <= 760 ? 22 : 28}px !important; }`;
+}
+document.querySelectorAll("iframe").forEach((frame) => {
+  frame.addEventListener("load", () => sizeEmbedText(frame));
+  sizeEmbedText(frame); // in case it has already loaded
+});
+window.addEventListener("resize", () => document.querySelectorAll("iframe").forEach(sizeEmbedText));
 
 // Tell each embedded map which step to show (0, 1, 2, ...), from how far we've scrolled through it.
 // data-steps says how many steps a map has; as in scrolly.html

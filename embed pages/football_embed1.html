@@ -334,7 +334,26 @@ fetch("../places.json").then((r) => r.json()).then((places) => {
   }))];
   placesLoaded = true;
   if (pendingStep !== null) goToStep(pendingStep);
+  warmUp();
 });
+
+// Before anyone scrolls to them, visit every other stop once with the map hidden, waiting at each for its imagery, so
+// the browser has it saved and each place shows straight away when its step comes; then back to the first stop.
+// A step taken meanwhile stops this at once
+async function warmUp() {
+  if (!map.loaded()) await new Promise((resolve) => map.once("idle", resolve));
+  if (currentStep !== 0) return;
+  const id = moveId;
+  const stillWarming = () => moveId === id && currentStep === 0;
+  mapDiv.style.visibility = "hidden";
+  for (const stop of stops.slice(1)) {
+    if (!stillWarming()) break;
+    map.jumpTo({ center: stop.center, zoom: stop.zoom, bearing: stop.bearing });
+    await Promise.race([new Promise((resolve) => map.once("idle", resolve)), wait(5000)]);
+  }
+  if (stillWarming()) map.jumpTo({ center: HOME.center, zoom: HOME.zoom, bearing: HOME.bearing });
+  mapDiv.style.visibility = "";
+}
 
 // --- which step to show ---
 let pendingStep = null;

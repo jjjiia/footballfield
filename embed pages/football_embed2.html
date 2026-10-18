@@ -379,7 +379,33 @@ placeReady.then(() => fetch("../units.json")).then((r) => r.json()).then((units)
   });
   useUnit(units.find((u) => u.key === stepUnitKeys[0]) || sports[0]);
   if (pendingStep !== null) goToStep(pendingStep);
+  warmUp();
 });
+
+// Before anyone scrolls to them, zoom once to each later step's unit with the map hidden, waiting at each for its
+// imagery, so the browser has it saved and nothing is blank when the map zooms out (to Central Park, say); then back.
+// A step taken meanwhile stops this at once
+async function warmUp() {
+  if (!map.loaded()) await new Promise((resolve) => map.once("idle", resolve));
+  if (currentStep !== 0) return;
+  const firstZoom = map.getZoom();
+  const canvas = map.getCanvas();
+  const zoomFor = (u) => {
+    const w = u.widthFt != null ? u.widthFt * 0.3048 : u.widthM, h = u.widthFt != null ? u.lengthFt * 0.3048 : u.lengthM;
+    const [wM, hM] = u.shape === "pentagon" ? [w * 1.618, w * 1.539] : u.shape === "diamond" ? [w * Math.SQRT2, w * Math.SQRT2] : [w, h];
+    const mPerPx = Math.max(wM / (0.9 * canvas.clientWidth), hM / (0.9 * canvas.clientHeight));
+    return Math.min(HOME.zoom, Math.log2(78271.517 * Math.cos(HOME.center[1] * Math.PI / 180) / mPerPx));
+  };
+  mapDiv.style.visibility = "hidden";
+  for (const key of stepUnitKeys.slice(1)) {
+    const u = allUnits.find((x) => x.key === key);
+    if (!u || currentStep !== 0) break;
+    map.jumpTo({ zoom: zoomFor(u) });
+    await Promise.race([new Promise((resolve) => map.once("idle", resolve)), new Promise((r) => setTimeout(r, 5000))]);
+  }
+  if (currentStep === 0) map.jumpTo({ zoom: firstZoom });
+  mapDiv.style.visibility = "";
+}
 
 function useUnit(u) {
   unit = u;
