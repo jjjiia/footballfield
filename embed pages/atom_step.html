@@ -125,6 +125,8 @@
       container: document.querySelector(".map"), style: STYLE, center, zoom: 4,
       scrollZoom: false, boxZoom: false, doubleClickZoom: false, touchZoomRotate: false,
       dragRotate: false, touchPitch: false, keyboard: false,
+      // embedded in a page that scrolls (index.html): on a phone one finger scrolls that page and two fingers pan the map
+      cooperativeGestures: true,
     });
     // after a drag, refit around the new spot: further north or south the map's scale changes, so it gently re-zooms
     // to keep the window the walk across

@@ -602,6 +602,8 @@ function sizeEmbedText(frame) {
     doc.head.appendChild(style);
   }
   style.textContent = `${EMBED_TEXT}{ font-size: ${innerWidth <= 760 ? 22 : 28}px !important; }`;
+  // the embed's dropdowns size themselves to their text; have them measure again at the new size
+  frame.contentWindow.dispatchEvent(new Event("resize"));
 }
 document.querySelectorAll("iframe").forEach((frame) => {
   frame.addEventListener("load", () => sizeEmbedText(frame));

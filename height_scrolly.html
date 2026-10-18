@@ -21,6 +21,9 @@
     html{ scroll-snap-type: y mandatory; }
     /* driven by the embedding page: no scrolling of its own, so a scroll over it scrolls that page */
     html.driven{ scroll-snap-type: none; overflow: hidden; }
+    /* and it moves from step to step by sliding its steps up, not by scrolling: on phones, scrolling a page inside
+       another scrolls the outer one too, which would carry the embedding page along with it */
+    html.driven .inner{ transition: transform 0.6s cubic-bezier(0.33, 0, 0.2, 1); }
     body{ font-family: 'Inter', Arial, sans-serif; background: #FAF8F3; color: #000; }
     .inner{ max-width: none; padding: 0; }
     .slide{
@@ -686,7 +689,7 @@
             const step = e.data && e.data.heightsStep;
             if (typeof step !== "number" || step === shown || !slides[step]) return;
             shown = step;
-            slides[step].scrollIntoView({ behavior: "smooth", block: "start" });
+            document.querySelector(".inner").style.transform = `translateY(${-slides[step].offsetTop}px)`;
           });
         }
         watchProgress();

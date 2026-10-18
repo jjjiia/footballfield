@@ -86,7 +86,7 @@ b{ font-weight: 700; }
 
 /* searchable dropdown: type in the box to narrow the list */
 .combo{ position: relative; display: inline-block; max-width: 100%; }
-.combo-input{ box-sizing: border-box; cursor: pointer; }
+.combo-input{ box-sizing: border-box; cursor: pointer; text-overflow: ellipsis; }
 .combo-input:focus{ outline: none; cursor: text; min-width: 240px; }
 .combo-input::placeholder{ color: #000; opacity: 0.5; }
 .combo-list{
@@ -259,7 +259,9 @@ function fitToContent(input) {
   document.body.appendChild(probe);
   const w = probe.getBoundingClientRect().width;
   probe.remove();
-  input.style.width = Math.ceil(w + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 4) + "px";
+  // never wider than the page leaves room for (a long label on a phone ends in "…" instead of running off)
+  const room = document.documentElement.clientWidth - 40;
+  input.style.width = Math.min(room, Math.ceil(w + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 4)) + "px";
 }
 
 // A dropdown you can type in. items: [{ value, label, section }]. Clicking the
@@ -510,6 +512,7 @@ Promise.all([
     return best && bestGap <= SUM_TOLERANCE * n ? best.map((k) => parts[k]) : null;
   }
   document.fonts.ready.then(() => { profCombo.fit(); areaCombo.fit(); });
+  window.addEventListener("resize", () => { profCombo.fit(); areaCombo.fit(); }); // and again when the page's width or text size changes
   update();
 });
 </script>
