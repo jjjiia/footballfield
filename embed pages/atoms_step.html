@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Atoms in Steps</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../site.css">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <style>
+    /* one screen: a single sentence, centered, with a height box that works out your step and the walk,
+       over a map zoomed so the window is that walk across */
+    html, body{ background: #FAF8F3; color: #000; }
+    body{ font-family: 'Inter', Arial, sans-serif; margin: 0; }
+    /* the map fills the window behind the sentence, the same basemap as the football field page */
+    .map{ position: fixed; inset: 0; z-index: 0; }
+    .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib{ display: none !important; }
+    .page{
+      position: relative;
+      z-index: 1;
+      pointer-events: none; /* only the sentence takes clicks */
+      box-sizing: border-box;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: flex-start; /* the sentence at the top of the screen */
+      justify-content: center;
+      padding: 24px;
+    }
+    /* the walk: halfway down the window, arrows from the label out toward both edges, their tips a little in
+       from the edges; white with a black drop shadow */
+    .walk{
+      position: fixed; left: 16px; right: 16px; top: 50%; transform: translateY(-50%);
+      display: flex; align-items: center;
+      z-index: 1; pointer-events: none;
+    }
+    .walk-label{
+      margin: 0 16px; white-space: nowrap;
+      font-size: 28px; font-weight: 700; letter-spacing: 1px; color: #fff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 10px rgba(0, 0, 0, 0.6); /* a firm drop shadow below, and a soft glow round it */
+    }
+    /* each arrow: a 4px shaft that fills the space toward the edge, with its head (a triangle) at the end;
+       the shaft stops halfway into the head, so the head's point stands clear of it */
+    .arrow{
+      position: relative; flex: 1; height: 4px; background: #fff;
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8)); /* follows the head's shape too */
+    }
+    .arrow::before{
+      content: ""; position: absolute; top: 50%; transform: translateY(-50%);
+      border-top: 10px solid transparent; border-bottom: 10px solid transparent;
+    }
+    .arrow.left{ margin-left: 8px; }
+    .arrow.right{ margin-right: 8px; }
+    .arrow.left::before{ left: -8px; border-right: 16px solid #fff; }
+    .arrow.right::before{ right: -8px; border-left: 16px solid #fff; }
+    /* a short upright stop bar just past each arrow's point, near the window's edge */
+    .arrow::after{
+      content: ""; position: absolute; top: 50%; transform: translateY(-50%);
+      width: 4px; height: 32px; background: #fff;
+    }
+    .arrow.left::after{ left: -20px; }
+    .arrow.right::after{ right: -20px; }
+    .sentence{
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1.5;
+      text-align: center;
+      margin: 0;
+      max-width: 640px;
+      background: #FAF8F3; /* an off-white box, so it reads over the map */
+      padding: 12px 20px;
+      pointer-events: auto;
+    }
+    /* the height box inside the sentence, with a − before and a + after, inside one outlined box */
+    .measure{
+      font: inherit;
+      font-weight: 700;
+      color: #000;
+      background: transparent;
+      border: 2px solid #000;
+      padding: 0 0.2em;
+    }
+    input.measure{ width: 2.6em; text-align: center; -moz-appearance: textfield; appearance: textfield; }
+    input.measure::-webkit-inner-spin-button, input.measure::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
+    .spin-box{ display: inline-flex; align-items: stretch; border: 2px solid #000; vertical-align: baseline; }
+    .spin-box input.measure{ border: none; }
+    .spin-btn{ all: unset; cursor: pointer; padding: 0 0.3em; font-weight: 700; }
+    @media (max-width: 760px){
+      .sentence, .walk-label{ font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="map"></div>
+  <div class="walk"><span class="arrow left"></span><span class="walk-label">width of a hair</span><span class="arrow right"></span></div>
+  <div class="page">
+    <p class="sentence">If you are <input type="number" class="measure walker-height" value="48" min="20" max="100" step="1" aria-label="Your height in inches"> inches tall, your step is around <span class="walker-step">20 inches</span>. If an atom is a step, the width of a hair is <span class="walker-miles">316 miles</span>.</p>
+  </div>
+
+  <script>
+    // ---- your height sets your step, and so how far a hair would be to walk ----
+    const STEP_FACTOR = 0.414; // step length as a share of height, as on the heights page
+    const heightInput = document.querySelector(".walker-height");
+    function updateWalk() {
+      const step = Math.round((Number(heightInput.value) || 0) * STEP_FACTOR);
+      document.querySelector(".walker-step").textContent = step + (step === 1 ? " inch" : " inches");
+      // a hair is a million atoms wide, so a million steps
+      const miles = Math.round((1e6 * step) / 63360);
+      document.querySelector(".walker-miles").textContent = miles.toLocaleString() + (miles === 1 ? " mile" : " miles");
+      walkMiles = (1e6 * step) / 63360;
+      fitWalk();
+    }
+
+    // ---- the map: centered on the Hyatt Regency in downtown Milwaukee, and zoomed so the window is exactly
+    // the walk across ----
+    mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ";
+    const STYLE = "mapbox://styles/jjjiia123/cmmb9euid00at01qr9mbfapn7"; // as on the football field page
+    let center = [-87.914929, 43.04109]; // Hyatt Regency Milwaukee, 333 W Kilbourn Ave
+    let walkMiles = 0;
+    // it can be dragged around, but not zoomed or turned, so the window always stays the walk across
+    const map = new mapboxgl.Map({
+      container: document.querySelector(".map"), style: STYLE, center, zoom: 4,
+      scrollZoom: false, boxZoom: false, doubleClickZoom: false, touchZoomRotate: false,
+      dragRotate: false, touchPitch: false, keyboard: false,
+    });
+    // after a drag, refit around the new spot: further north or south the map's scale changes, so it gently re-zooms
+    // to keep the window the walk across
+    map.on("dragend", () => { center = map.getCenter().toArray(); fitWalk(400); });
+
+    // a box as wide as the walk, centered on the place; a degree of longitude is shorter the further from the equator
+    function fitWalk(duration = 800) {
+      if (!walkMiles) return;
+      const halfDegrees = (walkMiles * 1.609344) / 2 / (111.32 * Math.cos((center[1] * Math.PI) / 180));
+      map.fitBounds([[center[0] - halfDegrees, center[1]], [center[0] + halfDegrees, center[1]]], { padding: 0, duration });
+    }
+    window.addEventListener("resize", () => fitWalk(0));
+    heightInput.addEventListener("input", updateWalk);
+
+    // − and + around the number box, stepping by its step and staying within its min and max
+    document.querySelectorAll("input.measure[type=number]").forEach((input) => {
+      const box = document.createElement("span");
+      box.className = "spin-box";
+      input.before(box);
+      const button = (label, text, dir) => {
+        const b = Object.assign(document.createElement("button"), { type: "button", className: "spin-btn", textContent: text });
+        b.setAttribute("aria-label", label);
+        b.addEventListener("click", () => {
+          const step = Number(input.step) || 1;
+          const next = Math.min(Number(input.max) || Infinity, Math.max(Number(input.min) || 0, (Number(input.value) || 0) + dir * step));
+          input.value = next;
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+        return b;
+      };
+      box.append(button("Decrease", "−", -1), input, button("Increase", "+", 1));
+    });
+    updateWalk();
+    fitWalk(0);
+  </script>
+</body>
+</html>
