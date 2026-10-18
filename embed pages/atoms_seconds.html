@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="site.css">
+  <link rel="stylesheet" href="../site.css">
   <style>
     /* one screen: a circle drawn over and over in the top half, counting seconds, and a sentence under it */
     html, body{ background: #FAF8F3; color: #000; }
@@ -30,7 +30,8 @@
       height: 100dvh;
       pointer-events: none;
     }
-    .circle path{ fill: none; stroke: #000; stroke-width: 8px; stroke-linejoin: round; stroke-linecap: round; }
+    .circle path{ fill: none; stroke: #000; stroke-width: 4px; stroke-linejoin: round; stroke-linecap: round; }
+    .circle .pen path{ stroke-linecap: butt; } /* the pen's pieces butt end to end, so their overlaps don't show as dark dots */
     /* the sentence, pinned just under the circle's half of the window */
     .about{
       position: fixed;
@@ -40,9 +41,6 @@
       right: 24px;
       margin: 0 auto;
     }
-    /* after 10 Mississippis: a note about saving this page's address, faded in under the sentence */
-    .save-note{ display: block; margin-top: 24px; opacity: 0; transition: opacity 1s; }
-    .save-note.shown{ opacity: 1; }
     /* "1 Mississippi" sits in the middle of the circle, kept to the middle 60% of its width
        (the circle is as big as fits in the top half), so the lines under the count wrap inside it */
     .mississippi{
@@ -63,9 +61,9 @@
   </style>
 </head>
 <body>
-  <svg class="circle" aria-hidden="true"><path class="pen"></path></svg>
+  <svg class="circle" aria-hidden="true"><g class="pen"></g></svg>
   <p class="sentence mississippi"><span class="count">1 Mississippi</span><span class="counting-since"></span><span class="hairs-counted"></span></p>
-  <p class="sentence about">If you count 1 atom per second, it would take 11 days, 13 hours, 46 minutes and 40 seconds to count all the atoms across the width of a hair. <b>You will have counted 1 hair width of atoms by <span class="done-at"></span>.</b><span class="save-note">You can save your unique URL to this page and come back to check its progress.</span></p>
+  <p class="sentence about">If you count 1 atom per second, it would take 11 days, 13 hours, 46 minutes and 40 seconds to count all the atoms across the width of a hair. <b>You will have counted 1 hair width of atoms by <span class="done-at"></span>.</b></p>
 
   <script>
     const svg = document.querySelector(".circle");
@@ -85,21 +83,35 @@
     // how much of the wobble to use: none on the first circle, a perfect one, then a little more each second
     // until it is all there by the 11th
     const WOBBLE_IN = 10;
+    const MAX_WOBBLE = 0.05; // the furthest the wobble may push the outline in or out, as a share of the radius; how far a circle's end lands left or right of the top is held to the same
     let wobbliness = 0;
 
-    // the circle: as big as fits in the top half of the window, a little in from its edges, starting and ending
-    // at its right-hand side. The wobble pushes the outline in and out, and is shifted to be zero there,
-    // so every circle starts exactly where the one before ended
+    // each circle carries on from the end of the one before: like a clock hand it starts at the top, where the last
+    // one ended, goes once round, and ends a touch before or past the top, so its ends are always at the top,
+    // just a little to the left or right of the last (by up to MAX_WOBBLE of the radius)
+    let lap = { startAngle: 0, endAngle: 0 };
+    function nextCircle() {
+      const between = (low, high) => low + Math.random() * (high - low);
+      wobbleShape = makeWobble(); // each new circle wobbles its own way
+      lap = { startAngle: lap.endAngle, endAngle: wobbliness * between(-MAX_WOBBLE, MAX_WOBBLE) };
+    }
+
+    // the circle: as big as fits in the top half of the window, a little in from its edges, going round
+    // clockwise from where the last one ended, near the top. The wobble pushes the outline in and out,
+    // and is zero at both ends
     function drawCircle() {
       const w = svg.clientWidth, h = svg.clientHeight / 2; // the circle is sized and centered for the top half
       const radius = Math.min(w, h) / 2 - 16;
       const waves = (turn) => wobbleShape.reduce((sum, wave) => sum + wave.size * Math.sin(wave.times * turn + wave.phase), 0);
-      circlePoints = [];
-      for (let i = 0; i <= 720; i++) {
-        const turn = (i / 720 - 0.5) * 2 * Math.PI;
-        const r = radius * (1 + wobbliness * (waves(turn) - waves(Math.PI)));
-        circlePoints.push([w / 2 - Math.cos(turn) * r, h / 2 + Math.sin(turn) * r]);
-      }
+      const along = Array.from({ length: 721 }, (_, i) => i / 720); // 0 to 1, start to end
+      const offsets = along.map((t) => waves(t * 2 * Math.PI) - waves(0));
+      // never too wobbly: a shape that strays further than MAX_WOBBLE of the radius anywhere is toned down to just that
+      const tame = Math.min(1, MAX_WOBBLE / Math.max(...offsets.map(Math.abs)));
+      circlePoints = along.map((t, i) => {
+        const angle = lap.startAngle + t * (2 * Math.PI + lap.endAngle - lap.startAngle); // clockwise from the top
+        const r = radius * (1 + wobbliness * tame * offsets[i]);
+        return [w / 2 + Math.sin(angle) * r, h / 2 - Math.cos(angle) * r];
+      });
       drawPen(1);
     }
     let circlePoints = [];
@@ -107,7 +119,11 @@
 
     // the pen's line: just the part of the outline drawn so far, 0 to 1 of the way round, ending part way
     // between two points so it moves smoothly. (Drawn this way, not with a dash pattern, which phones can
-    // show broken into segments)
+    // show broken into segments.)
+    // It has a tail: solid at the tip, fading back along the line to 10% where this circle began, which is
+    // what the finished circles fade to. A line can't change opacity along its length, so the pen is drawn
+    // as short pieces of PIECE points each, each piece as see-through as its place in the tail
+    const PIECE = 6, TAIL_END = 0.1;
     function drawPen(drawn) {
       const along = drawn * (circlePoints.length - 1);
       const whole = Math.floor(along);
@@ -116,20 +132,26 @@
         const [x0, y0] = circlePoints[whole], [x1, y1] = circlePoints[whole + 1], part = along - whole;
         done.push([x0 + (x1 - x0) * part, y0 + (y1 - y0) * part]);
       }
-      pen.setAttribute("d", "M" + done.map(pointText).join("L") + (drawn >= 1 ? "Z" : ""));
+      const pieces = Math.ceil((done.length - 1) / PIECE);
+      while (pen.children.length < pieces) pen.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "path"));
+      [...pen.children].forEach((piece, k) => {
+        if (k >= pieces) { piece.setAttribute("d", ""); return; }
+        const from = k * PIECE, to = Math.min(done.length - 1, from + PIECE); // pieces share their end points, so the line is unbroken
+        piece.setAttribute("d", "M" + done.slice(from, to + 1).map(pointText).join("L"));
+        piece.style.opacity = TAIL_END + (1 - TAIL_END) * ((from + to) / 2 / Math.max(1, done.length - 1));
+      });
     }
 
     // ---- the pen draws the circle round in exactly one second, again and again,
     // and the count fades in at the start of every second: 1 Mississippi, 2 Mississippi, 3 Mississippi... ----
     const CIRCLE_MS = 1000, FADE_MS = 300;
-    // each finished circle stays behind: it fades to 30% over its first second, then by a tenth every second after,
-    // and goes for good after 20 seconds
-    const GHOST_FADE = 0.9, GHOST_MS = 20000;
+    // each finished circle stays behind, a second at each of these opacities, and is gone after 2 seconds
+    const GHOST_STEPS = [0.1, 0], GHOST_MS = GHOST_STEPS.length * 1000;
     let ghosts = [];
     function keepGhost(born) {
-      const ghost = pen.cloneNode();
+      const ghost = document.createElementNS("http://www.w3.org/2000/svg", "path");
       ghost.setAttribute("class", "ghost");
-      ghost.setAttribute("d", "M" + circlePoints.map(pointText).join("L") + "Z"); // the whole outline
+      ghost.setAttribute("d", "M" + circlePoints.map(pointText).join("L")); // the whole outline
       pen.before(ghost);
       ghosts.push({ ghost, born });
     }
@@ -149,18 +171,18 @@
     document.querySelector(".done-at").textContent =
       daysAway === 0 ? "today at " + atTime : daysAway === 1 ? "tomorrow at " + atTime : doneAt.toLocaleString(undefined, when);
 
-    // a count already under way: lay down the circles from the last 10 seconds, as if they had been drawn,
+    // a count already under way: lay down the circles from the last few seconds, as if they had been drawn,
     // each with its own wobble for the second it was drawn in and faded for its age
     const opened = performance.now();
     let drawing = Math.floor((opened - circleStart) / CIRCLE_MS) + 1;
-    for (let back = Math.min(10, drawing - 1); back >= 1; back--) {
-      wobbleShape = makeWobble();
+    for (let back = Math.min(GHOST_STEPS.length, drawing - 1); back >= 1; back--) {
       wobbliness = Math.min(1, (drawing - back - 1) / WOBBLE_IN);
+      nextCircle();
       drawCircle();
       keepGhost(opened - back * CIRCLE_MS);
     }
-    wobbleShape = makeWobble();
     wobbliness = Math.min(1, (drawing - 1) / WOBBLE_IN);
+    nextCircle();
     drawCircle();
 
     requestAnimationFrame(function tick(now) {
@@ -168,19 +190,19 @@
       if (n !== drawing) {
         keepGhost(now); // the circle just finished stays, whole, behind the next one
         drawing = n;
-        wobbleShape = makeWobble(); // each new circle wobbles its own way
         wobbliness = Math.min(1, (n - 1) / WOBBLE_IN);
+        nextCircle();
         drawCircle();
       }
       ghosts = ghosts.filter(({ ghost, born }) => {
         if (now - born >= GHOST_MS) { ghost.remove(); return false; }
         const age = (now - born) / 1000;
-        ghost.style.opacity = age < 1 ? 1 - age * 0.7 : 0.3 * GHOST_FADE ** (age - 1);
+        ghost.style.opacity = GHOST_STEPS[Math.floor(age)];
         return true;
       });
       const elapsed = (now - circleStart) % CIRCLE_MS;
       const progress = elapsed / CIRCLE_MS;
-      drawPen(progress * progress * progress); // eases in: slow at the start of the second, fast at the end
+      drawPen(1 - (1 - progress) ** 3); // eases out: fast at the start of the second, slow at the end
       // a hair is a million atoms: at a million the count starts over, and the hairs counted so far go up by one
       const count = document.querySelector(".mississippi");
       const hairs = Math.floor((n - 1) / 1e6);
@@ -188,7 +210,6 @@
       count.querySelector(".count").textContent = (((n - 1) % 1e6) + 1).toLocaleString() + (n <= 3 ? " Mississippi" : " atoms");
       count.querySelector(".hairs-counted").textContent = hairs ? hairs.toLocaleString() + (hairs === 1 ? " hair width" : " hair widths") + " of atoms counted" : "";
       count.querySelector(".count").style.opacity = Math.min(1, elapsed / FADE_MS); // only the count fades in each second
-      document.querySelector(".save-note").classList.toggle("shown", n > 10); // once 10 Mississippis have passed
       requestAnimationFrame(tick);
     });
 
