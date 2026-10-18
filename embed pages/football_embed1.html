@@ -317,23 +317,29 @@ gridBtn.addEventListener("click", () => {
   redraw();
 });
 
-// two more places, picked at random from this short list (names as in places.json)
+// two more places, picked at random from this short list (names as in places.json), or, when the address names
+// them as ?places=the Hoover Dam|the White House, those places in that order
 const RANDOM_PLACES = ["the Hoover Dam", "Niagara Falls", "Central Park", "the Grand Canyon"];
+const CHOSEN_PLACES = new URLSearchParams(location.search).get("places")?.split("|");
+let placesLoaded = false;
 fetch("../places.json").then((r) => r.json()).then((places) => {
-  const pool = places.filter((p) => RANDOM_PLACES.includes(p.name));
-  stops = [HOME, ...pickRandom(pool, 2).map((p) => ({
+  const picked = CHOSEN_PLACES
+    ? CHOSEN_PLACES.map((name) => places.find((p) => p.name === name)).filter(Boolean)
+    : pickRandom(places.filter((p) => RANDOM_PLACES.includes(p.name)), 2);
+  stops = [HOME, ...picked.map((p) => ({
     center: [p.lng, p.lat],
     zoom: p.zoom ?? 15,
     bearing: p.bearing || 0,
     html: "You are at <b>" + p.name + "</b>."
   }))];
+  placesLoaded = true;
   if (pendingStep !== null) goToStep(pendingStep);
 });
 
 // --- which step to show ---
 let pendingStep = null;
 function requestStep(index) {
-  if (stops.length < 3) { pendingStep = index; return; } // places not loaded yet
+  if (!placesLoaded) { pendingStep = index; return; } // places not loaded yet
   goToStep(index);
 }
 

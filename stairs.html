@@ -3,40 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Steps</title>
+  <title>Stairs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
   <script>
-    // steps.html?embed -- shown inside another page (scrolly.html): no banner
+    // stairs.html?embed -- shown inside another page (scrolly.html)
     if (new URLSearchParams(location.search).has("embed")) document.documentElement.classList.add("embed");
   </script>
   <style>
 html, body{ background: #FAF8F3; color: #000; }
-.embed .top-banner{ display: none; }
 .embed .steps{ padding-top: 0; padding-bottom: 0; display: flow-root; } /* flow-root: the last line's margin counts in its height */
 body{ font-family: 'Inter', Arial, sans-serif; }
 b{ font-weight: 700; }
-
-/* top banner, same as the football field page */
-.top-banner{
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  box-sizing: border-box;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  background: #000;
-  color: #FAF8F3;
-  font-family: 'Inter', Arial, sans-serif;
-  font-weight: 400;
-  font-size: 20px;
-  letter-spacing: 1px;
-  padding: 0 20px;
-  margin: 0;
-}
 
 .steps{ padding: 40px 20px; max-width: 900px; }
 
@@ -65,6 +45,10 @@ b{ font-weight: 700; }
 .step-height{ width: 2.6em; text-align: center; -moz-appearance: textfield; }
 .step-height::-webkit-inner-spin-button, .step-height::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
 .step-height:focus, .unit-select:focus{ outline: none; }
+/* number boxes get a − before and a + after, sharing the one underline */
+.spin-box{ display: inline-flex; align-items: baseline; border-bottom: 2px solid #000; }
+.spin-box .step-height{ border-bottom: none; }
+.spin-btn{ all: unset; cursor: pointer; padding: 0 0.2em; font-weight: 700; }
 .unit-select{
   background: #FAF8F3 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 16px center;
   padding-right: 48px;
@@ -87,12 +71,10 @@ b{ font-weight: 700; }
 </head>
 <body>
 
-<h1 class="top-banner">Steps</h1>
-
 <div class="steps">
   <p class="step-line">
     Measure a stair. If it is
-    <input class="step-height" id="height" type="number" min="1" step="any" value="7" aria-label="Stair height">
+    <input class="step-height" id="height" type="number" min="1" step="any" value="7" data-step="1" aria-label="Stair height">
     <select class="unit-select" id="unit" aria-label="Unit">
       <option value="0.0254" selected>inches</option>
       <option value="0.01">cm</option>
@@ -100,40 +82,55 @@ b{ font-weight: 700; }
     tall,
   </p>
   <p class="step-line" id="result"></p>
+  <p class="step-line">
+    If each step takes
+    <input class="step-height" id="pace" type="number" min="0.5" step="any" value="1" data-step="0.5" aria-label="Seconds a step">
+    <span id="seconds-word">second</span>, it would take you <b id="time">…</b> to reach the bottom.
+  </p>
   <p class="source">
     Depths, from <a href="height_data.html">the heights data</a>:
-    average ocean depth 3,682 m (12,080 ft), <a href="https://oceanservice.noaa.gov/facts/oceandepth.html">NOAA</a>;
-    Grand Canyon at its deepest 1,857 m (6,093 ft), <a href="https://en.wikipedia.org/wiki/Grand_Canyon">Wikipedia</a>.
+    average ocean depth 3,682 m (12,080 ft), <a href="https://oceanservice.noaa.gov/facts/oceandepth.html">NOAA</a>.
   </p>
 </div>
 
 <script>
-// steps.html?embed&note=N -- the sources are note N at the end of the embedding page, so none here
+// stairs.html?embed&note=N -- the sources are note N at the end of the embedding page, so none here
 {
   const note = new URLSearchParams(location.search).get("note");
   if (note) document.querySelector(".source").remove();
 }
 
-// depths in meters, the same as height_data.csv
-const OCEAN = 3682;        // Average ocean depth
-const GRAND_CANYON = 1857; // Grand Canyon, deepest point
+// depth in meters, the same as height_data.csv
+const OCEAN = 3682; // Average ocean depth
 
 const heightInput = document.getElementById("height");
 const unitSelect = document.getElementById("unit");
 const result = document.getElementById("result");
+const paceInput = document.getElementById("pace");
+const timeOut = document.getElementById("time");
 
 // 527, 1,052, 2.4: whole numbers from 10 up, two significant digits below
 const fmt = n => n >= 10 ? Math.round(n).toLocaleString("en-US") : String(Number(n.toPrecision(2)));
 const b = text => Object.assign(document.createElement("b"), { textContent: text });
 
+// minutes -> "45 minutes", "5 hours and 45 minutes", "2 days and 3 hours"
+function duration(minutes) {
+  const unit = (n, word) => n.toLocaleString("en-US") + " " + word + (n === 1 ? "" : "s");
+  const total = Math.round(minutes);
+  if (total < 60) return unit(Math.max(1, total), "minute");
+  const days = Math.floor(total / 1440), hours = Math.floor((total % 1440) / 60), mins = total % 60;
+  const parts = days ? [unit(days, "day"), hours && unit(hours, "hour")] : [unit(hours, "hour"), mins && unit(mins, "minute")];
+  return parts.filter(Boolean).join(" and ");
+}
+
 function update() {
   const meters = Number(heightInput.value) * Number(unitSelect.value);
   result.innerHTML = "";
-  if (!(meters > 0)) { result.textContent = "then it would be … steps down to the deepest part of the Grand Canyon."; return; }
-  result.append(
-    "then it would be ", b(fmt(GRAND_CANYON / meters) + " steps"), " down to the deepest part of the Grand Canyon, or ",
-    b(fmt(OCEAN / meters)), " to the bottom of the ocean."
-  );
+  const secondsPerStep = Number(paceInput.value);
+  document.getElementById("seconds-word").textContent = secondsPerStep === 1 ? "second" : "seconds";
+  timeOut.textContent = meters > 0 && secondsPerStep > 0 ? duration((OCEAN / meters) * secondsPerStep / 60) : "…";
+  if (!(meters > 0)) { result.textContent = "then it would be … steps down to the bottom of the ocean."; return; }
+  result.append("then it would be ", b(fmt(OCEAN / meters) + " steps"), " down to the bottom of the ocean.");
 }
 
 // switching units keeps the same stair: 7 inches becomes 18 cm
@@ -144,6 +141,24 @@ unitSelect.addEventListener("change", () => {
   update();
 });
 heightInput.addEventListener("input", update);
+paceInput.addEventListener("input", update);
+
+// − and + around each number box: the stair height by 1, the seconds a step by half a second, never below the box's min
+document.querySelectorAll(".step-height").forEach((input) => {
+  const box = Object.assign(document.createElement("span"), { className: "spin-box" });
+  input.before(box);
+  const button = (label, text, dir) => {
+    const btn = Object.assign(document.createElement("button"), { type: "button", className: "spin-btn", textContent: text });
+    btn.setAttribute("aria-label", label);
+    btn.addEventListener("click", () => {
+      const next = Math.max(Number(input.min) || 0, (Number(input.value) || 0) + dir * Number(input.dataset.step));
+      input.value = Number(next.toPrecision(4));
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    return btn;
+  };
+  box.append(button("Decrease", "−", -1), input, button("Increase", "+", 1));
+});
 update();
 </script>
 </body>

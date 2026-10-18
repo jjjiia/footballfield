@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wealth as Area</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <style>
+    /* a two-step scrolly over a map: first a square mile, outlined, for the typical household's wealth, then, as you
+       scroll, the map zooms out until the window is Jeff Bezos's wealth on the same scale */
+    html, body{ background: #FAF8F3; color: #000; margin: 0; }
+    body{ font-family: 'Inter', Arial, sans-serif; }
+    /* the map stays put behind the steps, the same basemap as the football field page */
+    .map{ position: fixed; inset: 0; pointer-events: none; }
+    .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib{ display: none !important; }
+    .step{ height: 100vh; height: 100dvh; } /* scrolling from one to the next plays the zoom */
+    /* the step's sentence, pinned at the top of the screen on an off-white box so it reads over the map */
+    .sentence{
+      position: fixed; top: 24px; left: 24px; right: 24px;
+      width: fit-content; max-width: 640px; margin: 0 auto;
+      box-sizing: border-box; padding: 12px 20px;
+      background: #FAF8F3;
+      font-size: 28px; font-weight: 300; line-height: 1.5; text-align: center;
+      display: none;
+    }
+    .sentence.on{ display: block; }
+    @media (max-width: 760px){
+      .sentence{ font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="map"></div>
+  <section class="step">
+    <p class="sentence">If the average American household net worth was a square mile,</p>
+  </section>
+  <section class="step">
+    <p class="sentence">then Jeff Bezos' wealth would be this.</p>
+  </section>
+
+  <script>
+    // ---- the scale: the typical household's wealth (median US household net worth, $192,900, Federal Reserve Survey of
+    // Consumer Finances 2022) is one square mile, so Jeff Bezos's (about $370 billion, Forbes, October 2, 2026) is about
+    // 1.9 million square miles ----
+    const TYPICAL_HOUSEHOLD = 192900, BEZOS = 370e9;
+    const MILE_KM = 1.609344;
+    const BEZOS_KM2 = (BEZOS / TYPICAL_HOUSEHOLD) * MILE_KM * MILE_KM;
+    const SQUARE_SHARE = 0.4; // on step 1 the square mile is this share of the window's shorter side
+
+    // ---- the map: centered on the middle of the contiguous United States, near Lebanon, Kansas ----
+    mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ";
+    const STYLE = "mapbox://styles/jjjiia123/cmmb9euid00at01qr9mbfapn7"; // as on the football field page
+    const CENTER = [-98.5795, 39.8283];
+    const map = new mapboxgl.Map({ container: document.querySelector(".map"), style: STYLE, center: CENTER, zoom: 4, interactive: false });
+
+    // the zoom at which a pixel is kmPerPixel across: on a web map, one pixel is 40,075 km × cos(latitude) / (512 × 2^zoom)
+    // across, measured at the center
+    const zoomFor = (kmPerPixel) => Math.log2((40075.016686 * Math.cos((CENTER[1] * Math.PI) / 180)) / (512 * kmPerPixel));
+    // step 1: the square mile fills SQUARE_SHARE of the shorter side; step 2: the window's area is Bezos's. (Over an area
+    // that big the scale changes from top to bottom, so it is right at the center and close elsewhere)
+    const squareZoom = () => zoomFor(MILE_KM / (SQUARE_SHARE * Math.min(innerWidth, innerHeight)));
+    const bezosZoom = () => zoomFor(Math.sqrt(BEZOS_KM2 / (innerWidth * innerHeight)));
+
+    // the square mile, outlined like the football field: a white line over a soft black shadow
+    map.on("load", () => {
+      const half = MILE_KM / 2;
+      const dLat = half / 110.574, dLon = half / (111.32 * Math.cos((CENTER[1] * Math.PI) / 180));
+      const [x, y] = CENTER;
+      map.addSource("square", {
+        type: "geojson",
+        data: { type: "Feature", geometry: { type: "Polygon", coordinates: [[
+          [x - dLon, y - dLat], [x + dLon, y - dLat], [x + dLon, y + dLat], [x - dLon, y + dLat], [x - dLon, y - dLat],
+        ]] } },
+      });
+      map.addLayer({ id: "square-shadow", type: "line", source: "square", paint: { "line-color": "#000", "line-width": 20, "line-opacity": 0.4, "line-blur": 6 } });
+      map.addLayer({ id: "square-outline", type: "line", source: "square", paint: { "line-color": "#fff", "line-width": 8 } });
+    });
+
+    // ---- scrolling: the zoom follows the scroll exactly, from the square mile at the top to Bezos at the second step;
+    // each step's sentence shows once it is half way up the screen ----
+    const steps = [...document.querySelectorAll(".step")];
+    function onScroll() {
+      const along = Math.min(1, Math.max(0, scrollY / (steps[1].offsetTop - steps[0].offsetTop)));
+      map.jumpTo({ center: CENTER, zoom: squareZoom() + along * (bezosZoom() - squareZoom()) });
+      const current = along < 0.5 ? 0 : 1;
+      steps.forEach((step, i) => step.querySelector(".sentence").classList.toggle("on", i === current));
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    onScroll();
+  </script>
+</body>
+</html>

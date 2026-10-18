@@ -324,7 +324,12 @@ gridBtn.addEventListener("click", () => {
 
 // All units from units.json go in the dropdown, grouped by category.
 // Scrolling: step 0 the football field, steps 1-2 two other sports units at
-// random, step 3 a park at random.
+// random, step 3 a park at random; or, when the address names them as
+// ?units=football-field|soccer-field|central-park, those units in that order.
+// The address can also name the place, as in ../places.json: ?place=the Great Pyramid of Giza
+const params = new URLSearchParams(location.search);
+const CHOSEN_UNITS = params.get("units")?.split("|");
+const CHOSEN_PLACE = params.get("place");
 const CATEGORY_LABELS = { squares: "Squares", parks: "Parks", sports: "Sports", buildings: "Buildings", homes: "Homes" };
 // only on this page, not in units.json: a 1,000 sq ft apartment, drawn as a square
 const SQFT_1000_SIDE_FT = Math.sqrt(1000);
@@ -335,11 +340,19 @@ const APARTMENT = {
 };
 let allUnits = [];
 let stepUnitKeys = ["football-field"];
-fetch("../units.json").then((r) => r.json()).then((units) => {
+// the chosen place first, if there is one, so each unit's zoom is worked out for it
+const placeReady = !CHOSEN_PLACE ? Promise.resolve() : fetch("../places.json").then((r) => r.json()).then((places) => {
+  const p = places.find((q) => q.name === CHOSEN_PLACE);
+  if (!p) return;
+  Object.assign(HOME, { center: [p.lng, p.lat], zoom: p.zoom ?? 15, bearing: p.bearing || 0, html: "You are at <b>" + p.name + "</b>." });
+  placeLine.innerHTML = HOME.html;
+  map.jumpTo({ center: HOME.center, zoom: HOME.zoom, bearing: HOME.bearing });
+});
+placeReady.then(() => fetch("../units.json")).then((r) => r.json()).then((units) => {
   units = [...units, APARTMENT];
   allUnits = units;
   const sports = units.filter((u) => u.category === "sports");
-  stepUnitKeys = [
+  stepUnitKeys = CHOSEN_UNITS ? CHOSEN_UNITS.filter((key) => units.some((u) => u.key === key)) : [
     "football-field",
     ...pickRandom(sports.filter((u) => u.key !== "football-field"), 2).map((u) => u.key),
     pickRandom(units.filter((u) => u.category === "parks"), 1)[0].key
@@ -364,7 +377,7 @@ fetch("../units.json").then((r) => r.json()).then((units) => {
   unitSelect.addEventListener("change", () => {
     useUnit(units.find((u) => u.key === unitSelect.value));
   });
-  useUnit(sports.find((u) => u.key === "football-field") || sports[0]);
+  useUnit(units.find((u) => u.key === stepUnitKeys[0]) || sports[0]);
   if (pendingStep !== null) goToStep(pendingStep);
 });
 
@@ -379,7 +392,7 @@ function useUnit(u) {
     : FIELD_W_M * FIELD_H_M;
   fitSelectToContent(unitSelect);
   if (map.getSource("field")) { redraw(); updateAreaText(); }
-  // Niagara's own zoom, or further out if the unit (e.g. Central Park) wouldn't fit
+  // the place's own zoom, or further out if the unit (e.g. Central Park) wouldn't fit
   map.easeTo({ zoom: Math.min(HOME.zoom, unitFitZoom()), duration: 1400, essential: true });
 }
 

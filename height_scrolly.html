@@ -259,10 +259,8 @@
           <option value="Statue of Liberty, statue alone" data-plural="Statues of Liberty">Statues of Liberty</option>
           <option value="Empire State Building, to the tip" data-plural="Empire State Buildings">Empire State Buildings</option>
           <option value="S" data-plural="of you">you</option>
-          <option value="J" data-plural="Moms">Mom</option>
+          <option value="J" data-plural="Moms">Moms</option>
           <option value="Robert Wadlow" data-plural="Robert Wadlows">Robert Wadlows</option>
-          <option value="Average US adult man" data-plural="average US men">average US men</option>
-          <option value="Average US adult woman" data-plural="average US women">average US women</option>
         </select>.</p>
       <div class="stage"></div>
     </section>
@@ -512,6 +510,57 @@
       document.querySelectorAll(".slide").forEach((slide) => observer.observe(slide));
     }
 
+    // ---- entrance: as a step of upright lines comes on screen, the lines it shares with the step before slide over
+    // from where they stood there, and to their new height, making room; then its new lines grow up from the bottom
+    // and their labels fade in ----
+    const SHIFT_MS = 700, GROW_MS = 900;
+    const upright = (slide) => slide && slide.querySelector(".stage .bar") && !slide.classList.contains("sideways") && !slide.classList.contains("axis");
+    function playEntrance(slide) {
+      const before = slide.previousElementSibling;
+      const was = new Map();
+      if (upright(before)) {
+        before.querySelectorAll(".stage .bar").forEach((bar) => {
+          const box = bar.getBoundingClientRect();
+          was.set(bar.dataset.key, { x: box.left + box.width / 2, height: bar.querySelector(".bar-line").offsetHeight });
+        });
+      }
+      const bars = [...slide.querySelectorAll(".stage .bar")];
+      bars.forEach((bar) => {
+        const line = bar.querySelector(".bar-line"), label = bar.querySelector(".bar-label");
+        [bar, line, label].forEach((el) => { el.style.transition = "none"; });
+        line.style.transformOrigin = "bottom";
+        const old = was.get(bar.dataset.key);
+        if (old) {
+          // start where it stood on the step before, at the height it had there
+          const box = bar.getBoundingClientRect(), height = line.offsetHeight;
+          bar.style.transform = `translateX(${old.x - (box.left + box.width / 2)}px)`;
+          line.style.transform = `scaleY(${height ? old.height / height : 1})`;
+          label.style.transform = `translateY(${height - old.height}px)`;
+        } else {
+          // a new line: flat, label hidden, until the others have made room
+          line.style.transform = "scaleY(0)";
+          label.style.opacity = "0";
+        }
+      });
+      slide.offsetWidth; // apply the starting positions before animating
+      bars.forEach((bar) => {
+        const line = bar.querySelector(".bar-line"), label = bar.querySelector(".bar-label");
+        const isNew = !was.has(bar.dataset.key);
+        const ease = "cubic-bezier(0.33, 0, 0.2, 1)";
+        bar.style.transition = `transform ${SHIFT_MS}ms ${ease}`;
+        line.style.transition = `transform ${isNew ? GROW_MS : SHIFT_MS}ms ${ease} ${isNew ? SHIFT_MS * 0.6 : 0}ms`;
+        label.style.transition = isNew ? `opacity 300ms ease ${SHIFT_MS * 0.6 + GROW_MS}ms` : `transform ${SHIFT_MS}ms ${ease}`;
+        bar.style.transform = line.style.transform = label.style.transform = "";
+        label.style.opacity = "";
+      });
+    }
+    function watchEntrances() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => { if (entry.isIntersecting && upright(entry.target)) playEntrance(entry.target); });
+      }, { threshold: 0.6, rootMargin: "0px 0px -30px 0px" }); // 30px further into view before it starts
+      document.querySelectorAll(".slide").forEach((slide) => observer.observe(slide));
+    }
+
     // ---- progress dots: one per step, filled up to the step on screen; clicking a dot jumps to its step ----
     function watchProgress() {
       const nav = document.querySelector(".progress");
@@ -564,6 +613,7 @@
           const meters = parts.reduce((sum, d) => sum + Number(d.meters), 0);
           return {
             parts,
+            key: names, // the same thing on another step is the same line, for the entrance animation
             label: labels[i] || names,
             sublabel: captions[i] ? captions[i] : unit === "m"
               ? meters.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m"
@@ -577,6 +627,7 @@
         const bars = items.map((d) => {
           const bar = document.createElement("div");
           bar.className = "bar";
+          bar.dataset.key = d.key;
           bar.innerHTML = '<div class="bar-label"><b></b><span></span></div><div class="bar-line"></div>';
           // a label can have a second line, after a line break ("Michael James&#10;giraffe"), in plain type
           const [name, kind] = d.label.split("\n");
@@ -616,6 +667,7 @@
         drawSlides();
         window.addEventListener("resize", drawSlides);
         watchUnitSteps();
+        watchEntrances();
         watchProgress();
       });
   </script>

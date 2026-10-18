@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Atoms as People</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+  <style>
+    /* one screen: a single sentence, centered */
+    html, body{ background: #FAF8F3; color: #000; }
+    body{ font-family: 'Inter', Arial, sans-serif; margin: 0; }
+    .page{
+      box-sizing: border-box;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .sentence{
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1.5;
+      text-align: center;
+      margin: 0;
+      max-width: 640px;
+    }
+    @media (max-width: 760px){
+      .sentence{ font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- about 8.2 billion people; even the finest grain of sand (1/16 mm) is about 10 quadrillion atoms,
+         and a 1 mm grain about 40 quintillion -->
+    <p class="sentence">If an atom is a person, then the population of the world would fit in a grain of sand a million times.</p>
+  </div>
+</body>
+</html>
