@@ -90,6 +90,8 @@
     .spin-box{ display: inline-flex; align-items: stretch; border-bottom: 2px solid #000; vertical-align: baseline; }
     .spin-box input.measure{ border: none; }
     .spin-btn{ all: unset; cursor: pointer; padding: 0 0.3em; font-weight: 700; }
+    /* the small how-to line under the sentence, as on the football maps */
+    .sentence .hint{ display: block; margin-top: 8px; font-size: 12px; line-height: 1.4; }
     @media (max-width: 760px){
       .sentence, .walk-label{ font-size: 18px; }
     }
@@ -102,7 +104,7 @@
   <div class="map"></div>
   <div class="walk"><span class="arrow left"></span><span class="walk-label">width of a hair</span><span class="arrow right"></span></div>
   <div class="page">
-    <p class="sentence">If you are <input type="number" class="measure walker-height" value="48" min="20" max="100" step="1" aria-label="Your height in inches"> inches tall, each of your steps is around <span class="walker-step">20 inches</span>. If an atom is a step, the width of a hair is <span class="walker-miles">316 miles</span>.</p>
+    <p class="sentence">If you are <input type="number" class="measure walker-height" value="48" min="20" max="100" step="1" aria-label="Your height in inches"> inches tall, each of your steps is around <span class="walker-step">20 inches</span>. If an atom is a step, the width of a hair is <span class="walker-miles">316 miles</span>.<span class="hint">Change your height to see how far the width of a hair is.</span></p>
   </div>
 
   <script>
