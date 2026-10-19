@@ -117,6 +117,7 @@
     <span class="map-line">This white outline is a <select class="unit-select" aria-label="Unit"></select>.</span>
     <span class="map-line place-line"></span>
     <span class="map-line area-text"></span>
+    <span class="map-line grid-note" hidden></span>
   </div>
   <button class="map-line grid-btn" type="button">Show grid</button>
 </div>
@@ -181,23 +182,34 @@ function fieldFeature(map) {
 
 // Lines tiling the unit across the view, lined up with the center one
 // (turned 45° for a diamond).
+// A grid with too many lines to draw (a whole canyon in football fields, say) is drawn coarser instead: each square
+// 10 by 10 of the unit, or 100 by 100, and so on, until it has at most MAX_GRID_LINES lines; the note says so
+const MAX_GRID_LINES = 200;
+let gridScale = 1;
+function gridScaleFor(reach, sx, sy) {
+  let scale = 1;
+  while (2 * (reach / (sx * scale) + reach / (sy * scale)) > MAX_GRID_LINES) scale *= 10;
+  return scale;
+}
 function gridFeatures(map) {
   const c = map.getCenter();
   const { mPerDegLat, mPerDegLng } = metersPerDeg(c.lat);
   const b = map.getBounds();
   const reach = Math.max(...[b.getNorthWest(), b.getNorthEast(), b.getSouthEast(), b.getSouthWest()]
     .map((p) => Math.hypot((p.lng - c.lng) * mPerDegLng, (p.lat - c.lat) * mPerDegLat)));
-  const nx = Math.ceil(reach / FIELD_W_M) + 1;
-  const ny = Math.ceil(reach / FIELD_H_M) + 1;
-  if (nx + ny > 1000) return [];
+  // each square is gridScale by gridScale of the unit, still lined up with the center one
+  gridScale = gridScaleFor(reach, FIELD_W_M, FIELD_H_M);
+  const sx = FIELD_W_M * gridScale, sy = FIELD_H_M * gridScale;
+  const nx = Math.ceil(reach / sx) + 1;
+  const ny = Math.ceil(reach / sy) + 1;
 
   const lines = [];
   for (let i = -nx; i <= nx; i++) {
-    const x = FIELD_W_M / 2 + i * FIELD_W_M;
+    const x = FIELD_W_M / 2 + i * sx;
     lines.push([[x, -reach], [x, reach]]);
   }
   for (let j = -ny; j <= ny; j++) {
-    const y = FIELD_H_M / 2 + j * FIELD_H_M;
+    const y = FIELD_H_M / 2 + j * sy;
     lines.push([[-reach, y], [reach, y]]);
   }
   const rot = unit.shape === "diamond" ? Math.PI / 4 : 0;
@@ -283,9 +295,13 @@ function updateAreaText() {
 }
 
 let gridOn = false;
+const gridNote = document.querySelector(".grid-note");
 function redraw() {
   map.getSource("field").setData({ type: "FeatureCollection", features: [fieldFeature(map)] });
   if (gridOn) map.getSource("grid").setData({ type: "FeatureCollection", features: gridFeatures(map) });
+  // a coarser grid says so
+  gridNote.hidden = !(gridOn && gridScale > 1);
+  if (!gridNote.hidden) gridNote.textContent = `Each grid square here is ${gridScale.toLocaleString()} × ${gridScale.toLocaleString()} ${unit.plural}.`;
 }
 
 // each step is a different unit at the same place

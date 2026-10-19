@@ -310,6 +310,7 @@
       <span class="map-line">This white outline is a <select class="unit-select"></select>. Measure any place by <span class="measure-unit"></span>.</span>
       <span class="map-line">You are at <select class="unit-select place-select"><option value="home" selected>Levi's Stadium</option></select><span class="place-note">, site of the 2025 American Super Bowl</span>.</span>
       <span class="map-line area-text"></span>
+      <span class="map-line grid-note" hidden></span>
     </div>
     <div class="custom-popup" hidden>
       <div class="custom-box">
@@ -514,7 +515,10 @@ function makeFieldFeature(map, widthM, heightM, shape, points) {
 // Lines tiling the current unit across the whole view, lined up with the
 // center shape and screen-vertical like it. A diamond's grid is turned 45°;
 // a pentagon (which doesn't tile) gets a side-by-side square grid.
-// Returns no lines when there would be too many to draw.
+// When there would be too many lines to draw (a whole canyon in football fields, say), each square is drawn 10 by 10
+// of the unit instead, or 100 by 100, and so on, until there are at most MAX_GRID_LINES; gridScale says how coarse
+const MAX_GRID_LINES = 200;
+let gridScale = 1;
 function makeGridFeatures(map, widthM, heightM, shape) {
   const c = map.getCenter();
   const center = [c.lng, c.lat];
@@ -524,22 +528,24 @@ function makeGridFeatures(map, widthM, heightM, shape) {
     .map((p) => Math.hypot((p.lng - c.lng) * mPerDegLng, (p.lat - c.lat) * mPerDegLat)));
 
   const square = shape === "diamond" || shape === "pentagon";
-  const sx = widthM;
-  const sy = square ? widthM : heightM;
+  const fx = widthM;
+  const fy = square ? widthM : heightM;
+  gridScale = 1;
+  while (2 * (reach / (fx * gridScale) + reach / (fy * gridScale)) > MAX_GRID_LINES) gridScale *= 10;
+  const sx = fx * gridScale, sy = fy * gridScale; // each square, still lined up with the center shape
   const nx = Math.ceil(reach / sx) + 1;
   const ny = Math.ceil(reach / sy) + 1;
-  if (nx + ny > 1000) return [];
 
   const rot = shape === "diamond" ? Math.PI / 4 : 0;
   const turn = ([x, y]) => [x * Math.cos(rot) - y * Math.sin(rot), x * Math.sin(rot) + y * Math.cos(rot)];
 
   const lines = [];
   for (let i = -nx; i <= nx; i++) {
-    const x = sx / 2 + i * sx;
+    const x = fx / 2 + i * sx;
     lines.push([[x, -reach], [x, reach]]);
   }
   for (let j = -ny; j <= ny; j++) {
-    const y = sy / 2 + j * sy;
+    const y = fy / 2 + j * sy;
     lines.push([[-reach, y], [reach, y]]);
   }
 
@@ -828,6 +834,12 @@ function initMapExperience(root, options) {
           type: "FeatureCollection",
           features: makeGridFeatures(map, widthM, heightM, currentUnit.shape)
         });
+      }
+      // a coarser grid says so
+      const gridNote = document.querySelector(".grid-note");
+      gridNote.hidden = !(gridOn && gridScale > 1);
+      if (!gridNote.hidden) {
+        gridNote.textContent = `Each grid square here is ${gridScale.toLocaleString()} × ${gridScale.toLocaleString()} ${currentUnit.plural || "units"}.`;
       }
     }
 
