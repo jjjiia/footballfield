@@ -521,8 +521,29 @@ function prefetchViews(views) {
   });
 }
 
+// Every view a move between two of these passes through: a move shows the new place at the old zoom, then eases to the
+// new zoom (and moving back does the same the other way), so each place is fetched at every whole zoom level between
+// the two, not just at its own
+function viewsBetween(views) {
+  const out = [], seen = new Set();
+  const add = (center, zoom, bearing) => {
+    const key = center.join() + "|" + zoom;
+    if (!seen.has(key)) { seen.add(key); out.push({ center, zoom, bearing }); }
+  };
+  views.forEach((v) => add(v.center, v.zoom, v.bearing));
+  for (let i = 1; i < views.length; i++) {
+    const a = views[i - 1], b = views[i];
+    for (let z = Math.ceil(Math.min(a.zoom, b.zoom)); z < Math.max(a.zoom, b.zoom); z++) {
+      add(b.center, z, b.bearing);
+      add(a.center, z, a.bearing);
+    }
+  }
+  return out;
+}
+
 function warmUp() {
-  prefetchViews(stops.slice(1));
+  // the stops in scrolling order, and the zooms each move between them passes through
+  prefetchViews(viewsBetween(stops).filter((v) => v.center !== HOME.center || v.zoom !== HOME.zoom));
 }
 
 // --- which step to show ---

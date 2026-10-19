@@ -539,9 +539,31 @@ function warmUp() {
     const mPerPx = Math.max(wM / (0.9 * canvas.clientWidth), hM / (0.9 * canvas.clientHeight));
     return Math.min(HOME.zoom, Math.log2(78271.517 * Math.cos(HOME.center[1] * Math.PI / 180) / mPerPx));
   };
-  const views = stepUnitKeys.slice(1).map((key) => allUnits.find((x) => x.key === key)).filter(Boolean)
+  // every unit's view in scrolling order (all at the same place), and the zooms each move between them passes through
+  const views = stepUnitKeys.map((key) => allUnits.find((x) => x.key === key)).filter(Boolean)
     .map((u) => ({ center: HOME.center, zoom: zoomFor(u), bearing: HOME.bearing }));
-  if (views.length) prefetchViews(views);
+  const between = viewsBetween(views).slice(1); // the first is on screen already
+  if (between.length) prefetchViews(between);
+}
+
+// Every view a move between two of these passes through: a move shows the new place at the old zoom, then eases to the
+// new zoom (and moving back does the same the other way), so each place is fetched at every whole zoom level between
+// the two, not just at its own
+function viewsBetween(views) {
+  const out = [], seen = new Set();
+  const add = (center, zoom, bearing) => {
+    const key = center.join() + "|" + zoom;
+    if (!seen.has(key)) { seen.add(key); out.push({ center, zoom, bearing }); }
+  };
+  views.forEach((v) => add(v.center, v.zoom, v.bearing));
+  for (let i = 1; i < views.length; i++) {
+    const a = views[i - 1], b = views[i];
+    for (let z = Math.ceil(Math.min(a.zoom, b.zoom)); z < Math.max(a.zoom, b.zoom); z++) {
+      add(b.center, z, b.bearing);
+      add(a.center, z, a.bearing);
+    }
+  }
+  return out;
 }
 
 function useUnit(u) {
