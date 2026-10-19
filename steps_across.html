@@ -24,8 +24,8 @@
       pointer-events: none; /* only the sentence takes clicks, so the map can be moved everywhere else */
       box-sizing: border-box;
       display: flex;
-      justify-content: center;
-      padding: 24px;
+      justify-content: flex-start; /* the box at the top left, as on the football maps */
+      padding: 20px;
     }
     .sentence{
       font-size: 24px;
@@ -33,7 +33,8 @@
       line-height: 1.5;
       text-align: left;
       margin: 0;
-      max-width: 640px;
+      max-width: 50%; /* wide screens: half the map's width, so it covers less of it, as on the football maps */
+      box-sizing: border-box;
       background: #FAF8F3; /* an off-white box, so it reads over the map */
       padding: 12px 20px;
       pointer-events: auto;
@@ -58,6 +59,9 @@
     .spin-btn{ all: unset; cursor: pointer; padding: 0 0.3em; font-weight: 700; }
     @media (max-width: 760px){
       .sentence{ font-size: 18px; }
+    }
+    @media (max-width: 600px){
+      .sentence{ max-width: none; width: 100%; } /* phones: the full width */
     }
   </style>
 </head>
