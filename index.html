@@ -211,6 +211,8 @@ html, body{ background: #FAF8F3; }
   padding-left: 20px;
 }
 .notes li{ margin-bottom: 12px; }
+.notes .note-parts{ margin: 6px 0 0; padding-left: 20px; list-style: disc; }
+.notes .note-parts li{ margin-bottom: 6px; }
 
 /* room between two screenshots in a row */
 .gap{ height: 64px; }
@@ -521,6 +523,17 @@ html, body{ background: #FAF8F3; }
       <li id="note-3"><b>Map 5, jobs.</b> United States: U.S. Census Bureau, <a href="https://www.census.gov/programs-surveys/acs">American Community Survey</a> 2020–2024 5-year estimates, table B24114, Detailed Occupation for the Civilian Employed Population 16 Years and Over; occupations are grouped into professions in <a href="populations/acs/census_occupation_mapping.json">census_occupation_mapping.json</a>. States and metro areas: U.S. Bureau of Labor Statistics, <a href="https://www.bls.gov/oes/tables.htm">Occupational Employment and Wage Statistics</a>, May 2025 state and metropolitan area estimates; occupations are grouped into professions in <a href="populations/bls/occupation_mapping.json">occupation_mapping.json</a>. Not all areas have published numbers for all occupations.</li>
       <li id="note-4"><b>Map 10, stairs.</b> Depths, from <a href="height_data.html">the heights data</a>: average ocean depth 3,682 m (12,080 ft), <a href="https://oceanservice.noaa.gov/facts/oceandepth.html">NOAA</a>.</li>
       <li id="note-5"><b>Conclusion.</b> The average American: the median family net worth, $215,900, from the Federal Reserve’s 2025 Survey of Consumer Finances, <a href="https://www.federalreserve.gov/newsevents/pressreleases/other20261009a.htm">press release</a>, October 9, 2026, and <a href="https://www.federalreserve.gov/publications/files/scf26.pdf">“Changes in U.S. Family Finances from 2022 to 2025”</a>; the mean is $1.24 million. Reported by <a href="https://www.cbsnews.com/news/fed-data-americans-over-75-richest/">CBS News</a>, <a href="https://finance.yahoo.com/economy/articles/key-takeaways-feds-2025-survey-213249592.html">Yahoo Finance</a> and <a href="https://qz.com/fed-survey-consumer-finances-older-families-wealth-younger-decline-101426">Quartz</a>. The 2022 survey: <a href="https://www.federalreserve.gov/publications/files/scf23.pdf">“Changes in U.S. Family Finances from 2019 to 2022”</a>, October 2023, median $192,900. Elon Musk’s net worth, about $970 billion (Bloomberg $966.5 billion, Forbes about $977 billion, October 13, 2026), and Jeff Bezos’s, about $370 billion (Forbes, October 2, 2026); both change daily. Hungary, about 9.5 million people (Hungarian Central Statistical Office, end of 2025). The oldest person alive, Ethel Caterham, born August 21, 1909, 117 years old, <a href="https://www.guinnessworldrecords.com/news/2026/8/worlds-oldest-person-ethel-caterham-becomes-first-ever-brit-to-reach-age-117">Guinness World Records</a>. About 100,000 hairs on a head.</li>
+      <li id="note-6"><b>Map 12, things you already do.</b>
+        <ul class="note-parts">
+        <li><i>If you pay rent:</i> Assumes 12 months, 365 days and 8,760 hours per year.</li>
+        <li><i>If you drink water:</i> A glass: An 8-oz glass; eight glasses is half a gallon a day. A bathtub: ~40 gallons; <a href="https://www.hunker.com/13416360/how-many-gallons-of-water-does-the-average-house-bathtub-contain/" target="_blank" rel="noopener">household tubs hold 30–60</a>. An Olympic pool: 50 m × 25 m × 2 m deep, <a href="https://www.nbc.com/nbc-insider/olympic-swimming-pool-size-gallons-meters-depth" target="_blank" rel="noopener">~660,000 gallons</a>. The Central Park Reservoir: The reservoir's earthen embankment has a <a href="https://www.enr.com/articles/62606-nyc-to-replace-160-plus-year-old-equipment-from-central-park-reservoir" target="_blank" rel="noopener">storage capacity of 1,040 million gallons</a>. Every New Yorker: 8,584,629 people, the Census Bureau's <a href="https://www.census.gov/quickfacts/fact/table/newyorkcitynewyork/PST045225" target="_blank" rel="noopener">July 2025 estimate</a> for New York City.</li>
+        <li><i>If you eat dinner with your kid:</i> Assumes 52 weeks (12 months) per year, counted from birth to their 18th birthday.</li>
+        <li><i>If you climb stairs:</i> To the <a href="https://www.esbnyc.com/blog/what-difference-between-esbs-86th-102nd-floor-observation-decks" target="_blank" rel="noopener">86th-floor observatory</a>, ~1,050 ft up. Counting flights, that's ~105 at the <a href="https://support.google.com/fitbit/answer/14237111" target="_blank" rel="noopener">fitness-tracker convention</a> of ~10 ft per flight. Counting stairs, it's the 1,576 steps of the annual <a href="https://www.esbnyc.com/2026-esb-run-up" target="_blank" rel="noopener">Empire State Building Run-Up</a>.</li>
+        <li><i>If you talk to a new person:</i> Time: Assumes 60 seconds/minute, 60 minutes/hour, 7 days/week, 30 days/month, 365 days/year. Cities: City-proper populations from Wikipedia's <a href="https://en.wikipedia.org/wiki/List_of_largest_cities_by_population_in_2026" target="_blank" rel="noopener">List of largest cities by population in 2026</a>.</li>
+        <li><i>If you go to a new restaurant:</i> 12,526 food establishments in Manhattan, per <a href="https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Inspection-Results/43nn-pn8j" target="_blank" rel="noopener">NYC DOHMH restaurant inspection data</a>.</li>
+        <li><i>If you sleep:</i> A month is calculated as 30 days.</li>
+        </ul>
+      </li>
     </ol>
   </div>
 </section>
@@ -625,7 +638,10 @@ function sizeEmbedText(frame) {
     style = Object.assign(doc.createElement("style"), { id: "scrolly2-text-size" });
     doc.head.appendChild(style);
   }
-  style.textContent = `${EMBED_TEXT}{ font-size: ${innerWidth <= 760 ? 22 : 28}px !important; }`;
+  // the maps' text a little smaller (24px, 18px on phones), so it covers less of the map; the rest 28px, 22px on phones
+  const isMap = frame.matches(".map-frame, .steps-across-frame, .atom-step-frame, .wealth-frame");
+  const size = isMap ? (innerWidth <= 760 ? 18 : 24) : (innerWidth <= 760 ? 22 : 28);
+  style.textContent = `${EMBED_TEXT}, .walk-label{ font-size: ${size}px !important; }`;
   // the embed's dropdowns size themselves to their text; have them measure again at the new size
   frame.contentWindow.dispatchEvent(new Event("resize"));
 }

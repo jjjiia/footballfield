@@ -10,8 +10,6 @@
   <link rel="stylesheet" href="site.css">
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-  <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.css" rel="stylesheet" />
-  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
   <style>
     /* one screen: a map zoomed so the window is someone's wealth in football fields, if your net worth is one field,
        with the sentence over it at the top */
@@ -32,10 +30,10 @@
       padding: 24px;
     }
     .sentence{
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 300;
       line-height: 1.9; /* room between the lines for the boxes, so boxes on lines one above the other don't touch */
-      text-align: center;
+      text-align: left;
       margin: 0;
       max-width: 640px;
       background: #FAF8F3; /* an off-white box, so it reads over the map */
@@ -67,28 +65,46 @@
     }
     /* the sentence and the place search share the off-white box */
     .sentence-text{ margin: 0; }
-    /* the place search under the sentence, in the box: outlined like the net worth box and the dropdown */
-    .place-search{ width: min(420px, 100%); margin: 12px auto 4px; text-align: left; }
-    .place-search .mapboxgl-ctrl-geocoder{
-      margin: 0;
-      width: 100%;
-      min-width: 0;
-      max-width: none;
-      background: transparent;
-      border: 2px solid #000;
-      border-radius: 0;
-      box-shadow: none;
-      font-family: 'Inter', Arial, sans-serif;
-      font-size: 18px;
-      line-height: normal;
+    /* the place box in the sentence ("over the Grand Canyon"), outlined like the net worth box and the dropdown: click it
+       for the football field page's places, or type to narrow them and to search anywhere else */
+    .place-search{ position: relative; display: inline-block; }
+    .place-input{
+      max-width: 100%;
+      cursor: pointer;
+      padding-right: 32px;
+      background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 10px center;
+      -webkit-appearance: none;
+      appearance: none;
     }
-    .place-search .mapboxgl-ctrl-geocoder--input{ height: 40px; padding: 0 32px 0 34px; font: inherit; color: #000; }
-    .place-search .mapboxgl-ctrl-geocoder--icon-search{ top: 50%; left: 8px; transform: translateY(-50%); fill: #000; }
-    .place-search .mapboxgl-ctrl-geocoder--pin-right > *{ top: 50%; transform: translateY(-50%); }
-    .place-search .suggestions{ border-radius: 0; font-size: 16px; }
+    .place-input:focus{ outline: none; cursor: text; }
+    .place-input::placeholder{ color: #000; opacity: 0.55; }
+    .place-list{
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: max-content;
+      min-width: 100%;
+      max-width: min(360px, 90vw);
+      text-align: left;
+      font-weight: 300;
+      z-index: 5;
+      margin: 0;
+      padding: 4px 0;
+      list-style: none;
+      max-height: 280px;
+      overflow-y: auto;
+      background: #FAF8F3;
+      border: 2px solid #000;
+      border-top: 0;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+    .place-list[hidden]{ display: none; }
+    .place-list li{ padding: 5px 12px; cursor: pointer; }
+    .place-list li.section{ font-weight: 700; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; padding-top: 8px; cursor: default; }
+    .place-list li.active{ background: #000; color: #FAF8F3; }
     @media (max-width: 760px){
-      .sentence{ font-size: 22px; }
-      .place-search .mapboxgl-ctrl-geocoder{ font-size: 16px; }
+      .sentence{ font-size: 18px; }
     }
   </style>
 </head>
@@ -107,8 +123,7 @@
         <option value="167.2e9">Larry Ellison</option>
         <option value="163.5e9">Steve Ballmer</option>
         <option value="151.1e9">Warren Buffett</option>
-      </select> is the visible area on this map.</p>
-    <div class="place-search"></div>
+      </select>’s net worth is the visible area over <span class="place-search"><input type="text" class="measure place-input" value="the Grand Canyon" autocomplete="off" aria-label="Place" role="combobox" aria-expanded="false" aria-controls="place-list"><ul class="place-list" id="place-list" role="listbox" hidden></ul></span>.</p>
     </div>
   </div>
 
@@ -154,20 +169,83 @@
     map.on("dragend", () => { center = map.getCenter().toArray(); moveField(); fitWealth(400); });
     window.addEventListener("resize", () => { fitControls(); fitWealth(0); }); // and the boxes re-measured, if their text size changed
 
-    // ---- the place search: picking a place moves the map there and re-zooms for it; it does not move the map itself ----
-    const geocoder = new MapboxGeocoder({
-      accessToken: mapboxgl.accessToken,
-      mapboxgl: mapboxgl,
-      marker: false,
-      flyTo: false,
-      limit: 6,
-      placeholder: "Go to a place",
+    // ---- the place box: one box for both the football field page's places (Levi's Stadium and ../places.json) and a
+    // search for anywhere else. Clicking it lists the places; typing narrows them and searches as well. Picking one moves
+    // the map there; the zoom stays set by the wealth ----
+    const placeInput = document.querySelector(".place-input");
+    const placeList = document.querySelector(".place-list");
+    let presets = [{ name: "Levi's Stadium", center: [-121.96979950341608, 37.403187791716775] }];
+    fetch("places.json").then((r) => r.json()).then((places) => {
+      presets = presets.concat(places.map((p) => ({ name: p.name, center: [p.lng, p.lat] })));
     });
-    document.querySelector(".place-search").appendChild(geocoder.onAdd(map));
-    geocoder.on("result", (e) => {
-      center = e.result.center;
+    let shown = [], active = -1, searchId = 0, currentPlace = "the Grand Canyon";
+    const capitalize = (name) => name.charAt(0).toUpperCase() + name.slice(1);
+    function showList(found, searched) {
+      placeList.innerHTML = "";
+      shown = [];
+      const section = (title) => placeList.appendChild(Object.assign(document.createElement("li"), { className: "section", textContent: title }));
+      const add = (place) => {
+        const li = Object.assign(document.createElement("li"), { textContent: capitalize(place.name), role: "option" });
+        const index = shown.length;
+        li.addEventListener("mousedown", (e) => { e.preventDefault(); goTo(shown[index]); });
+        placeList.appendChild(li);
+        shown.push(place);
+      };
+      if (found.length) { section("Places"); found.forEach(add); }
+      if (searched && searched.length) { section("Search"); searched.forEach(add); }
+      active = -1;
+      placeList.hidden = !shown.length;
+      placeInput.setAttribute("aria-expanded", String(!placeList.hidden));
+    }
+    function highlight(index) {
+      const items = [...placeList.querySelectorAll("li:not(.section)")];
+      items.forEach((li, i) => li.classList.toggle("active", i === index));
+      if (items[index]) items[index].scrollIntoView({ block: "nearest" });
+      active = index;
+    }
+    function goTo(place) {
+      placeInput.value = place.short || place.name; // in the sentence: "over the White House", "over Chicago"
+      placeList.hidden = true;
+      placeInput.setAttribute("aria-expanded", "false");
+      placeInput.blur();
+      currentPlace = placeInput.value;
+      center = place.center;
       moveField();
       fitWealth(1500);
+      fitControls();
+    }
+    // the places whose names have the words typed, then (once two letters are in) Mapbox's search for anywhere
+    function update() {
+      const words = placeInput.value.toLowerCase().trim();
+      const found = presets.filter((p) => p.name.toLowerCase().includes(words));
+      showList(found);
+      if (words.length < 2) return;
+      const id = ++searchId;
+      fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(words)}.json?limit=5&access_token=${mapboxgl.accessToken}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (id !== searchId) return; // a newer search took over
+          showList(found, (data.features || []).map((f) => ({ name: f.place_name, short: f.text, center: f.center })));
+        })
+        .catch(() => {});
+    }
+    placeInput.addEventListener("focus", () => {
+      placeInput.style.width = Math.max(placeInput.offsetWidth, 260) + "px"; // room to type
+      placeInput.select();
+      showList(presets);
+    });
+    placeInput.addEventListener("input", update);
+    placeInput.addEventListener("blur", () => {
+      placeList.hidden = true;
+      placeInput.setAttribute("aria-expanded", "false");
+      if (!placeInput.value.trim()) placeInput.value = currentPlace; // left empty: back to where the map is
+      fitControls();
+    });
+    placeInput.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown") { e.preventDefault(); highlight(Math.min(shown.length - 1, active + 1)); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); highlight(Math.max(0, active - 1)); }
+      else if (e.key === "Enter" && shown.length) { e.preventDefault(); goTo(shown[active >= 0 ? active : 0]); }
+      else if (e.key === "Escape") placeInput.blur();
     });
 
     // your one football field, outlined at the center like the football field page's (white over a soft black
@@ -199,6 +277,7 @@
     function fitControls() {
       fitWidth(netWorthInput, netWorthInput.value || "0", 16);
       fitWidth(whoSelect, whoSelect.selectedOptions[0].textContent, 44);
+      if (document.activeElement !== placeInput) fitWidth(placeInput, placeInput.value || placeInput.placeholder, 48);
     }
     netWorthInput.addEventListener("input", () => { fitControls(); fitWealth(); });
     netWorthInput.addEventListener("change", () => {
