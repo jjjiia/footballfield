@@ -357,12 +357,16 @@ const APARTMENT = {
 let allUnits = [];
 let stepUnitKeys = ["football-field"];
 // the chosen place first, if there is one, so each unit's zoom is worked out for it
+// a chosen place: the map stays faded out until it is there, rather than showing Niagara Falls for a moment first
+if (CHOSEN_PLACE) { mapDiv.style.opacity = "0"; mapDiv.style.transition = "opacity 0.4s"; }
 const placeReady = !CHOSEN_PLACE ? Promise.resolve() : fetch("../places.json").then((r) => r.json()).then((places) => {
   const p = places.find((q) => q.name === CHOSEN_PLACE);
   if (!p) return;
   Object.assign(HOME, { center: [p.lng, p.lat], zoom: p.zoom ?? 15, bearing: p.bearing || 0, html: "You are at <b>" + p.name + "</b>." });
   placeLine.innerHTML = HOME.html;
   map.jumpTo({ center: HOME.center, zoom: HOME.zoom, bearing: HOME.bearing });
+}).finally(() => {
+  if (CHOSEN_PLACE) map.once("idle", () => { mapDiv.style.opacity = ""; });
 });
 placeReady.then(() => fetch("../units.json")).then((r) => r.json()).then((units) => {
   units = [...units, APARTMENT];
@@ -398,13 +402,27 @@ placeReady.then(() => fetch("../units.json")).then((r) => r.json()).then((units)
   warmUp();
 });
 
-// Before anyone scrolls to them, zoom once to each later step's unit with the map hidden, waiting at each for its
-// imagery, so the browser has it saved and nothing is blank when the map zooms out (to Central Park, say); then back.
-// A step taken meanwhile stops this at once
-async function warmUp() {
-  if (!map.loaded()) await new Promise((resolve) => map.once("idle", resolve));
-  if (currentStep !== 0) return;
-  const firstZoom = map.getZoom();
+// Before anyone scrolls to them, fetch the imagery for each later step's zoom, so nothing is blank when the map zooms
+// out (to Central Park, say)
+// A second map, off screen and the same size as this one, for fetching imagery ahead of time without touching the map
+// on screen: it visits each view in turn, waiting at each for its imagery to arrive (the browser keeps it), then goes
+function prefetchViews(views) {
+  const box = document.createElement("div");
+  box.style.cssText = `position:fixed; left:-10000px; top:0; width:${mapDiv.clientWidth}px; height:${mapDiv.clientHeight}px;`;
+  document.body.appendChild(box);
+  const ghost = new mapboxgl.Map({ container: box, style: STYLE, center: views[0].center, zoom: views[0].zoom, bearing: views[0].bearing || 0, interactive: false });
+  const settle = () => Promise.race([new Promise((resolve) => ghost.once("idle", resolve)), new Promise((r) => setTimeout(r, 5000))]);
+  ghost.once("load", async () => {
+    for (const view of views) {
+      ghost.jumpTo({ center: view.center, zoom: view.zoom, bearing: view.bearing || 0 });
+      await settle();
+    }
+    ghost.remove();
+    box.remove();
+  });
+}
+
+function warmUp() {
   const canvas = map.getCanvas();
   const zoomFor = (u) => {
     const w = u.widthFt != null ? u.widthFt * 0.3048 : u.widthM, h = u.widthFt != null ? u.lengthFt * 0.3048 : u.lengthM;
@@ -412,15 +430,9 @@ async function warmUp() {
     const mPerPx = Math.max(wM / (0.9 * canvas.clientWidth), hM / (0.9 * canvas.clientHeight));
     return Math.min(HOME.zoom, Math.log2(78271.517 * Math.cos(HOME.center[1] * Math.PI / 180) / mPerPx));
   };
-  mapDiv.style.visibility = "hidden";
-  for (const key of stepUnitKeys.slice(1)) {
-    const u = allUnits.find((x) => x.key === key);
-    if (!u || currentStep !== 0) break;
-    map.jumpTo({ zoom: zoomFor(u) });
-    await Promise.race([new Promise((resolve) => map.once("idle", resolve)), new Promise((r) => setTimeout(r, 5000))]);
-  }
-  if (currentStep === 0) map.jumpTo({ zoom: firstZoom });
-  mapDiv.style.visibility = "";
+  const views = stepUnitKeys.slice(1).map((key) => allUnits.find((x) => x.key === key)).filter(Boolean)
+    .map((u) => ({ center: HOME.center, zoom: zoomFor(u), bearing: HOME.bearing }));
+  if (views.length) prefetchViews(views);
 }
 
 function useUnit(u) {

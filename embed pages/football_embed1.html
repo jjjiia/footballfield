@@ -401,22 +401,28 @@ fetch("../places.json").then((r) => r.json()).then((places) => {
   warmUp();
 });
 
-// Before anyone scrolls to them, visit every other stop once with the map hidden, waiting at each for its imagery, so
-// the browser has it saved and each place shows straight away when its step comes; then back to the first stop.
-// A step taken meanwhile stops this at once
-async function warmUp() {
-  if (!map.loaded()) await new Promise((resolve) => map.once("idle", resolve));
-  if (currentStep !== 0) return;
-  const id = moveId;
-  const stillWarming = () => moveId === id && currentStep === 0;
-  mapDiv.style.visibility = "hidden";
-  for (const stop of stops.slice(1)) {
-    if (!stillWarming()) break;
-    map.jumpTo({ center: stop.center, zoom: stop.zoom, bearing: stop.bearing });
-    await Promise.race([new Promise((resolve) => map.once("idle", resolve)), wait(5000)]);
-  }
-  if (stillWarming()) map.jumpTo({ center: HOME.center, zoom: HOME.zoom, bearing: HOME.bearing });
-  mapDiv.style.visibility = "";
+// Before anyone scrolls to them, fetch every other stop's imagery, so each place shows straight away when its step
+// comes
+// A second map, off screen and the same size as this one, for fetching imagery ahead of time without touching the map
+// on screen: it visits each view in turn, waiting at each for its imagery to arrive (the browser keeps it), then goes
+function prefetchViews(views) {
+  const box = document.createElement("div");
+  box.style.cssText = `position:fixed; left:-10000px; top:0; width:${mapDiv.clientWidth}px; height:${mapDiv.clientHeight}px;`;
+  document.body.appendChild(box);
+  const ghost = new mapboxgl.Map({ container: box, style: STYLE, center: views[0].center, zoom: views[0].zoom, bearing: views[0].bearing || 0, interactive: false });
+  const settle = () => Promise.race([new Promise((resolve) => ghost.once("idle", resolve)), new Promise((r) => setTimeout(r, 5000))]);
+  ghost.once("load", async () => {
+    for (const view of views) {
+      ghost.jumpTo({ center: view.center, zoom: view.zoom, bearing: view.bearing || 0 });
+      await settle();
+    }
+    ghost.remove();
+    box.remove();
+  });
+}
+
+function warmUp() {
+  prefetchViews(stops.slice(1));
 }
 
 // --- which step to show ---
