@@ -76,8 +76,7 @@
       margin: 0 auto;
     }
     /* after 10 Mississippis: a note about saving this page's address, faded in under the sentence */
-    .save-note{ display: block; margin-top: 24px; opacity: 0; transition: opacity 1s; }
-    .save-note.shown{ opacity: 1; }
+    .save-note{ display: block; margin-top: 24px; } /* shown from the start */
     /* "1 Mississippi" sits in the middle of the circle, kept to the middle 60% of its width
        (the circle is as big as fits in the top half), so the lines under the count wrap inside it */
     .mississippi{
@@ -291,7 +290,6 @@
       count.querySelector(".count").textContent = (((n - 1) % across.atoms) + 1).toLocaleString() + (n <= 3 ? " Mississippi" : " atoms");
       count.querySelector(".hairs-counted").textContent = hairs ? hairs.toLocaleString() + " " + (hairs === 1 ? across.one : across.many) + " of atoms counted" : "";
       count.querySelector(".count").style.opacity = Math.min(1, elapsed / FADE_MS); // only the count fades in each second
-      document.querySelector(".save-note").classList.toggle("shown", n > 10); // once 10 Mississippis have passed
       requestAnimationFrame(tick);
     });
 
