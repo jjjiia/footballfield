@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wealth in Football Fields</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
+  <style>
+    /* one screen: a map zoomed so the window is someone's wealth in football fields, if your net worth is one field,
+       with the sentence over it at the top */
+    html, body{ background: #FAF8F3; color: #000; }
+    body{ font-family: 'Inter', Arial, sans-serif; margin: 0; }
+    /* the map fills the window behind the sentence, the same basemap as the football field page */
+    .map{ position: fixed; inset: 0; z-index: 0; }
+    .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib{ display: none !important; }
+    .page{
+      position: relative;
+      z-index: 1;
+      pointer-events: none; /* only the sentence takes clicks, so the map can be dragged everywhere else */
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 24px;
+    }
+    .sentence{
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1.9; /* room between the lines for the boxes, so boxes on lines one above the other don't touch */
+      text-align: center;
+      margin: 0;
+      max-width: 640px;
+      background: #FAF8F3; /* an off-white box, so it reads over the map */
+      padding: 12px 20px;
+      pointer-events: auto;
+    }
+    /* the net worth box and the person dropdown inside the sentence, square, outlined */
+    .measure{
+      font: inherit;
+      font-weight: 700;
+      color: #000;
+      background: transparent;
+      border: 2px solid #000;
+      border-radius: 0;
+      padding: 0 0.2em;
+      line-height: 1.2; /* the boxes hug their text, with little room above and below it */
+      vertical-align: baseline;
+    }
+    input.measure{ width: 5em; text-align: center; }
+    select.measure{
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+      max-width: 100%;
+      padding-top: 0;
+      padding-bottom: 0;
+      padding-right: 32px;
+      background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 10px center;
+    }
+    /* the sentence and the place search share the off-white box */
+    .sentence-text{ margin: 0; }
+    /* the place search under the sentence, in the box: outlined like the net worth box and the dropdown */
+    .place-search{ width: min(420px, 100%); margin: 12px auto 4px; text-align: left; }
+    .place-search .mapboxgl-ctrl-geocoder{
+      margin: 0;
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      background: transparent;
+      border: 2px solid #000;
+      border-radius: 0;
+      box-shadow: none;
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 18px;
+      line-height: normal;
+    }
+    .place-search .mapboxgl-ctrl-geocoder--input{ height: 40px; padding: 0 32px 0 34px; font: inherit; color: #000; }
+    .place-search .mapboxgl-ctrl-geocoder--icon-search{ top: 50%; left: 8px; transform: translateY(-50%); fill: #000; }
+    .place-search .mapboxgl-ctrl-geocoder--pin-right > *{ top: 50%; transform: translateY(-50%); }
+    .place-search .suggestions{ border-radius: 0; font-size: 16px; }
+    @media (max-width: 760px){
+      .sentence{ font-size: 22px; }
+      .place-search .mapboxgl-ctrl-geocoder{ font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="map"></div>
+  <div class="page">
+    <div class="sentence">
+    <p class="sentence-text">If I have a net worth of $<input type="text" inputmode="numeric" class="measure net-worth" value="215,900" aria-label="Your net worth in dollars">, represented by a <b>football field</b>, then <select class="measure who" aria-label="Whose wealth">
+        <option value="908.5e9">Elon Musk</option>
+        <option value="369.9e9" selected>Jeff Bezos</option>
+        <option value="279.3e9">Larry Page</option>
+        <option value="257.1e9">Sergey Brin</option>
+        <option value="243.3e9">Mark Zuckerberg</option>
+        <option value="237.0e9">Michael Dell</option>
+        <option value="185.6e9">Jensen Huang</option>
+        <option value="167.2e9">Larry Ellison</option>
+        <option value="163.5e9">Steve Ballmer</option>
+        <option value="151.1e9">Warren Buffett</option>
+      </select> is the visible area on this map.</p>
+    <div class="place-search"></div>
+    </div>
+  </div>
+
+  <script>
+    // ---- the numbers: your net worth is one football field (160 by 360 feet), so someone's wealth is that many fields.
+    // Starting at the median American family's net worth, $215,900 (Federal Reserve, Survey of Consumer Finances 2025).
+    // The ten richest people, each option's value their net worth in dollars: Forbes real-time estimates, October
+    // 17–19, 2026 (as listed by WealthRank and Goodreturns); they change daily ----
+    const FIELD_W_M = 160 * 0.3048, FIELD_H_M = 360 * 0.3048;
+    const FIELD_M2 = FIELD_W_M * FIELD_H_M;
+    const netWorthInput = document.querySelector(".net-worth");
+    const whoSelect = document.querySelector(".who");
+    const netWorth = () => Number(netWorthInput.value.replace(/[^0-9.]/g, "")) || 0;
+    const fields = () => (netWorth() > 0 ? Number(whoSelect.value) / netWorth() : 0);
+
+    // ---- the map: centered on the Grand Canyon (as in places.json); it can be dragged, but the zoom is set
+    // by the numbers, so it can't be zoomed or turned ----
+    mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ";
+    const STYLE = "mapbox://styles/jjjiia123/cmmb9euid00at01qr9mbfapn7"; // as on the football field page
+    let center = [-112.12863105704415, 36.109958720381826]; // the Grand Canyon
+    const map = new mapboxgl.Map({
+      container: document.querySelector(".map"), style: STYLE, center, zoom: 8,
+      scrollZoom: false, boxZoom: false, doubleClickZoom: false, touchZoomRotate: false,
+      dragRotate: false, touchPitch: false, keyboard: false,
+      // wealth_field.html?embed -- inside a page that scrolls (index.html): on a phone one finger scrolls that page and
+      // two fingers move the map
+      cooperativeGestures: new URLSearchParams(location.search).has("embed"),
+    });
+
+    // the zoom at which the window's ground area is that many football fields: on a web map one pixel is
+    // 40,075 km × cos(latitude) / (512 × 2^zoom) across, measured at the center (over a big area the scale changes from
+    // top to bottom, so it is right at the center and close elsewhere)
+    function fitWealth(duration = 800) {
+      const area = fields() * FIELD_M2;
+      if (!(area > 0)) return;
+      const metersPerPixel = Math.sqrt(area / (innerWidth * innerHeight));
+      const zoom = Math.log2((40075016.686 * Math.cos((center[1] * Math.PI) / 180)) / (512 * metersPerPixel));
+      // the place sits in the middle of the map below the text box, where it can be seen, not under the box
+      const boxBottom = document.querySelector(".sentence").getBoundingClientRect().bottom;
+      map.easeTo({ center, zoom: Math.max(0, Math.min(22, zoom)), padding: { top: boxBottom, bottom: 0, left: 0, right: 0 }, duration });
+    }
+    // after a drag, refit around the new spot: further north or south the map's scale changes
+    map.on("dragend", () => { center = map.getCenter().toArray(); moveField(); fitWealth(400); });
+    window.addEventListener("resize", () => { fitControls(); fitWealth(0); }); // and the boxes re-measured, if their text size changed
+
+    // ---- the place search: picking a place moves the map there and re-zooms for it; it does not move the map itself ----
+    const geocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl,
+      marker: false,
+      flyTo: false,
+      limit: 6,
+      placeholder: "Go to a place",
+    });
+    document.querySelector(".place-search").appendChild(geocoder.onAdd(map));
+    geocoder.on("result", (e) => {
+      center = e.result.center;
+      moveField();
+      fitWealth(1500);
+    });
+
+    // your one football field, outlined at the center like the football field page's (white over a soft black
+    // shadow); too small to see unless your net worth is close to theirs
+    const fieldShape = () => {
+      const [x, y] = center;
+      const dLat = FIELD_H_M / 2 / 110574, dLon = FIELD_W_M / 2 / (111320 * Math.cos((y * Math.PI) / 180));
+      return { type: "Feature", geometry: { type: "Polygon", coordinates: [[
+        [x - dLon, y - dLat], [x + dLon, y - dLat], [x + dLon, y + dLat], [x - dLon, y + dLat], [x - dLon, y - dLat],
+      ]] } };
+    };
+    const moveField = () => { if (map.getSource("field")) map.getSource("field").setData(fieldShape()); };
+    map.on("load", () => {
+      map.addSource("field", { type: "geojson", data: fieldShape() });
+      map.addLayer({ id: "field-shadow", type: "line", source: "field", paint: { "line-color": "#000", "line-width": 20, "line-opacity": 0.4, "line-blur": 6 } });
+      map.addLayer({ id: "field-outline", type: "line", source: "field", paint: { "line-color": "#fff", "line-width": 8 } });
+    });
+
+    // ---- the sentence: the net worth box shows its number with commas, and is as wide as it; the dropdown is as
+    // wide as the name picked ----
+    const sizer = document.createElement("span");
+    sizer.style.cssText = "position:absolute;visibility:hidden;white-space:pre;left:-9999px;top:0";
+    document.body.appendChild(sizer);
+    function fitWidth(el, text, room) {
+      sizer.style.font = getComputedStyle(el).font;
+      sizer.textContent = text;
+      el.style.width = Math.ceil(sizer.getBoundingClientRect().width) + room + "px";
+    }
+    function fitControls() {
+      fitWidth(netWorthInput, netWorthInput.value || "0", 16);
+      fitWidth(whoSelect, whoSelect.selectedOptions[0].textContent, 44);
+    }
+    netWorthInput.addEventListener("input", () => { fitControls(); fitWealth(); });
+    netWorthInput.addEventListener("change", () => {
+      if (netWorth() > 0) netWorthInput.value = netWorth().toLocaleString("en-US");
+      fitControls();
+    });
+    whoSelect.addEventListener("change", () => { fitControls(); fitWealth(); });
+    fitControls();
+    if (document.fonts) document.fonts.ready.then(() => { fitControls(); fitWealth(0); }); // the box's final height, once its font is in
+    fitWealth(0);
+  </script>
+</body>
+</html>

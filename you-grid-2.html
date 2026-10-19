@@ -222,10 +222,10 @@
     /* with no lines between them, just space: wide between the columns, a little between the rows */
     .two-cols .inner{ grid-template-columns: repeat(2, 1fr); grid-template-rows: none; grid-auto-rows: auto; height: auto; width: 100%; column-gap: 64px; row-gap: 24px; }
     .two-cols .inner .slide{ grid-column: auto; grid-row: auto; min-height: 220px; overflow: visible; border: none; }
-    /* in two columns: "If you pay rent" second, after "If you talk", and "If you walk" at the very end */
+    /* in two columns: "If you pay rent" second, after "If you talk" */
     .two-cols .cell-talk{ order: -2; }
     .two-cols .cell-rent{ order: -1; }
-    .two-cols .cell-walk{ order: 1; }
+    .two-cols .cell-walk{ display: none; } /* the "if you walk 10,000 steps a day" calculator: not in the two-column grid */
     /* phones: one column, each cell a window tall */
     @media (max-width: 760px){
       body{ overflow: auto; }
