@@ -32,12 +32,13 @@
     .sentence{
       font-size: 24px;
       font-weight: 300;
-      line-height: 1.9; /* room between the lines for the boxes, so boxes on lines one above the other don't touch */
+      line-height: 1.7; /* room between the lines for the boxes, so boxes on lines one above the other don't touch */
       text-align: left;
       margin: 0;
-      max-width: 640px;
+      max-width: max(50%, 300px); /* half the map's width, so it covers less of it (but never too narrow to read) */
+      box-sizing: border-box;
       background: #FAF8F3; /* an off-white box, so it reads over the map */
-      padding: 12px 20px;
+      padding: 12px 20px 8px;
       pointer-events: auto;
     }
     /* the net worth box and the person dropdown inside the sentence, square, outlined */

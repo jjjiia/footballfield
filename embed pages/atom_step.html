@@ -69,9 +69,10 @@
       line-height: 1.5;
       text-align: left;
       margin: 0;
-      max-width: 640px;
+      max-width: max(50%, 300px); /* half the map's width, so it covers less of it (but never too narrow to read) */
+      box-sizing: border-box;
       background: #FAF8F3; /* an off-white box, so it reads over the map */
-      padding: 12px 20px;
+      padding: 12px 20px 8px;
       pointer-events: auto;
     }
     /* the height box inside the sentence, with a − before and a + after, inside one outlined box */

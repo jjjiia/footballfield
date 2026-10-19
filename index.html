@@ -62,9 +62,21 @@ html, body{ background: #FAF8F3; }
 }
 .text-block .section-title:first-child{ margin-top: 48px; } /* with the block's own 64px, the same room above the bar */
 /* a black bar across the text column above each subhead, dividing the sections */
-.section-title{ border-top: 80px solid #000; padding-top: 20px; } /* a thick bar, the same as before the headings grew */
+/* a very thick black bar above each subhead, all the way across the window (not just the text column), drawn
+   behind it; the column is centered, so the bar starts half the window to the left of the column's middle */
+.section-title{ position: relative; padding-top: 180px; }
+.section-title::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: calc(50% - 50vw);
+  width: 100vw;
+  height: 160px;
+  background: #000;
+}
+html, body{ overflow-x: clip; } /* the window's width counts the scrollbar, so the bars would poke out past it */
 /* the same bar on its own, with no heading under it, to start a new section */
-.section-bar{ border: 0; border-top: 80px solid #000; margin: 112px 0 40px; }
+.section-bar{ border: 0; height: 160px; background: #000; width: 100vw; margin: 112px 0 40px calc(50% - 50vw); }
 .text-block .section-bar:first-child{ margin-top: 48px; }
 @media (max-width: 760px){ .section-title{ font-size: 26px; } } /* phones: a little smaller, so long ones wrap less */
 
