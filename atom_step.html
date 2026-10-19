@@ -26,9 +26,9 @@
       min-height: 100vh;
       min-height: 100dvh;
       display: flex;
-      align-items: flex-start; /* the sentence at the top of the screen */
-      justify-content: center;
-      padding: 24px;
+      align-items: flex-start; /* the sentence at the top left of the screen, as on the football maps */
+      justify-content: flex-start;
+      padding: 20px;
     }
     /* the walk: halfway down the window, arrows from the label out toward both edges, their tips a little in
        from the edges; white with a black drop shadow */
@@ -69,28 +69,32 @@
       line-height: 1.5;
       text-align: left;
       margin: 0;
-      max-width: max(50%, 300px); /* half the map's width, so it covers less of it (but never too narrow to read) */
+      max-width: 50%; /* wide screens: half the map's width, so it covers less of it, as on the football maps */
       box-sizing: border-box;
       background: #FAF8F3; /* an off-white box, so it reads over the map */
       padding: 12px 20px 8px;
       pointer-events: auto;
     }
-    /* the height box inside the sentence, with a − before and a + after, inside one outlined box */
+    /* the height box inside the sentence, with a − before and a + after, underlined together like the dropdowns */
     .measure{
       font: inherit;
       font-weight: 700;
       color: #000;
       background: transparent;
-      border: 2px solid #000;
+      border: none;
+      border-bottom: 2px solid #000;
       padding: 0 0.2em;
     }
     input.measure{ width: 2.6em; text-align: center; -moz-appearance: textfield; appearance: textfield; }
     input.measure::-webkit-inner-spin-button, input.measure::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
-    .spin-box{ display: inline-flex; align-items: stretch; border: 2px solid #000; vertical-align: baseline; }
+    .spin-box{ display: inline-flex; align-items: stretch; border-bottom: 2px solid #000; vertical-align: baseline; }
     .spin-box input.measure{ border: none; }
     .spin-btn{ all: unset; cursor: pointer; padding: 0 0.3em; font-weight: 700; }
     @media (max-width: 760px){
       .sentence, .walk-label{ font-size: 18px; }
+    }
+    @media (max-width: 600px){
+      .sentence{ max-width: none; width: 100%; } /* phones: the full width */
     }
   </style>
 </head>

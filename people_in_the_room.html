@@ -37,12 +37,16 @@
       font-weight: 700;
       color: #000;
       background: transparent;
-      border: 2px solid #000;
+      border: none;
+      border-bottom: 2px solid #000; /* underlined, not boxed, like the dropdowns */
       padding: 0 0.2em;
+      line-height: 1.15; /* less room inside than the sentence's lines, so boxes on lines one above the other don't touch */
     }
     /* the dropdown drawn by the page, not the browser, so it is square everywhere (phones round the browser's corners),
        with its own arrow */
     select.measure{
+      border: none;
+      border-bottom: 2px solid #000; /* a dropdown is underlined, not boxed, as on the football maps */
       max-width: 100%;
       cursor: pointer;
       -webkit-appearance: none;
@@ -53,9 +57,9 @@
     }
     input.measure{ width: 2.6em; text-align: center; -moz-appearance: textfield; appearance: textfield; }
     input.measure::-webkit-inner-spin-button, input.measure::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
-    .spin-box{ display: inline-flex; align-items: stretch; border: 2px solid #000; vertical-align: baseline; }
+    .spin-box{ display: inline-flex; align-items: stretch; border-bottom: 2px solid #000; vertical-align: baseline; } /* underlined, like the dropdowns */
     .spin-box input.measure{ border: none; }
-    .spin-btn{ all: unset; cursor: pointer; padding: 0 0.3em; font-weight: 700; }
+    .spin-btn{ all: unset; cursor: pointer; padding: 0 0.3em; font-weight: 700; line-height: 1.15; }
     @media (max-width: 760px){
       .sentence{ font-size: 22px; }
     }
@@ -102,13 +106,17 @@
     sizer.style.cssText = "position:absolute;visibility:hidden;white-space:pre;left:-9999px;top:0";
     document.body.appendChild(sizer);
     function fitSelect() {
-      sizer.style.font = getComputedStyle(city).font;
+      const cs = getComputedStyle(city);
+      sizer.style.font = cs.font;
       sizer.textContent = city.selectedOptions[0].textContent;
-      city.style.width = Math.ceil(sizer.getBoundingClientRect().width) + 40 + "px"; // room for the arrow
+      // the text, plus the box's own padding (the right side holds the arrow) and borders, at whatever size the text is
+      const extra = ["paddingLeft", "paddingRight", "borderLeftWidth", "borderRightWidth"].reduce((sum, k) => sum + parseFloat(cs[k]), 0);
+      city.style.width = Math.ceil(sizer.getBoundingClientRect().width + extra + 2) + "px";
     }
     city.addEventListener("change", () => { fitSelect(); update(); });
     fitSelect();
     if (document.fonts) document.fonts.ready.then(fitSelect);
+    window.addEventListener("resize", fitSelect); // the embedding page can change the text size, then sends a resize
 
     // − and + around the number box, stepping by its step and never below its min
     document.querySelectorAll("input.measure[type=number]").forEach((input) => {

@@ -140,11 +140,11 @@ html, body{ background: #FAF8F3; }
   border: 0;
 }
 
-/* the people-in-the-room calculator (people_in_the_room.html): one centered sentence, as wide as the text column,
-   with room for it to wrap */
+/* the people-in-the-room calculator (people_in_the_room.html): one centered sentence, as wide as the other
+   calculators, with room for it to wrap */
 .room-frame{
   display: block;
-  width: min(700px, 100% - 40px);
+  width: min(480px, 100% - 40px);
   margin: 0 auto;
   height: 320px;
   border: 0;
@@ -178,10 +178,11 @@ html, body{ background: #FAF8F3; }
   border: 0;
 }
 
-/* the atom counter (embed pages/atom_seconds.html): fills exactly one window, so the full window; as in scrolly.html */
+/* the atom counter (embed pages/atom_seconds.html): one window tall, as wide as the other calculators */
 .atoms-frame{
   display: block;
-  width: 100%;
+  width: min(480px, 100% - 40px);
+  margin: 0 auto;
   height: 100vh;
   border: 0;
 }
@@ -451,7 +452,7 @@ html, body{ background: #FAF8F3; }
 <section class="text-block">
   <div class="text-block-inner">
     <h2 class="section-title">Find a thing you already do.</h2>
-    <p>And grow it in scale.</p>
+    <p>And grow it in scale or shrink it down to size.</p>
   </div>
 </section>
 

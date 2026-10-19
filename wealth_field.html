@@ -25,9 +25,9 @@
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-start; /* the sentence at the top left, as on the football maps */
       gap: 12px;
-      padding: 24px;
+      padding: 20px;
     }
     .sentence{
       font-size: 24px;
@@ -35,25 +35,30 @@
       line-height: 1.7; /* room between the lines for the boxes, so boxes on lines one above the other don't touch */
       text-align: left;
       margin: 0;
-      max-width: max(50%, 300px); /* half the map's width, so it covers less of it (but never too narrow to read) */
+      max-width: 50%; /* wide screens: half the map's width, so it covers less of it, as on the football maps */
       box-sizing: border-box;
       background: #FAF8F3; /* an off-white box, so it reads over the map */
       padding: 12px 20px 8px;
       pointer-events: auto;
     }
-    /* the net worth box and the person dropdown inside the sentence, square, outlined */
+    /* the net worth box and the person dropdown inside the sentence, underlined like the dropdowns */
     .measure{
       font: inherit;
       font-weight: 700;
       color: #000;
       background: transparent;
-      border: 2px solid #000;
+      border: none;
+      border-bottom: 2px solid #000;
       border-radius: 0;
       padding: 0 0.2em;
       line-height: 1.2; /* the boxes hug their text, with little room above and below it */
       vertical-align: baseline;
     }
     input.measure{ width: 5em; text-align: center; }
+    select.measure, .place-input{
+      border: none;
+      border-bottom: 2px solid #000; /* a dropdown is underlined, not boxed, as on the football maps */
+    }
     select.measure{
       -webkit-appearance: none;
       appearance: none;
@@ -106,6 +111,9 @@
     .place-list li.active{ background: #000; color: #FAF8F3; }
     @media (max-width: 760px){
       .sentence{ font-size: 18px; }
+    }
+    @media (max-width: 600px){
+      .sentence{ max-width: none; width: 100%; } /* phones: the full width */
     }
   </style>
 </head>

@@ -76,7 +76,7 @@
       margin: 0 0 auto; /* anchored at the top; the footnotes sit at the bottom of the cell */
       color: var(--ink);
     }
-    /* every part of the sentence you can change: an outlined box on the white slide,
+    /* every part of the sentence you can change: underlined on the white slide,
        in the sentence's ink (--blank-ink was picked for the old solid fill and can vanish without it) */
     .blank-input{
       width: 3.6em;
@@ -86,7 +86,8 @@
       text-align: center;
       color: var(--ink);
       background: transparent;
-      border: 2px solid var(--rule);
+      border: none;
+      border-bottom: 2px solid var(--rule); /* underlined, not boxed, like the dropdowns */
     }
     .blank-input:focus{ outline: none; }
     /* number blanks spin: wheel over them or drag up/down on touch */
@@ -98,12 +99,12 @@
     }
     input.blank-input[type="number"]::-webkit-inner-spin-button,
     input.blank-input[type="number"]::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
-    /* number blanks sit in a .spin-box with little up/down arrows; the box carries the border */
+    /* number blanks sit in a .spin-box with little up/down arrows; the box carries the underline */
     .spin-box{
       display: inline-flex;
       align-items: center;
       background: transparent;
-      border: 2px solid var(--rule);
+      border-bottom: 2px solid var(--rule); /* underlined, not boxed, like the dropdowns */
       touch-action: none;
       cursor: ns-resize;
     }
@@ -168,7 +169,8 @@
       font-size: 1em;
       font-weight: 700;
       color: var(--ink);
-      border: 2px solid var(--rule);
+      border: none;
+      border-bottom: 2px solid var(--rule); /* a dropdown is underlined, not boxed, as on the football maps */
       /* the browser's own arrow swapped for the same chevron the number boxes use */
       -webkit-appearance: none;
       appearance: none;
@@ -251,7 +253,8 @@
       font-size: 0.64em; /* 18px at the full sentence size */
       background: transparent;
       box-shadow: none;
-      border: 2px solid var(--rule);
+      border: none;
+      border-bottom: 2px solid var(--rule); /* underlined, not boxed, like the dropdowns */
       border-radius: 0;
     }
     .geocoder-box .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--input{

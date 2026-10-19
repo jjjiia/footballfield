@@ -43,18 +43,19 @@
     .sentence .line{ display: block; }
     .sentence .line + .line{ margin-top: 12px; }
     .sentence .hint{ font-size: 12px; } /* the instruction under the sentence, small, as on the football maps */
-    /* the height box inside the sentence, with a − before and a + after, inside one outlined box */
+    /* the height box inside the sentence, with a − before and a + after, underlined together */
     .measure{
       font: inherit;
       font-weight: 700;
       color: #000;
       background: transparent;
-      border: 2px solid #000;
+      border: none;
+      border-bottom: 2px solid #000; /* underlined, not boxed, like the dropdowns */
       padding: 0 0.2em;
     }
     input.measure{ width: 2.6em; text-align: center; -moz-appearance: textfield; appearance: textfield; }
     input.measure::-webkit-inner-spin-button, input.measure::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
-    .spin-box{ display: inline-flex; align-items: stretch; border: 2px solid #000; vertical-align: baseline; }
+    .spin-box{ display: inline-flex; align-items: stretch; border-bottom: 2px solid #000; vertical-align: baseline; } /* underlined, like the dropdowns */
     .spin-box input.measure{ border: none; }
     .spin-btn{ all: unset; cursor: pointer; padding: 0 0.3em; font-weight: 700; }
     @media (max-width: 760px){
