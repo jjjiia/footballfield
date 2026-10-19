@@ -753,7 +753,7 @@ function initMapExperience(root, options) {
     gridBtn.dataset.tip = "The grid is rectangles the size of the unit being used (" + currentUnit.singular + ").";
     const r = computeFieldsInView(map, unitAreaM2(currentUnit));
     textLabel.innerHTML =
-      "The total map area you see on screen is about " +
+      "The total visible map area is about " +
       formatNumber(r.fields) + ' <span class="area-unit">' + currentUnit.plural + "</span>.";
   }
 

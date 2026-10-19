@@ -31,6 +31,8 @@ html, body{ background: #FAF8F3; }
   margin: 0 0 1em;
 }
 .text-block a{ color: #000; }
+/* a small endnote number in the text */
+.note-mark{ font-size: 0.55em; line-height: 0; margin-left: 2px; }
 
 /* the title at the top, like scrolly.html's */
 .page-title{
@@ -95,8 +97,8 @@ html, body{ background: #FAF8F3; }
    last place, then the page moves on */
 .map-scrolly{ height: 600vh; }
 /* the sports fields map (embed pages/football_embed2.html) at the Great Pyramid: a screen per unit (football field,
-   soccer field, Central Park), and one more on the last */
-.units-scrolly{ height: 400vh; }
+   soccer field, the Pentagon, Central Park), and one more on the last */
+.units-scrolly{ height: 500vh; }
 .map-frame{
   position: sticky;
   top: 0;
@@ -333,11 +335,11 @@ html, body{ background: #FAF8F3; }
   <div class="text-block-inner">
     <h1 class="page-title">Title TBD</h1>
     <p>I changed the way I think about scale when my son asked how many seconds it was until the weekend. The length of one second is a tangible thing to a child, equivalent to a tick-tock sound he can make on his own. Similarly, explanations of large numbers usually worked only when they started with the small and personal — the size of his room, the distance walked every morning to school, the height of scaffolding he likes to climb.</p>
-    <p>When I trim my son’s nails, I like to hold up a sliver of baby fingernail and say, “this is how much the tectonic plates have moved since we last cut your nails,” all because I read in a decade-old article that “Continents Split Up at the Same Speed Finger Nails Grow.” That factoid stayed with me because the sentence connected this global phenomenon so effectively to my literal fingertip. It reminds me that nothing would be too big or small to build a relationship with, if only we had the right unit of measurement.</p>
-    <p class="pull-quote">Measurement is “the correlation of some target to some comparator or unit.”</p>
+    <p>When I trim my son’s nails, I like to hold up a sliver of baby fingernail and say, “this is how much the tectonic plates have moved since we last cut your nails,” all because I read in a decade-old article that “Continents Split Up at the Same Speed Finger Nails Grow.”<sup class="note-mark">1</sup> That factoid stayed with me because the sentence connected this global phenomenon so effectively to my literal fingertip. It reminds me that nothing would be too big or small to build a relationship with, if only we had the right unit of measurement.</p>
+    <p class="pull-quote">Measurement is “the correlation of some target to some comparator or unit.”<sup class="note-mark">2</sup></p>
     <p>Many units of measurement originate in our own bodies: hand, foot, hair, nose, thumb, finger, arm, step. In some cultures they still persist against standards. It is perhaps not only more intuitive but also logical to use our biological attributes as units. After all, part of the world we aim to measure — our built environment — grows out of the human body as its base unit.</p>
-    <p>Standardized units and systems of measurement are about human communication. While units often have to separate from their human origins in order to function properly, a shared unit builds connection between two acts of measurement. It does not matter how different the things we measure are. By measuring them we push them to exist in the same system and space.</p>
-    <p>A colloquial unit both precedes and follows systems of standardized units. Older humanistic units persist today because of their ability to manipulate the narrative of standards and not resist them. These units live where straightforward conversions and the world of feet, hairs, and nails coexist.</p>
+    <p>Standardized units and systems of measurement are about human communication. While units often have to be separated from their human origins in order to function properly, a shared unit builds connection between two acts of measurement. It does not matter how different the things we measure are. By measuring them we impose the structural system that forces them into existing in the same space.</p>
+    <p>A colloquial unit both precedes and follows systems of standardized units. Older humanistic units persist today not because of their ability to resist standards, but rather due to their power to manipulate the narrative of standards. These units live where dollars, meters, miles, and the world of feet, hairs, and nails coexist.</p>
     <h2 class="section-title">Let’s start with a football field.</h2>
     <p>This is a map that measures the area that is in view in football fields.</p>
   </div>
@@ -356,8 +358,8 @@ html, body{ background: #FAF8F3; }
 
 <!-- Map 2 - allows entering or drawing own units, and preset with sizes of things: the live map at the Great Pyramid,
      one screen of scrolling per unit -->
-<div class="map-scrolly units-scrolly" data-steps="3">
-  <iframe class="map-frame" src="embed%20pages/football_embed2.html?place=the%20Great%20Pyramid%20of%20Giza&amp;units=football-field|soccer-field|central-park" title="Sports fields map"></iframe>
+<div class="map-scrolly units-scrolly" data-steps="4">
+  <iframe class="map-frame" src="embed%20pages/football_embed2.html?place=the%20Great%20Pyramid%20of%20Giza&amp;units=football-field|soccer-field|the-pentagon|central-park" title="Sports fields map"></iframe>
 </div>
 
 <section class="text-block">
@@ -368,7 +370,7 @@ html, body{ background: #FAF8F3; }
 </section>
 
 <!-- Map 3 - a map that counts Texas in Rhode Islands or vice versa using boundary data from the census and world bank -->
-<iframe class="nested-frame" src="nested.html?embed&amp;note=1" title="Nesting map"></iframe>
+<iframe class="nested-frame" src="nested.html?embed&amp;note=3" title="Nesting map"></iframe>
 
 <section class="text-block">
   <div class="text-block-inner">
@@ -377,7 +379,7 @@ html, body{ background: #FAF8F3; }
 </section>
 
 <!-- Map 4 - a calculator that uses people counts from the people data in wikipedia -->
-<iframe class="people-frame" src="nested_people.html?embed&amp;note=2" title="Population nesting"></iframe>
+<iframe class="people-frame" src="nested_people.html?embed&amp;note=4" title="Population nesting"></iframe>
 
 <section class="text-block">
   <div class="text-block-inner">
@@ -387,7 +389,7 @@ html, body{ background: #FAF8F3; }
 </section>
 
 <!-- Map 5 - a calculator that compares occupations in the ACS and BLS dataset -->
-<iframe class="jobs-frame" src="jobs.html?embed&amp;note=3" title="Jobs"></iframe>
+<iframe class="jobs-frame" src="jobs.html?embed&amp;note=5" title="Jobs"></iframe>
 
 <section class="text-block">
   <div class="text-block-inner">
@@ -433,7 +435,7 @@ html, body{ background: #FAF8F3; }
 </section>
 
 <!-- Map 10 - steps down to the ocean and grand canyon calculator -->
-<iframe class="steps-frame" src="stairs.html?embed&amp;note=4" title="Stairs"></iframe>
+<iframe class="steps-frame" src="stairs.html?embed&amp;note=6" title="Stairs"></iframe>
 
 <section class="text-block">
   <div class="text-block-inner">
@@ -522,12 +524,14 @@ html, body{ background: #FAF8F3; }
   <div class="text-block-inner">
     <h2 class="section-title">Notes – UNFINISHED</h2>
     <ol class="notes">
-      <li id="note-1"><b>Map 3, nesting.</b> Areas are land area, leaving out water; lakes and reservoirs are water surface area. US states and metropolitan statistical areas: U.S. Census Bureau, 2024 cartographic boundary files (land area). Countries: <a href="https://data.worldbank.org/indicator/AG.LND.TOTL.K2">World Bank, Land area (sq. km)</a>, 2024, and World Bank Official Boundaries. Lakes and reservoirs of 5,000 km² or more: <a href="https://www.hydrosheds.org/products/hydrolakes">HydroLAKES</a> (Messager et al. 2016). <a href="nested_data_source.html">All areas and sources</a>. Shapes are drawn to the same scale on an equal-area projection centered on each place.</li>
-      <li id="note-2"><b>Map 4, population nesting.</b> Counts of people from <a href="https://www.wikidata.org/">Wikidata</a>: country populations, language speakers, Instagram followers, yearly visitors and passengers, venue capacity, and a few others. Each count under a dropdown links to its Wikidata entry. Wikidata is edited by volunteers, so dates and methods vary from count to count. Left out: visitor and passenger counts under 1,000 a year (wrong in Wikidata), entries with no name, and vaccination and view counts (they count doses and views, not people). Data: <a href="populations/wikidata/people_counts.json">people_counts.json</a>.</li>
-      <li id="note-3"><b>Map 5, jobs.</b> United States: U.S. Census Bureau, <a href="https://www.census.gov/programs-surveys/acs">American Community Survey</a> 2020–2024 5-year estimates, table B24114, Detailed Occupation for the Civilian Employed Population 16 Years and Over; occupations are grouped into professions in <a href="populations/acs/census_occupation_mapping.json">census_occupation_mapping.json</a>. States and metro areas: U.S. Bureau of Labor Statistics, <a href="https://www.bls.gov/oes/tables.htm">Occupational Employment and Wage Statistics</a>, May 2025 state and metropolitan area estimates; occupations are grouped into professions in <a href="populations/bls/occupation_mapping.json">occupation_mapping.json</a>. Not all areas have published numbers for all occupations.</li>
-      <li id="note-4"><b>Map 10, stairs.</b> Depths, from <a href="height_data.html">the heights data</a>: average ocean depth 3,682 m (12,080 ft), <a href="https://oceanservice.noaa.gov/facts/oceandepth.html">NOAA</a>.</li>
-      <li id="note-5"><b>Conclusion.</b> The average American: the median family net worth, $215,900, from the Federal Reserve’s 2025 Survey of Consumer Finances, <a href="https://www.federalreserve.gov/newsevents/pressreleases/other20261009a.htm">press release</a>, October 9, 2026, and <a href="https://www.federalreserve.gov/publications/files/scf26.pdf">“Changes in U.S. Family Finances from 2022 to 2025”</a>; the mean is $1.24 million. Reported by <a href="https://www.cbsnews.com/news/fed-data-americans-over-75-richest/">CBS News</a>, <a href="https://finance.yahoo.com/economy/articles/key-takeaways-feds-2025-survey-213249592.html">Yahoo Finance</a> and <a href="https://qz.com/fed-survey-consumer-finances-older-families-wealth-younger-decline-101426">Quartz</a>. The 2022 survey: <a href="https://www.federalreserve.gov/publications/files/scf23.pdf">“Changes in U.S. Family Finances from 2019 to 2022”</a>, October 2023, median $192,900. Elon Musk’s net worth, about $970 billion (Bloomberg $966.5 billion, Forbes about $977 billion, October 13, 2026), and Jeff Bezos’s, about $370 billion (Forbes, October 2, 2026); both change daily. Hungary, about 9.5 million people (Hungarian Central Statistical Office, end of 2025). The oldest person alive, Ethel Caterham, born August 21, 1909, 117 years old, <a href="https://www.guinnessworldrecords.com/news/2026/8/worlds-oldest-person-ethel-caterham-becomes-first-ever-brit-to-reach-age-117">Guinness World Records</a>. About 100,000 hairs on a head.</li>
-      <li id="note-6"><b>Map 12, things you already do.</b>
+      <li id="note-1"><b>Intro.</b> <a href="https://www.nytimes.com/2016/07/23/science/continental-drift-tectonic-plates.html">The New York Times, “Continents Split Up at the Same Speed Finger Nails Grow”</a> (July 23, 2016).</li>
+      <li id="note-2"><b>Measurement.</b> <a href="https://www.science.org/doi/10.1126/science.adf1936">Kaaronen, Manninen, and Eronen, “Body-based units of measure in cultural evolution,” <i>Science</i></a> (2023).</li>
+      <li id="note-3"><b>Map 3, nesting.</b> Areas are land area, leaving out water; lakes and reservoirs are water surface area. US states and metropolitan statistical areas: U.S. Census Bureau, 2024 cartographic boundary files (land area). Countries: <a href="https://data.worldbank.org/indicator/AG.LND.TOTL.K2">World Bank, Land area (sq. km)</a>, 2024, and World Bank Official Boundaries. Lakes and reservoirs of 5,000 km² or more: <a href="https://www.hydrosheds.org/products/hydrolakes">HydroLAKES</a> (Messager et al. 2016). <a href="nested_data_source.html">All areas and sources</a>. Shapes are drawn to the same scale on an equal-area projection centered on each place.</li>
+      <li id="note-4"><b>Map 4, population nesting.</b> Counts of people from <a href="https://www.wikidata.org/">Wikidata</a>: country populations, language speakers, Instagram followers, yearly visitors and passengers, venue capacity, and a few others. Each count under a dropdown links to its Wikidata entry. Wikidata is edited by volunteers, so dates and methods vary from count to count. Left out: visitor and passenger counts under 1,000 a year (wrong in Wikidata), entries with no name, and vaccination and view counts (they count doses and views, not people). Data: <a href="populations/wikidata/people_counts.json">people_counts.json</a>.</li>
+      <li id="note-5"><b>Map 5, jobs.</b> United States: U.S. Census Bureau, <a href="https://www.census.gov/programs-surveys/acs">American Community Survey</a> 2020–2024 5-year estimates, table B24114, Detailed Occupation for the Civilian Employed Population 16 Years and Over; occupations are grouped into professions in <a href="populations/acs/census_occupation_mapping.json">census_occupation_mapping.json</a>. States and metro areas: U.S. Bureau of Labor Statistics, <a href="https://www.bls.gov/oes/tables.htm">Occupational Employment and Wage Statistics</a>, May 2025 state and metropolitan area estimates; occupations are grouped into professions in <a href="populations/bls/occupation_mapping.json">occupation_mapping.json</a>. Not all areas have published numbers for all occupations.</li>
+      <li id="note-6"><b>Map 10, stairs.</b> Depths, from <a href="height_data.html">the heights data</a>: average ocean depth 3,682 m (12,080 ft), <a href="https://oceanservice.noaa.gov/facts/oceandepth.html">NOAA</a>.</li>
+      <li id="note-7"><b>Conclusion.</b> The average American: the median family net worth, $215,900, from the Federal Reserve’s 2025 Survey of Consumer Finances, <a href="https://www.federalreserve.gov/newsevents/pressreleases/other20261009a.htm">press release</a>, October 9, 2026, and <a href="https://www.federalreserve.gov/publications/files/scf26.pdf">“Changes in U.S. Family Finances from 2022 to 2025”</a>; the mean is $1.24 million. Reported by <a href="https://www.cbsnews.com/news/fed-data-americans-over-75-richest/">CBS News</a>, <a href="https://finance.yahoo.com/economy/articles/key-takeaways-feds-2025-survey-213249592.html">Yahoo Finance</a> and <a href="https://qz.com/fed-survey-consumer-finances-older-families-wealth-younger-decline-101426">Quartz</a>. The 2022 survey: <a href="https://www.federalreserve.gov/publications/files/scf23.pdf">“Changes in U.S. Family Finances from 2019 to 2022”</a>, October 2023, median $192,900. Elon Musk’s net worth, about $970 billion (Bloomberg $966.5 billion, Forbes about $977 billion, October 13, 2026), and Jeff Bezos’s, about $370 billion (Forbes, October 2, 2026); both change daily. Hungary, about 9.5 million people (Hungarian Central Statistical Office, end of 2025). The oldest person alive, Ethel Caterham, born August 21, 1909, 117 years old, <a href="https://www.guinnessworldrecords.com/news/2026/8/worlds-oldest-person-ethel-caterham-becomes-first-ever-brit-to-reach-age-117">Guinness World Records</a>. About 100,000 hairs on a head.</li>
+      <li id="note-8"><b>Map 12, things you already do.</b>
         <ul class="note-parts">
         <li><i>If you pay rent:</i> Assumes 12 months, 365 days and 8,760 hours per year.</li>
         <li><i>If you drink water:</i> A glass: An 8-oz glass; eight glasses is half a gallon a day. A bathtub: ~40 gallons; <a href="https://www.hunker.com/13416360/how-many-gallons-of-water-does-the-average-house-bathtub-contain/" target="_blank" rel="noopener">household tubs hold 30–60</a>. An Olympic pool: 50 m × 25 m × 2 m deep, <a href="https://www.nbc.com/nbc-insider/olympic-swimming-pool-size-gallons-meters-depth" target="_blank" rel="noopener">~660,000 gallons</a>. The Central Park Reservoir: The reservoir's earthen embankment has a <a href="https://www.enr.com/articles/62606-nyc-to-replace-160-plus-year-old-equipment-from-central-park-reservoir" target="_blank" rel="noopener">storage capacity of 1,040 million gallons</a>. Every New Yorker: 8,584,629 people, the Census Bureau's <a href="https://www.census.gov/quickfacts/fact/table/newyorkcitynewyork/PST045225" target="_blank" rel="noopener">July 2025 estimate</a> for New York City.</li>
@@ -642,10 +646,11 @@ function sizeEmbedText(frame) {
     style = Object.assign(doc.createElement("style"), { id: "scrolly2-text-size" });
     doc.head.appendChild(style);
   }
-  // the maps' text a little smaller (24px, 18px on phones), so it covers less of the map; the rest 28px, 22px on phones
+  // the maps' text the size of the paragraphs around them (18px), so it covers less of the map; the rest 28px, 22px on phones
   const isMap = frame.matches(".map-frame, .steps-across-frame, .atom-step-frame, .wealth-frame");
-  const size = isMap ? (innerWidth <= 760 ? 18 : 24) : (innerWidth <= 760 ? 22 : 28);
-  style.textContent = `${EMBED_TEXT}, .walk-label{ font-size: ${size}px !important; }`;
+  const size = isMap ? 18 : (innerWidth <= 760 ? 22 : 28);
+  // the football map's how-to line ("Use the dropdown and search ...") small, at 12px
+  style.textContent = `${EMBED_TEXT}, .walk-label{ font-size: ${size}px !important; } .map-line.map-hint{ font-size: 12px !important; }`;
   // the embed's dropdowns size themselves to their text; have them measure again at the new size
   frame.contentWindow.dispatchEvent(new Event("resize"));
 }

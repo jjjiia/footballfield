@@ -34,11 +34,13 @@
   position: absolute;
   top: 20px;
   left: 20px;
-  right: 20px;
+  max-width: calc(100% - 40px);
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: stretch; /* every line's box as wide as the widest, */
+  gap: 0;               /* and touching, so they read as one box */
+  padding: 10px 0;      /* with room above the first line and below the last */
+  background: #FAF8F3;
   z-index: 20;
   pointer-events: none;
 }
@@ -51,6 +53,7 @@
   padding: 6px 12px;
 }
 .map-line b{ font-weight: 700; }
+.map-line.map-hint{ font-size: 12px; padding: 4px 12px; } /* the small how-to line under the sentences */
 
 /* the place dropdown in "You are at ...", as on footballfield.html */
 .unit-select{
@@ -69,6 +72,37 @@
   padding: 0 36px 0 8px;
   cursor: pointer;
 }
+
+/* the place box: click it for the list of places, or type to narrow them and to search anywhere else,
+   as on the wealth map */
+.place-search{ position: relative; display: inline-block; pointer-events: auto; }
+.place-input{ cursor: pointer; max-width: 100%; }
+.place-input:focus{ outline: none; cursor: text; }
+.place-input::placeholder{ color: #000; opacity: 0.55; }
+.place-list{
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: max-content;
+  min-width: 100%;
+  max-width: min(360px, calc(100vw - 40px));
+  z-index: 25;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  max-height: 280px;
+  overflow-y: auto;
+  background: #FAF8F3;
+  border: 2px solid #000;
+  border-top: 0;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.35;
+}
+.place-list[hidden]{ display: none; }
+.place-list li{ padding: 5px 12px; cursor: pointer; }
+.place-list li.section{ font-weight: 700; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; padding-top: 8px; cursor: default; }
+.place-list li.active{ background: #000; color: #FAF8F3; }
 
 /* cross-fade shown while the camera jumps between places */
 .fade-overlay{
@@ -123,6 +157,10 @@
 @media (max-width: 600px){
   .map-line{ font-size: 16px; }
 }
+/* wide screens: the text takes up half the map's width, so it covers less of it; phones keep the full width */
+@media (min-width: 601px){
+  .labels{ max-width: calc(50% - 20px); }
+}
 </style>
 </head>
 <body>
@@ -132,8 +170,9 @@
   <div class="fade-overlay"></div>
   <div class="labels">
     <span class="map-line">This white outline is a <b>football field</b>.</span>
-    <span class="map-line place-line">You are at <select class="unit-select place-select" aria-label="Place"></select><span class="place-note"></span>.</span>
+    <span class="map-line place-line">You are at <span class="place-search"><input type="text" class="unit-select place-input" autocomplete="off" spellcheck="false" aria-label="Place" role="combobox" aria-expanded="false" aria-controls="place-list"><ul class="place-list" id="place-list" role="listbox" hidden></ul></span><span class="place-note"></span>.</span>
     <span class="map-line area-text"></span>
+    <span class="map-line map-hint">Use the dropdown and search to measure another place in football fields.</span>
     <span class="map-line grid-note" hidden></span>
   </div>
   <button class="map-line grid-btn" type="button">Show grid</button>
@@ -267,33 +306,99 @@ const fadeOverlay = document.querySelector(".fade-overlay");
 const areaText = document.querySelector(".area-text");
 const gridBtn = document.querySelector(".grid-btn");
 
-// the place dropdown: Levi's Stadium, then every place in ../places.json (filled in once they load); picking one
-// goes there, and each step of scrolling sets it to that step's place
-const placeSelect = document.querySelector(".place-select");
+// the place box: Levi's Stadium, then every place in ../places.json (filled in once they load), and Mapbox's
+// search for anywhere else once two letters are typed; picking one goes there, and each step of scrolling sets it
+// to that step's place
+const placeInput = document.querySelector(".place-input");
+const placeList = document.querySelector(".place-list");
 const placeNote = document.querySelector(".place-note");
 let allPlaces = [];
-placeSelect.appendChild(new Option(HOME.name, HOME.key));
+let currentStop = HOME;
 
-// A <select> is normally as wide as its longest option -- size it to the chosen one.
-function fitSelectToContent(selectEl) {
+// size the box to its text (plus its padding, which holds the arrow)
+function fitInput() {
   const probe = document.createElement("span");
-  const cs = getComputedStyle(selectEl);
+  const cs = getComputedStyle(placeInput);
   probe.style.cssText = "position:absolute;visibility:hidden;white-space:pre;";
   probe.style.font = cs.font;
   probe.style.letterSpacing = cs.letterSpacing;
-  probe.textContent = selectEl.options[selectEl.selectedIndex]?.text || "";
+  probe.textContent = placeInput.value || placeInput.placeholder;
   document.body.appendChild(probe);
   const w = probe.getBoundingClientRect().width;
   probe.remove();
-  selectEl.style.width = Math.ceil(w + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)) + "px";
+  placeInput.style.width = Math.ceil(w + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 2) + "px";
 }
 function showPlace(stop) {
-  placeSelect.value = stop.key;
+  currentStop = stop;
+  placeInput.value = stop.name;
   placeNote.textContent = stop.note || "";
-  fitSelectToContent(placeSelect);
+  fitInput();
 }
 showPlace(HOME);
-if (document.fonts) document.fonts.ready.then(() => fitSelectToContent(placeSelect));
+if (document.fonts) document.fonts.ready.then(() => { if (document.activeElement !== placeInput) fitInput(); });
+// the embedding page can change the text size, then sends a resize: measure again
+window.addEventListener("resize", () => { if (document.activeElement !== placeInput) fitInput(); });
+
+let shown = [], active = -1, searchId = 0;
+function showList(found, searched) {
+  placeList.innerHTML = "";
+  shown = [];
+  const section = (title) => placeList.appendChild(Object.assign(document.createElement("li"), { className: "section", textContent: title }));
+  const add = (stop) => {
+    const li = Object.assign(document.createElement("li"), { textContent: stop.label || stop.name, role: "option" });
+    const index = shown.length;
+    li.addEventListener("mousedown", (e) => { e.preventDefault(); pick(shown[index]); });
+    placeList.appendChild(li);
+    shown.push(stop);
+  };
+  if (found.length) { section("Places"); found.forEach(add); }
+  if (searched && searched.length) { section("Search"); searched.forEach(add); }
+  active = -1;
+  placeList.hidden = !shown.length;
+  placeInput.setAttribute("aria-expanded", String(!placeList.hidden));
+}
+function highlight(index) {
+  const items = [...placeList.querySelectorAll("li:not(.section)")];
+  items.forEach((li, i) => li.classList.toggle("active", i === index));
+  if (items[index]) items[index].scrollIntoView({ block: "nearest" });
+  active = index;
+}
+function pick(stop) {
+  placeInput.blur();
+  goToPlace(stop);
+}
+// the places whose names have the words typed, then (once two letters are in) Mapbox's search for anywhere
+function searchPlaces() {
+  const words = placeInput.value.toLowerCase().trim();
+  const found = [HOME, ...allPlaces].filter((p) => p.name.toLowerCase().includes(words));
+  showList(found);
+  if (words.length < 2) return;
+  const id = ++searchId;
+  fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(words)}.json?limit=5&access_token=${mapboxgl.accessToken}`)
+    .then((r) => r.json())
+    .then((data) => {
+      if (id !== searchId) return; // a newer search took over
+      showList(found, (data.features || []).map((f) => ({ key: f.id, name: f.text, label: f.place_name, center: f.center, zoom: 15, bearing: 0 })));
+    })
+    .catch(() => {});
+}
+placeInput.addEventListener("focus", () => {
+  placeInput.style.width = Math.max(placeInput.offsetWidth, 240) + "px"; // room to type
+  placeInput.select();
+  showList([HOME, ...allPlaces]);
+});
+placeInput.addEventListener("input", searchPlaces);
+placeInput.addEventListener("blur", () => {
+  placeList.hidden = true;
+  placeInput.setAttribute("aria-expanded", "false");
+  showPlace(currentStop); // nothing picked: back to where the map is
+});
+placeInput.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowDown") { e.preventDefault(); highlight(Math.min(shown.length - 1, active + 1)); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); highlight(Math.max(0, active - 1)); }
+  else if (e.key === "Enter" && shown.length) { e.preventDefault(); pick(shown[active >= 0 ? active : 0]); }
+  else if (e.key === "Escape") placeInput.blur();
+});
 
 const map = new mapboxgl.Map({
   container: mapDiv,
@@ -307,7 +412,7 @@ const map = new mapboxgl.Map({
 });
 
 function updateAreaText() {
-  areaText.innerHTML = "The total map area you see on screen is about " +
+  areaText.innerHTML = "The total visible map area is about " +
     formatNumber(fieldsInView(map)) + " <b>football fields</b>.";
 }
 
@@ -390,12 +495,7 @@ fetch("../places.json").then((r) => r.json()).then((places) => {
     : pickRandom(places.filter((p) => RANDOM_PLACES.includes(p.name)), 2);
   const asStop = (p) => ({ key: p.name, name: p.name, center: [p.lng, p.lat], zoom: p.zoom ?? 15, bearing: p.bearing || 0 });
   allPlaces = places.map(asStop);
-  allPlaces.forEach((stop) => placeSelect.appendChild(new Option(stop.name, stop.key)));
   stops = [HOME, ...picked.map((p) => allPlaces.find((stop) => stop.key === p.name))];
-  placeSelect.addEventListener("change", () => {
-    const stop = placeSelect.value === HOME.key ? HOME : allPlaces.find((q) => q.key === placeSelect.value);
-    if (stop) goToPlace(stop);
-  });
   placesLoaded = true;
   if (pendingStep !== null) goToStep(pendingStep);
   warmUp();

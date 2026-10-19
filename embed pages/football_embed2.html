@@ -32,11 +32,13 @@
   position: absolute;
   top: 20px;
   left: 20px;
-  right: 20px;
+  max-width: calc(100% - 40px);
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: stretch; /* every line's box as wide as the widest, */
+  gap: 0;               /* and touching, so they read as one box, */
+  padding: 10px 0;      /* with room above the first line and below the last; as on football_embed1.html */
+  background: #FAF8F3;
   z-index: 20;
   pointer-events: none;
 }
@@ -49,6 +51,7 @@
   padding: 6px 12px;
 }
 .map-line b{ font-weight: 700; }
+.map-line.map-hint{ font-size: 12px; padding: 4px 12px; } /* the small how-to line under the sentences */
 
 /* sports-unit dropdown, as on footballfield.html */
 .unit-select{
@@ -97,6 +100,65 @@
 .mapboxgl-ctrl-logo,
 .mapboxgl-ctrl-attrib{ display: none !important; }
 
+/* "Make your own" unit popup, as on footballfield.html */
+.custom-popup{
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+}
+.custom-popup[hidden]{ display: none; }
+.custom-box{
+  box-sizing: border-box;
+  width: min(560px, calc(100% - 32px));
+  max-height: calc(100% - 32px);
+  overflow-y: auto;
+  background: #FAF8F3;
+  color: #000;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.custom-form{ margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.custom-form[hidden]{ display: none; }
+.custom-tabs{ display: flex; gap: 12px; }
+.custom-title{ width: 100%; margin: 0; font-size: 18px; font-weight: 700; }
+.custom-number, .draw-name{
+  width: 5em;
+  font: inherit;
+  font-weight: 700;
+  color: #000;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #000;
+  border-radius: 0;
+  padding: 0 4px;
+}
+.draw-name{ width: 100%; box-sizing: border-box; font-weight: 300; }
+.draw-map{ width: 100%; height: 300px; }
+.draw-tools{ width: 100%; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 16px; }
+.custom-buttons{ width: 100%; display: flex; gap: 12px; }
+.custom-buttons button, .custom-tabs button, .draw-tools button{
+  font: inherit;
+  color: #000;
+  background: transparent;
+  border: 2px solid #000;
+  border-radius: 0;
+  padding: 2px 12px;
+  cursor: pointer;
+}
+.draw-tools button{ font-size: 16px; padding: 0 10px; }
+.custom-buttons button[type="submit"],
+.custom-tabs button[aria-pressed="true"]{ background: #000; color: #FAF8F3; }
+.custom-area-unit{ font-size: 18px; }
+
 /* only used when the page is opened on its own: one screen of scrolling per step */
 .scroll-steps{ display: none; }
 .standalone .scroll-steps{ display: block; position: relative; z-index: 1; pointer-events: none; }
@@ -106,6 +168,10 @@
 /* phones: slightly smaller text */
 @media (max-width: 600px){
   .map-line, .unit-select{ font-size: 16px; }
+}
+/* wide screens: the text takes up at most half the map's width, so it covers less of it; phones keep the full width */
+@media (min-width: 601px){
+  .labels{ max-width: calc(50% - 20px); }
 }
 </style>
 </head>
@@ -117,9 +183,40 @@
     <span class="map-line">This white outline is a <select class="unit-select" aria-label="Unit"></select>.</span>
     <span class="map-line place-line"></span>
     <span class="map-line area-text"></span>
+    <span class="map-line map-hint">Change units or make your own.</span>
     <span class="map-line grid-note" hidden></span>
   </div>
   <button class="map-line grid-btn" type="button">Show grid</button>
+  <div class="custom-popup" hidden>
+    <div class="custom-box">
+      <p class="custom-title">Make your own unit</p>
+      <div class="custom-tabs">
+        <button type="button" data-tab="area" aria-pressed="true">By area</button>
+        <button type="button" data-tab="draw" aria-pressed="false">Draw a shape</button>
+      </div>
+      <form class="custom-form area-form" data-panel="area">
+        <input class="custom-number" type="number" min="0" step="any" value="100" required aria-label="Amount">
+        <select class="unit-select custom-area-unit" aria-label="Area unit"></select>
+        <div class="custom-buttons">
+          <button type="submit">Use it</button>
+          <button type="button" class="custom-cancel">Cancel</button>
+        </div>
+      </form>
+      <form class="custom-form draw-form" data-panel="draw" hidden>
+        <input class="draw-name" type="text" placeholder="Name your shape" aria-label="Name">
+        <div class="draw-map"></div>
+        <div class="draw-tools">
+          <span class="draw-hint">Click on the map to add corners.</span>
+          <button type="button" class="draw-undo">Undo</button>
+          <button type="button" class="draw-clear">Clear</button>
+        </div>
+        <div class="custom-buttons">
+          <button type="submit">Use it</button>
+          <button type="button" class="custom-cancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
 <div class="scroll-steps">
@@ -171,7 +268,9 @@ function fieldFeature(map) {
   const hw = FIELD_W_M / 2, hh = FIELD_H_M / 2;
   const d = FIELD_W_M / Math.SQRT2; // diamond: center to corner
   const R5 = FIELD_W_M / (2 * Math.sin(Math.PI / 5)); // pentagon: center to corner
-  const corners = unit.shape === "diamond"
+  const corners = unit.shape === "polygon"
+    ? [...unit.points, unit.points[0]] // a drawn shape: its corners in local meters
+    : unit.shape === "diamond"
     ? [[0, d], [d, 0], [0, -d], [-d, 0], [0, d]]
     : unit.shape === "pentagon"
     ? [0, 1, 2, 3, 4, 0].map((k) => [R5 * Math.cos(Math.PI / 2 + k * 2 * Math.PI / 5), R5 * Math.sin(Math.PI / 2 + k * 2 * Math.PI / 5)])
@@ -289,7 +388,7 @@ const map = new mapboxgl.Map({
 });
 
 function updateAreaText() {
-  areaText.innerHTML = "The total map area you see on screen is about " +
+  areaText.innerHTML = "The total visible map area is about " +
     formatNumber(fieldsInView(map)) + " <b>" + unit.plural + "</b>.";
   gridBtn.dataset.tip = "The grid is rectangles the size of the unit being used (" + unit.singular + ").";
 }
@@ -390,12 +489,22 @@ placeReady.then(() => fetch("../units.json")).then((r) => r.json()).then((units)
     });
     unitSelect.appendChild(group);
   });
+  unitSelect.appendChild(new Option("Make your own…", "make-your-own"));
   unitSelect.value = "football-field";
   fitSelectToContent(unitSelect);
   document.fonts.ready.then(() => fitSelectToContent(unitSelect));
 
   unitSelect.addEventListener("change", () => {
-    useUnit(units.find((u) => u.key === unitSelect.value));
+    if (unitSelect.value === "make-your-own") {
+      // keep showing the current unit until the popup is submitted
+      unitSelect.value = unit.key;
+      fitSelectToContent(unitSelect);
+      customPopup.hidden = false;
+      if (activeTab === "draw") openDrawMap();
+      else { customNumber.focus(); customNumber.select(); }
+      return;
+    }
+    useUnit(unitSelect.value === "custom" ? customUnit : units.find((u) => u.key === unitSelect.value));
   });
   useUnit(units.find((u) => u.key === stepUnitKeys[0]) || sports[0]);
   if (pendingStep !== null) goToStep(pendingStep);
@@ -441,7 +550,9 @@ function useUnit(u) {
   const ft = u.widthFt != null;
   FIELD_W_M = ft ? u.widthFt * 0.3048 : u.widthM;
   FIELD_H_M = ft ? u.lengthFt * 0.3048 : u.lengthM;
-  FIELD_AREA_M2 = u.shape === "pentagon"
+  FIELD_AREA_M2 = u.shape === "polygon"
+    ? u.areaM2 // a drawn shape, its area worked out when drawn
+    : u.shape === "pentagon"
     ? (1 / 4) * Math.sqrt(5 * (5 + 2 * Math.sqrt(5))) * FIELD_W_M * FIELD_W_M
     : FIELD_W_M * FIELD_H_M;
   fitSelectToContent(unitSelect);
@@ -461,6 +572,131 @@ function unitFitZoom() {
   const mPerPx = Math.max(wM / (0.9 * canvas.clientWidth), hM / (0.9 * canvas.clientHeight));
   return Math.log2(78271.517 * Math.cos(map.getCenter().lat * Math.PI / 180) / mPerPx);
 }
+
+// ---- "Make your own…": a unit of any area (drawn as a square) or a shape drawn on a small map, as on
+// footballfield.html; it joins the dropdown, above "Make your own…" ----
+const AREA_UNITS = [
+  ["sqft", "square foot", "square feet", 0.09290304],
+  ["sqyd", "square yard", "square yards", 0.83612736],
+  ["sqm", "square meter", "square meters", 1],
+  ["acre", "acre", "acres", 4046.8564224],
+  ["hectare", "hectare", "hectares", 10000],
+  ["sqkm", "square kilometer", "square kilometers", 1e6],
+  ["sqmi", "square mile", "square miles", 2589988.110336]
+];
+function polygonAreaMeters2(points) {
+  let area2 = 0;
+  for (let i = 0; i < points.length; i++) {
+    const [x1, y1] = points[i], [x2, y2] = points[(i + 1) % points.length];
+    area2 += x1 * y2 - x2 * y1;
+  }
+  return Math.abs(area2) / 2;
+}
+const customPopup = document.querySelector(".custom-popup");
+const customForm = document.querySelector(".area-form");
+const customNumber = document.querySelector(".custom-number");
+const customAreaUnit = document.querySelector(".custom-area-unit");
+AREA_UNITS.forEach(([key, , plural]) => customAreaUnit.appendChild(new Option(plural, key)));
+customAreaUnit.value = "acre";
+let customUnit = null;
+
+function setCustomUnit(u) {
+  customUnit = u;
+  let option = unitSelect.querySelector('option[value="custom"]');
+  if (!option) {
+    option = new Option("", "custom");
+    unitSelect.insertBefore(option, unitSelect.querySelector('option[value="make-your-own"]'));
+  }
+  option.textContent = u.label;
+  customPopup.hidden = true;
+  useUnit(u);
+}
+
+// popup tabs
+let activeTab = "area";
+const tabButtons = document.querySelectorAll(".custom-tabs button");
+function showTab(name) {
+  activeTab = name;
+  tabButtons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tab === name)));
+  document.querySelectorAll(".custom-form").forEach((form) => { form.hidden = form.dataset.panel !== name; });
+  if (name === "draw") openDrawMap();
+}
+tabButtons.forEach((b) => b.addEventListener("click", () => showTab(b.dataset.tab)));
+
+// "Draw a shape": click corners on a second map, made the first time the tab opens, where the main map is
+const drawForm = document.querySelector(".draw-form");
+const drawName = document.querySelector(".draw-name");
+const drawHint = document.querySelector(".draw-hint");
+let drawMap = null;
+let drawPoints = []; // [lng, lat] corners, in click order
+function drawnData() {
+  const features = drawPoints.map((p) => ({ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: p } }));
+  if (drawPoints.length >= 2) {
+    features.push({
+      type: "Feature", properties: {},
+      geometry: drawPoints.length >= 3
+        ? { type: "Polygon", coordinates: [[...drawPoints, drawPoints[0]]] }
+        : { type: "LineString", coordinates: drawPoints }
+    });
+  }
+  return { type: "FeatureCollection", features };
+}
+function redrawDrawn() {
+  const src = drawMap && drawMap.getSource("drawn");
+  if (src) src.setData(drawnData());
+}
+function openDrawMap() {
+  if (drawMap) { drawMap.resize(); return; }
+  drawMap = new mapboxgl.Map({ container: document.querySelector(".draw-map"), style: STYLE, center: map.getCenter(), zoom: map.getZoom(), bearing: 0 });
+  drawMap.doubleClickZoom.disable(); // double clicks add corners instead
+  drawMap.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "bottom-right");
+  drawMap.on("load", () => {
+    drawMap.addSource("drawn", { type: "geojson", data: drawnData() });
+    drawMap.addLayer({ id: "drawn-fill", type: "fill", source: "drawn", filter: ["==", ["geometry-type"], "Polygon"], paint: { "fill-color": "#fff", "fill-opacity": 0.25 } });
+    drawMap.addLayer({ id: "drawn-line", type: "line", source: "drawn", filter: ["!=", ["geometry-type"], "Point"], paint: { "line-color": "#fff", "line-width": 3 } });
+    drawMap.addLayer({ id: "drawn-points", type: "circle", source: "drawn", filter: ["==", ["geometry-type"], "Point"], paint: { "circle-radius": 5, "circle-color": "#fff", "circle-stroke-color": "#000", "circle-stroke-width": 1.5 } });
+  });
+  drawMap.on("click", (e) => {
+    drawPoints.push([e.lngLat.lng, e.lngLat.lat]);
+    drawHint.textContent = "Click on the map to add corners.";
+    redrawDrawn();
+  });
+}
+document.querySelector(".draw-undo").addEventListener("click", () => { drawPoints.pop(); redrawDrawn(); });
+document.querySelector(".draw-clear").addEventListener("click", () => { drawPoints = []; redrawDrawn(); });
+
+drawForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = drawName.value.trim() || "your shape";
+  if (drawPoints.length < 3) { drawHint.textContent = "Add at least 3 corners."; return; }
+  // corners -> local east/north meters, centered on the shape's bounding box
+  const lng0 = drawPoints.reduce((a, p) => a + p[0], 0) / drawPoints.length;
+  const lat0 = drawPoints.reduce((a, p) => a + p[1], 0) / drawPoints.length;
+  const { mPerDegLat, mPerDegLng } = metersPerDeg(lat0);
+  let pts = drawPoints.map(([lng, lat]) => [(lng - lng0) * mPerDegLng, (lat - lat0) * mPerDegLat]);
+  const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  pts = pts.map(([x, y]) => [x - (minX + maxX) / 2, y - (minY + maxY) / 2]);
+  setCustomUnit({
+    key: "custom", label: name, singular: name, plural: name,
+    shape: "polygon", points: pts, areaM2: polygonAreaMeters2(pts), widthM: maxX - minX, lengthM: maxY - minY
+  });
+});
+
+customForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const n = Number(customNumber.value);
+  if (!(n > 0)) return;
+  const [, one, many, m2] = AREA_UNITS.find((a) => a[0] === customAreaUnit.value);
+  const amount = n.toLocaleString() + " " + (n === 1 ? one : many);
+  const side = Math.sqrt(n * m2);
+  setCustomUnit({ key: "custom", label: amount, singular: amount, plural: amount, widthM: side, lengthM: side });
+});
+
+function closeCustomPopup() { customPopup.hidden = true; }
+document.querySelectorAll(".custom-cancel").forEach((b) => b.addEventListener("click", closeCustomPopup));
+customPopup.addEventListener("click", (e) => { if (e.target === customPopup) closeCustomPopup(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCustomPopup(); });
 
 // --- which step to show ---
 let pendingStep = null;
