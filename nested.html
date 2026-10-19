@@ -108,6 +108,8 @@ b{ font-weight: 700; }
 .combo-list li.section{ font-weight: 700; font-size: 14px; padding-top: 10px; cursor: pointer; }
 .combo-list li.active{ background: #000; color: #FAF8F3; }
 
+/* the small how-to line under the sentence, as on the football maps */
+.nest-hint{ font-size: 12px; font-weight: 300; margin: -8px 0 16px; }
 .nest-map{ display: block; width: 100%; height: 60vh; }
 .embed .nest-map{ height: 480px; } /* embedded: the frame fits its content, so not a share of the frame */
 .nest-map .outer{ fill: none; stroke: #000; stroke-width: 1.5; }
@@ -141,6 +143,7 @@ b{ font-weight: 700; }
     in <span class="combo" id="unit"></span>
   </p>
   <p class="nest-line" id="result"></p>
+  <p class="nest-hint">Select other places from the dropdowns to see how they measure against each other.</p>
   <svg class="nest-map" id="map"></svg>
   <p class="source">
     Areas are land area, leaving out water; lakes and reservoirs are water surface area.

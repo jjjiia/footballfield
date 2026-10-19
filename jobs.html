@@ -86,7 +86,7 @@ b{ font-weight: 700; }
 
 /* searchable dropdown: type in the box to narrow the list */
 .combo{ position: relative; display: inline-block; max-width: 100%; }
-.combo-input{ box-sizing: border-box; cursor: pointer; text-overflow: ellipsis; }
+.combo-input{ box-sizing: border-box; cursor: pointer; display: inline-block; vertical-align: bottom; resize: none; overflow: hidden; white-space: pre-wrap; }
 .combo-input:focus{ outline: none; cursor: text; min-width: 240px; }
 .combo-input::placeholder{ color: #000; opacity: 0.5; }
 .combo-list{
@@ -214,7 +214,7 @@ body{ padding-bottom: 72px; } /* room for the fixed sources */
 // jobs.html?embed&note=N -- the sources are note N at the end of the embedding page, so none here
 {
   const note = new URLSearchParams(location.search).get("note");
-  if (note) document.querySelector(".source").remove();
+  if (note) { document.querySelector(".source").remove(); document.body.style.paddingBottom = "0"; } // and the room kept for it
 }
 </script>
 
@@ -259,16 +259,23 @@ function fitToContent(input) {
   document.body.appendChild(probe);
   const w = probe.getBoundingClientRect().width;
   probe.remove();
-  // never wider than the page leaves room for (a long label on a phone ends in "…" instead of running off)
+  // never wider than the page leaves room for: a longer label wraps onto a second line inside the box
   const room = document.documentElement.clientWidth - 40;
   input.style.width = Math.min(room, Math.ceil(w + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 4)) + "px";
+  fitHeight(input);
+}
+// the box (a textarea, so a long label can wrap) as tall as its lines; as on nested_people.html
+function fitHeight(input) {
+  input.style.height = "auto";
+  input.style.height = input.scrollHeight + "px";
 }
 
 // A dropdown you can type in. items: [{ value, label, section }]. Clicking the
 // box clears it to show the whole list; typing narrows it to labels containing
 // the text. Items for which isDisabled(value) is true are grey and can't be picked.
 function makeCombo(root, label, items, onPick) {
-  const input = Object.assign(document.createElement("input"), { className: "unit-select combo-input", type: "text" });
+  // a one-row textarea rather than an input, so a label too long for the line wraps inside the box instead of being cut off
+  const input = Object.assign(document.createElement("textarea"), { className: "unit-select combo-input", rows: 1 });
   input.setAttribute("aria-label", label);
   input.setAttribute("autocomplete", "off");
   input.spellcheck = false;
@@ -312,11 +319,16 @@ function makeCombo(root, label, items, onPick) {
   input.addEventListener("focus", () => {
     input.placeholder = byValue.get(value).label;
     input.value = "";
+    fitHeight(input);
     list.hidden = false;
     render();
     list.scrollTop = 0;
   });
-  input.addEventListener("input", render);
+  input.addEventListener("input", () => {
+    if (/\n/.test(input.value)) input.value = input.value.replace(/\n/g, " "); // pasted line breaks
+    fitHeight(input);
+    render();
+  });
   input.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown") { e.preventDefault(); setActive(Math.min(active + 1, shown.length - 1)); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setActive(Math.max(active - 1, 0)); }

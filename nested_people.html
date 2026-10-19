@@ -16,7 +16,7 @@
 html, body{ background: #FAF8F3; color: #000; }
 .embed .top-banner{ display: none; }
 /* embedded (scrolly.html gives the frame a fixed size, with room for the open list) */
-.embed .nested{ padding-top: 0; padding-bottom: 0; }
+.embed .nested{ padding-top: 0; padding-bottom: 0; display: flow-root; } /* flow-root: the last line's margin counts in its height */
 .embed .combo-list{ max-height: 240px; max-width: min(320px, calc(100vw - 40px)); }
 body{ font-family: 'Inter', Arial, sans-serif; }
 b{ font-weight: 700; }
@@ -81,7 +81,7 @@ b{ font-weight: 700; }
 
 /* searchable dropdown, same as the jobs page: type in the box to narrow the list */
 .combo{ position: relative; display: inline-block; max-width: 100%; }
-.combo-input{ box-sizing: border-box; cursor: pointer; text-overflow: ellipsis; }
+.combo-input{ box-sizing: border-box; cursor: pointer; display: inline-block; vertical-align: bottom; resize: none; overflow: hidden; white-space: pre-wrap; }
 .combo-input:focus{ outline: none; cursor: text; min-width: 320px; }
 .combo-input::placeholder{ color: #000; opacity: 0.5; }
 .combo-list{
@@ -107,6 +107,9 @@ b{ font-weight: 700; }
 .combo-list li{ padding: 4px 12px; cursor: pointer; }
 .combo-list li.section{ font-weight: 700; font-size: 14px; padding-top: 10px; cursor: pointer; }
 .combo-list li.active{ background: #000; color: #FAF8F3; }
+
+/* the small how-to line under the sentence, as on the nesting map */
+.nest-hint{ font-size: 12px; font-weight: 300; margin: -8px 0 16px; }
 
 .source{
   font-size: 11px;
@@ -134,6 +137,7 @@ b{ font-weight: 700; }
     in <span class="combo" id="unit"></span>
   </p>
   <p class="nest-line" id="result"></p>
+  <p class="nest-hint">Select other populations from the dropdowns to see how they measure against each other.</p>
   <p class="source">
     Counts of people from <a href="https://www.wikidata.org/">Wikidata</a>: country populations, language speakers, Instagram followers, yearly visitors and passengers, venue capacity, and a few others. Each count under a dropdown links to its Wikidata entry.
     Wikidata is edited by volunteers, so dates and methods vary from count to count.
@@ -184,16 +188,23 @@ function fitToContent(input) {
   document.body.appendChild(probe);
   const w = probe.getBoundingClientRect().width;
   probe.remove();
-  // never wider than the page leaves room for (a long label on a phone ends in "…" instead of running off)
+  // never wider than the page leaves room for: a longer label wraps onto a second line inside the box
   const room = document.documentElement.clientWidth - 40;
   input.style.width = Math.min(room, Math.ceil(w + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 4)) + "px";
+  fitHeight(input);
+}
+// the box (a textarea, so a long label can wrap) as tall as its lines
+function fitHeight(input) {
+  input.style.height = "auto";
+  input.style.height = input.scrollHeight + "px";
 }
 
 // A dropdown you can type in, same as the jobs page. items: [{ value, label, section }].
 // Clicking the box shows the sections closed, accordion style: click a section to
 // open or close it. Typing searches every section and shows all matches.
 function makeCombo(root, label, items, onPick) {
-  const input = Object.assign(document.createElement("input"), { className: "unit-select combo-input", type: "text" });
+  // a one-row textarea rather than an input, so a label too long for the line wraps inside the box instead of being cut off
+  const input = Object.assign(document.createElement("textarea"), { className: "unit-select combo-input", rows: 1 });
   input.setAttribute("aria-label", label);
   input.setAttribute("autocomplete", "off");
   input.spellcheck = false;
@@ -251,12 +262,17 @@ function makeCombo(root, label, items, onPick) {
   input.addEventListener("focus", () => {
     input.placeholder = byValue.get(value).label;
     input.value = "";
+    fitHeight(input);
     open.clear();
     list.hidden = false;
     render();
     list.scrollTop = 0;
   });
-  input.addEventListener("input", render);
+  input.addEventListener("input", () => {
+    if (/\n/.test(input.value)) input.value = input.value.replace(/\n/g, " "); // pasted line breaks
+    fitHeight(input);
+    render();
+  });
   input.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown") { e.preventDefault(); setActive(Math.min(active + 1, shown.length - 1)); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setActive(Math.max(active - 1, 0)); }

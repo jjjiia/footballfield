@@ -384,7 +384,7 @@ html, body{ background: #FAF8F3; }
 <section class="text-block">
   <div class="text-block-inner">
     <h2 class="section-title">There are as many teachers in Abilene, Texas as there are DJs in the whole United States.</h2>
-    <p>Part of having a lot of data at our fingertips today is that we have so much capacity to keep adding context by incorporating more datasets. We can connect them in endless ways in an attempt to generate a single meaningful connection. We can keep generating context until one clicks and becomes part of our experience.</p>
+    <p>We have a large capacity to keep adding context by incorporating the unprecedented amount of data at our fingertips. We can connect them in a million ways in an attempt to generate a single meaningful connection. We can keep generating context until one clicks and becomes part of our experience.</p>
   </div>
 </section>
 
@@ -394,7 +394,7 @@ html, body{ background: #FAF8F3; }
 <section class="text-block">
   <div class="text-block-inner">
     <h2 class="section-title">Giraffes</h2>
-    <p>When expanding and going outwards fail, though, another way is to rest and start from the small again. There are analog tools that people use to measure and record. For example, this tape measure is used by carpenters to write notes to themselves of what they have measured.</p>
+    <p>Sometimes comparisons take you further rather than closer to the objects you are comparing. When expanding and going outwards fail, another way is to reset and start from the small again. There are analog tools that people use to measure and record. For example, this tape measure is used by carpenters to write notes to themselves of what they have measured.</p>
   </div>
 </section>
 
@@ -683,6 +683,25 @@ document.querySelectorAll(".nested-frame, .steps-frame, .grid-frame").forEach((f
   frame.addEventListener("load", () => {
     const page = frame.contentDocument.querySelector(".nested, .steps, .inner");
     const fit = () => { frame.style.height = Math.ceil(page.getBoundingClientRect().height) + "px"; };
+    new ResizeObserver(fit).observe(page);
+    fit();
+  });
+});
+
+// The people and jobs frames: as tall as their page, so nothing scrolls inside them, but always with room under the
+// lowest dropdown for its open list (at most 240px tall on the people page, 320px on the jobs page), so opening a list
+// never changes the frame's size. A long name wraps a dropdown onto more lines, so the height is worked out again when
+// the page changes, though not while a dropdown is open (its box empties)
+document.querySelectorAll(".people-frame, .jobs-frame").forEach((frame) => {
+  const listRoom = frame.matches(".jobs-frame") ? 340 : 260;
+  frame.addEventListener("load", () => {
+    const doc = frame.contentDocument;
+    const page = doc.querySelector(".nested, .columns");
+    const fit = () => {
+      if (doc.activeElement && doc.activeElement.matches(".combo-input")) return;
+      const listBottom = Math.max(...[...doc.querySelectorAll(".combo")].map((c) => c.getBoundingClientRect().bottom)) + listRoom;
+      frame.style.height = Math.ceil(Math.max(page.getBoundingClientRect().bottom, listBottom)) + "px";
+    };
     new ResizeObserver(fit).observe(page);
     fit();
   });
