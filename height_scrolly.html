@@ -258,19 +258,19 @@
       <div class="stage"></div>
     </section>
 
-    <section class="slide" data-names="Slide at Travers Park+S|Michael James, giraffe" data-labels="Sid, on the slide|Giraffe">
-      <p class="sentence">If he stands at the top of the slide and reaches up, he can just touch Michael James' head.</p>
+    <section class="slide" data-names="Slide at Travers Park+S|James Michael, giraffe" data-labels="Sid, on the slide|Giraffe">
+      <p class="sentence">If he stands at the top of the slide and reaches up, he can just touch James Michael's head.</p>
       <div class="stage"></div>
     </section>
 
-    <section class="slide" data-names="Michael James, giraffe*9|Statue of Liberty, statue alone" data-labels="9 giraffes|Statue of Liberty">
-      <p class="sentence">Now imagine 9 Michael Jameses, each standing on the last one's head. This stack of giraffes would be about the height of the Statue of Liberty.</p>
+    <section class="slide" data-names="James Michael, giraffe*9|Statue of Liberty, statue alone" data-labels="9 giraffes|Statue of Liberty">
+      <p class="sentence">Now imagine 9 James Michaels, each standing on the last one's head. This stack of giraffes would be about the height of the Statue of Liberty.</p>
       <div class="stage"></div>
     </section>
 
-    <section class="slide crowded axis" data-names="Michael James, giraffe|Grand Canyon, deepest point|Mount Everest|Average ocean depth|Sauroposeidon, dinosaur|Typical airliner cruise|Crater Lake|Hyperion, coast redwood, California|Empire State Building, to the tip|Statue of Liberty, statue alone" data-labels="Michael James|Deepest part of the Grand Canyon|Mount Everest|Average ocean depth|Tallest dinosaur|Airplanes fly at|Crater Lake|Tallest tree|Empire State Building|Statue of Liberty">
+    <section class="slide crowded axis" data-names="James Michael, giraffe|Grand Canyon, deepest point|Mount Everest|Average ocean depth|Sauroposeidon, dinosaur|Typical airliner cruise|Crater Lake|Hyperion, coast redwood, California|Empire State Building, to the tip|Statue of Liberty, statue alone" data-labels="James Michael|Deepest part of the Grand Canyon|Mount Everest|Average ocean depth|Tallest dinosaur|Airplanes fly at|Crater Lake|Tallest tree|Empire State Building|Statue of Liberty">
       <p class="sentence">Let's measure some things in<br><select class="measure" aria-label="Measure in">
-          <option value="Michael James, giraffe" data-plural="giraffes" selected>giraffes</option>
+          <option value="James Michael, giraffe" data-plural="giraffes" selected>giraffes</option>
           <option value="Statue of Liberty, statue alone" data-plural="Statues of Liberty">Statues of Liberty</option>
           <option value="Empire State Building, to the tip" data-plural="Empire State Buildings">Empire State Buildings</option>
           <option value="Robert Wadlow" data-plural="Robert Wadlows" data-note="Robert Wadlow, 8'11&quot;, the tallest man ever recorded">Robert Wadlows</option>
@@ -444,7 +444,7 @@
         const stepIn = heightIn * STEP_FACTOR;
         const minutesFor = (meters) => (stepIn > 0 && perMinute > 0 ? meters / (stepIn * 0.0254) / perMinute : 0);
         slide.querySelector(".walker-step").textContent = Math.round(stepIn) + (Math.round(stepIn) === 1 ? " inch" : " inches");
-        slide.querySelector(".walker-giraffe").textContent = formatDuration(minutesFor(Number(byName["Michael James, giraffe"].meters)));
+        slide.querySelector(".walker-giraffe").textContent = formatDuration(minutesFor(Number(byName["James Michael, giraffe"].meters)));
         const minutes = names.map((name) => minutesFor(Number(byName[name].meters)));
         // the axis counts in seconds, minutes or hours, whichever suits the longest walk
         const longest = Math.max(...minutes);
@@ -656,7 +656,7 @@
           bar.className = "bar";
           bar.dataset.key = d.key;
           bar.innerHTML = '<div class="bar-label"><b></b><span></span></div><div class="bar-line"></div>';
-          // a label can have a second line, after a line break ("Michael James&#10;giraffe"), in plain type
+          // a label can have a second line, after a line break ("James Michael&#10;giraffe"), in plain type
           const [name, kind] = d.label.split("\n");
           bar.querySelector("b").textContent = name;
           if (kind) bar.querySelector("b").after(Object.assign(document.createElement("div"), { textContent: kind }));
