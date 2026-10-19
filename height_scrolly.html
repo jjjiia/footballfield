@@ -158,6 +158,8 @@
     }
     /* the dropdown drawn by the page, not the browser, so it is square everywhere (phones round the browser's corners),
        with its own arrow, as on the football field page */
+    .measure-note{ font-size: 14px; font-weight: 300; text-align: center; margin: 6px 0 0; }
+    .measure-note[hidden]{ display: none; }
     select.measure{
       max-width: 100%;
       -webkit-appearance: none;
@@ -267,9 +269,10 @@
           <option value="Michael James, giraffe" data-plural="giraffes" selected>giraffes</option>
           <option value="Statue of Liberty, statue alone" data-plural="Statues of Liberty">Statues of Liberty</option>
           <option value="Empire State Building, to the tip" data-plural="Empire State Buildings">Empire State Buildings</option>
-          <option value="S" data-plural="of you">you</option>
-          <option value="Robert Wadlow" data-plural="Robert Wadlows">Robert Wadlows</option>
+          <option value="S" data-plural="6-year-olds">6-year-olds</option>
+          <option value="Robert Wadlow" data-plural="Robert Wadlows" data-note="Robert Wadlow, 8'11&quot;, the tallest man ever recorded">Robert Wadlows</option>
         </select>.</p>
+      <p class="measure-note" hidden></p>
       <div class="stage"></div>
     </section>
   </div>
@@ -327,6 +330,17 @@
       selectSizer.textContent = select.selectedOptions[0].textContent;
       select.style.width = Math.ceil(selectSizer.getBoundingClientRect().width) + 40 + "px"; // room for the arrow
     }
+    // a picked unit with a note (Robert Wadlow: who he is) shows it under the sentence
+    document.querySelectorAll("select.measure").forEach((select) => {
+      const note = select.closest(".slide").querySelector(".measure-note");
+      if (!note) return;
+      const showNote = () => {
+        note.textContent = select.selectedOptions[0].dataset.note || "";
+        note.hidden = !note.textContent;
+      };
+      select.addEventListener("change", showNote);
+      showNote();
+    });
     document.querySelectorAll("select.measure").forEach((select) => {
       fitSelect(select);
       select.addEventListener("change", () => { fitSelect(select); drawSlides(); });
