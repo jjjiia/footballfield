@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Steps Across</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../site.css">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <style>
+    /* one screen: a map you can move and zoom, and over it a sentence that works out your step from your height
+       and how many of those steps it is across the window, and how many days that walk would take */
+    html, body{ background: #FAF8F3; color: #000; }
+    body{ font-family: 'Inter', Arial, sans-serif; margin: 0; }
+    /* the map fills the window behind the sentence, the same basemap as the football field page */
+    .map{ position: fixed; inset: 0; z-index: 0; }
+    .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib{ display: none !important; }
+    /* the + and − zoom buttons at the bottom right: off-white squares with the page's type, as on the football field page */
+    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl{ margin: 0 20px 20px 0; }
+    .mapboxgl-ctrl-group{ border-radius: 0; box-shadow: none; background: transparent; display: flex; flex-direction: column; gap: 4px; }
+    .mapboxgl-ctrl-group button{ width: 32px; height: 32px; border-radius: 0; border: none; background: #FAF8F3; }
+    .mapboxgl-ctrl-group button + button{ border-top: none; }
+    .mapboxgl-ctrl-group button:not(:disabled):hover{ background-color: #FAF8F3; }
+    .mapboxgl-ctrl button .mapboxgl-ctrl-icon{
+      background-image: none; display: flex; align-items: center; justify-content: center;
+      font-family: 'Inter', Arial, sans-serif; font-size: 24px; font-weight: 300; color: #000;
+    }
+    .mapboxgl-ctrl button.mapboxgl-ctrl-zoom-in .mapboxgl-ctrl-icon::before{ content: "+"; }
+    .mapboxgl-ctrl button.mapboxgl-ctrl-zoom-out .mapboxgl-ctrl-icon::before{ content: "\2212"; }
+    .page{
+      position: relative;
+      z-index: 1;
+      pointer-events: none; /* only the sentence takes clicks, so the map can be moved everywhere else */
+      box-sizing: border-box;
+      display: flex;
+      justify-content: flex-start; /* the box at the top left, as on the football maps */
+      padding: 20px;
+    }
+    .sentence{
+      font-size: 24px;
+      font-weight: 300;
+      line-height: 1.5;
+      text-align: left;
+      margin: 0;
+      max-width: 50%; /* wide screens: half the map's width, so it covers less of it, as on the football maps */
+      box-sizing: border-box;
+      background: #FAF8F3; /* an off-white box, so it reads over the map */
+      padding: 12px 20px;
+      pointer-events: auto;
+    }
+    .sentence b{ font-weight: 700; }
+    .sentence .line{ display: block; }
+    .sentence .line + .line{ margin-top: 12px; }
+    .sentence .hint{ font-size: 12px; } /* the instruction under the sentence, small, as on the football maps */
+    /* the height box inside the sentence, with a − before and a + after, underlined together */
+    .measure{
+      font: inherit;
+      font-weight: 700;
+      color: #000;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid #000; /* underlined, not boxed, like the dropdowns */
+      padding: 0 0.2em;
+    }
+    input.measure{ width: 2.6em; text-align: center; -moz-appearance: textfield; appearance: textfield; }
+    input.measure::-webkit-inner-spin-button, input.measure::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
+    .spin-box{ display: inline-flex; align-items: stretch; border-bottom: 2px solid #000; vertical-align: baseline; } /* underlined, like the dropdowns */
+    .spin-box input.measure{ border: none; }
+    .spin-btn{ all: unset; cursor: pointer; padding: 0 0.3em; font-weight: 700; }
+    @media (max-width: 760px){
+      .sentence{ font-size: 18px; }
+    }
+    @media (max-width: 600px){
+      .sentence{ max-width: none; width: 100%; } /* phones: the full width */
+    }
+  </style>
+</head>
+<body>
+  <div class="map"></div>
+  <div class="page">
+    <p class="sentence">
+      <span class="line">If you are <input type="number" class="measure walker-height" value="48" min="20" max="100" step="1" aria-label="Your height in inches"> inches tall, your step length is <b class="walker-step">20 inches</b>. The distance across this map will be <b class="map-steps">…</b> steps.</span>
+      <span class="line">If you walk 10,000 steps a day, it will take you <b class="map-days">…</b>.</span>
+      <span class="line hint">Enter your height, and zoom and pan the map, to recalculate the steps.</span>
+    </p>
+  </div>
+
+  <script>
+    const STEP_FACTOR = 0.414; // step length as a share of height, as on the heights page
+    const STEPS_A_DAY = 10000;
+    const heightInput = document.querySelector(".walker-height");
+
+    // ---- the map: centered on you if your browser shares where you are, otherwise on a city picked at random.
+    // It can be dragged and zoomed, not turned or tilted, so "across" is always the window's width ----
+    mapboxgl.accessToken = "pk.eyJ1IjoiampqaWlhMTIzIiwiYSI6ImNpbDQ0Z2s1OTN1N3R1eWtzNTVrd29lMDIifQ.gSWjNbBSpIFzDXU2X5YCiQ";
+    const STYLE = "mapbox://styles/jjjiia123/cmmb9euid00at01qr9mbfapn7"; // as on the football field page
+    const CITIES = [
+      [-74.006, 40.7128], [-87.6298, 41.8781], [-118.2437, 34.0522], [-0.1276, 51.5072], [2.3522, 48.8566],
+      [139.6917, 35.6895], [151.2093, -33.8688], [-43.1729, -22.9068], [28.0473, -26.2041], [77.209, 28.6139],
+      [-99.1332, 19.4326], [13.405, 52.52], [31.2357, 30.0444], [121.4737, 31.2304], [-79.3832, 43.6532],
+    ];
+    // steps_across.html?embed -- shown inside another page (index.html): scrolling scrolls that page, and the map
+    // zooms with ctrl or ⌘ and scroll, or two fingers on a phone, so the page can still be scrolled past it
+    const embedded = new URLSearchParams(location.search).has("embed");
+    // it opens zoomed out so the window is 10 days of walking across (100,000 steps at your step length), at that latitude
+    const START_DAYS = 10;
+    function zoomForDays(lat) {
+      const stepM = Math.round((Number(heightInput.value) || 48) * STEP_FACTOR) * 0.0254;
+      const metersPerPixel = (START_DAYS * STEPS_A_DAY * stepM) / innerWidth;
+      return Math.log2((40075016.686 * Math.cos((lat * Math.PI) / 180)) / (512 * metersPerPixel));
+    }
+    const start = CITIES[Math.floor(Math.random() * CITIES.length)];
+    const map = new mapboxgl.Map({
+      container: document.querySelector(".map"), style: STYLE,
+      center: start, zoom: zoomForDays(start[1]),
+      dragRotate: false, touchPitch: false, pitchWithRotate: false,
+      cooperativeGestures: embedded,
+    });
+    map.touchZoomRotate.disableRotation();
+    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "bottom-right"); // + and −, styled below
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((where) => {
+        map.flyTo({ center: [where.coords.longitude, where.coords.latitude], zoom: zoomForDays(where.coords.latitude), duration: 1500 });
+      });
+    }
+
+    // ---- the numbers: your step from your height, the window's width across the middle of the map in your steps,
+    // and the days that walk would take at 10,000 steps a day ----
+    // 527, 1,052, 2.4: whole numbers from 10 up, two significant figures below
+    const fmt = (n) => (n >= 10 ? Math.round(n).toLocaleString() : String(Number(n.toPrecision(2))));
+    function update() {
+      const stepInches = Math.round((Number(heightInput.value) || 0) * STEP_FACTOR);
+      document.querySelector(".walker-step").textContent = stepInches + (stepInches === 1 ? " inch" : " inches");
+      // on a web map one pixel is 40,075 km × cos(latitude) / (512 × 2^zoom) across, measured at the center
+      const metersPerPixel = (40075016.686 * Math.cos((map.getCenter().lat * Math.PI) / 180)) / (512 * 2 ** map.getZoom());
+      const steps = stepInches > 0 ? (innerWidth * metersPerPixel) / (stepInches * 0.0254) : 0;
+      document.querySelector(".map-steps").textContent = steps ? fmt(steps) : "…";
+      const days = steps / STEPS_A_DAY;
+      document.querySelector(".map-days").textContent = steps ? fmt(days) + (fmt(days) === "1" ? " day" : " days") : "…";
+    }
+    map.on("move", update);
+    window.addEventListener("resize", update);
+    heightInput.addEventListener("input", update);
+
+    // − and + around the number box, stepping by its step and staying within its min and max
+    document.querySelectorAll("input.measure[type=number]").forEach((input) => {
+      const box = document.createElement("span");
+      box.className = "spin-box";
+      input.before(box);
+      const button = (label, text, dir) => {
+        const b = Object.assign(document.createElement("button"), { type: "button", className: "spin-btn", textContent: text });
+        b.setAttribute("aria-label", label);
+        b.addEventListener("click", () => {
+          const step = Number(input.step) || 1;
+          const next = Math.min(Number(input.max) || Infinity, Math.max(Number(input.min) || 0, (Number(input.value) || 0) + dir * step));
+          input.value = next;
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+        return b;
+      };
+      box.append(button("Decrease", "−", -1), input, button("Increase", "+", 1));
+    });
+    update();
+  </script>
+</body>
+</html>

@@ -3,21 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nested people</title>
+  <title>Nested</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="../site.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
   <script>
-    // nested_people.html?embed -- shown inside another page (scrolly.html): no banner
+    // nested.html?embed -- shown inside another page (scrolly.html): no banner
     if (new URLSearchParams(location.search).has("embed")) document.documentElement.classList.add("embed");
   </script>
   <style>
 html, body{ background: #FAF8F3; color: #000; }
 .embed .top-banner{ display: none; }
-/* embedded (scrolly.html gives the frame a fixed size, with room for the open list) */
-.embed .nested{ padding-top: 0; padding-bottom: 0; display: flow-root; } /* flow-root: the last line's margin counts in its height */
-.embed .combo-list{ max-height: 240px; max-width: min(320px, calc(100vw - 40px)); }
 body{ font-family: 'Inter', Arial, sans-serif; }
 b{ font-weight: 700; }
 
@@ -41,6 +39,7 @@ b{ font-weight: 700; }
 }
 
 .nested{ padding: 40px 20px; }
+.embed .nested{ padding-top: 0; padding-bottom: 0; display: flow-root; } /* embedded: the text around it is on the embedding page; flow-root keeps margins inside its height */
 
 .nest-line{
   font-size: 40px;
@@ -48,11 +47,12 @@ b{ font-weight: 700; }
   line-height: 1.3;
   margin: 0 0 16px;
 }
-/* the dropdown line: same size as the sentence under it, with room under each
-   box for its count when the line wraps */
-.nest-pick{ line-height: calc(1.3em + 28px); margin-bottom: 24px; }
+/* the dropdown line: smaller, with room under it for each place's area */
+/* line-height leaves room for the captions when the line wraps onto two lines */
+.nest-pick{ font-size: 20px; line-height: 2.5; margin-bottom: 24px; }
 .nest-pick .combo{ line-height: normal; } /* captions sit right under the box */
-/* each count, under its dropdown's underline */
+.nest-pick .unit-select{ font-size: 20px; padding: 0 36px 0 8px; background-position: right 12px center; }
+/* each place's area, under its dropdown's underline */
 .combo-area{
   position: absolute;
   left: 8px;
@@ -81,7 +81,7 @@ b{ font-weight: 700; }
 
 /* searchable dropdown, same as the jobs page: type in the box to narrow the list */
 .combo{ position: relative; display: inline-block; max-width: 100%; }
-.combo-input{ box-sizing: border-box; cursor: pointer; display: inline-block; vertical-align: bottom; resize: none; overflow: hidden; white-space: pre-wrap; }
+.combo-input{ box-sizing: border-box; cursor: pointer; text-overflow: ellipsis; }
 .combo-input:focus{ outline: none; cursor: text; min-width: 320px; }
 .combo-input::placeholder{ color: #000; opacity: 0.5; }
 .combo-list{
@@ -108,8 +108,12 @@ b{ font-weight: 700; }
 .combo-list li.section{ font-weight: 700; font-size: 14px; padding-top: 10px; cursor: pointer; }
 .combo-list li.active{ background: #000; color: #FAF8F3; }
 
-/* the small how-to line under the sentence, as on the nesting map */
+/* the small how-to line under the sentence, as on the football maps */
 .nest-hint{ font-size: 12px; font-weight: 300; margin: -8px 0 16px; }
+.nest-map{ display: block; width: 100%; height: 60vh; }
+.embed .nest-map{ height: 480px; } /* embedded: the frame fits its content, so not a share of the frame */
+.nest-map .outer{ fill: none; stroke: #000; stroke-width: 1.5; }
+.nest-map .inner-shape{ fill: #000; stroke: none; }
 
 .source{
   font-size: 11px;
@@ -117,19 +121,21 @@ b{ font-weight: 700; }
   line-height: 1.5;
   margin: 24px 0 0;
 }
-.source a, .combo-area a{ color: #000; }
+.source a{ color: #000; }
 
 @media (max-width: 700px){
   .nest-line, .unit-select{ font-size: 28px; }
   .unit-select{ padding-right: 36px; background-position: right 12px center; }
+  .nest-pick, .nest-pick .unit-select{ font-size: 16px; }
   .combo-input:focus{ min-width: 240px; }
   .combo-list{ font-size: 16px; }
+  .nest-map{ height: 50vh; }
 }
   </style>
 </head>
 <body>
 
-<h1 class="top-banner">Nested people</h1>
+<h1 class="top-banner">Nested</h1>
 
 <div class="nested">
   <p class="nest-line nest-pick">
@@ -137,15 +143,18 @@ b{ font-weight: 700; }
     in <span class="combo" id="unit"></span>
   </p>
   <p class="nest-line" id="result"></p>
-  <p class="nest-hint">Select other populations from the dropdowns to see how they measure against each other.</p>
+  <p class="nest-hint">Select other places from the dropdowns to see how they measure against each other.</p>
+  <svg class="nest-map" id="map"></svg>
   <p class="source">
-    Counts of people from <a href="https://www.wikidata.org/">Wikidata</a>: country populations, language speakers, Instagram followers, yearly visitors and passengers, venue capacity, and a few others. Each count under a dropdown links to its Wikidata entry.
-    Wikidata is edited by volunteers, so dates and methods vary from count to count.
-    Left out: visitor and passenger counts under 1,000 a year (wrong in Wikidata), entries with no name, and vaccination and view counts (they count doses and views, not people).
-    Data: <a href="populations/wikidata/people_counts.json">people_counts.json</a>.
+    Areas are land area, leaving out water; lakes and reservoirs are water surface area.
+    US states and metropolitan statistical areas: U.S. Census Bureau, 2024 cartographic boundary files (land area).
+    Countries: <a href="https://data.worldbank.org/indicator/AG.LND.TOTL.K2">World Bank, Land area (sq. km)</a>, 2024, and World Bank Official Boundaries.
+    Lakes and reservoirs of 5,000 km² or more: <a href="https://www.hydrosheds.org/products/hydrolakes">HydroLAKES</a> (Messager et al. 2016).
+    <a href="../nested_data_source.html">All areas and sources</a>.
+    Shapes are drawn to the same scale on an equal-area projection centered on each place.
   </p>
 <script>
-// nested_people.html?embed&note=N -- the sources are note N at the end of the embedding page, so none here
+// nested.html?embed&note=N -- the sources are note N at the end of the embedding page, so none here
 {
   const note = new URLSearchParams(location.search).get("note");
   if (note) document.querySelector(".source").remove();
@@ -154,28 +163,31 @@ b{ font-weight: 700; }
 </div>
 
 <script>
-// 2,577, 8.3, 0.12: whole numbers from 10 up, two significant digits below
+const FILES = [
+  { file: "../areas/states.geojson", group: "US states" },
+  { file: "../areas/msas.geojson", group: "US metro areas" },
+  { file: "../areas/countries.geojson", group: "Countries" },
+  { file: "../areas/lakes.geojson", group: "Lakes and reservoirs" },
+];
+
+// d3 draws a polygon's rings clockwise; GeoJSON files wind them the other way,
+// which d3 reads as "the whole globe minus this shape". Flip any that come out
+// bigger than a hemisphere.
+function rewind(feature) {
+  const polys = feature.geometry.type === "Polygon" ? [feature.geometry.coordinates] : feature.geometry.coordinates;
+  for (const rings of polys) {
+    if (d3.geoArea({ type: "Polygon", coordinates: rings }) > 2 * Math.PI) rings.forEach(r => r.reverse());
+  }
+  return feature;
+}
+
+// 253, 8.3, 0.12, 0.0039: whole numbers from 10 up, two significant digits below
 const fmt = n => n >= 10 ? Math.round(n).toLocaleString("en-US") : String(Number(n.toPrecision(2)));
 
-// country names that read with "the": "people in the United States"
-const THE = /^(United|People's|Democratic|Republic|Kingdom|Federated|Czech|Dominican|Central African|Netherlands|Philippines|Bahamas|Gambia|Maldives|Comoros|Seychelles)|Islands$/;
-
-// How to say "N of these people", plural and singular, by the Wikidata property
-// the count comes from.
-function phrases(name, property) {
-  const the = THE.test(name) ? "the " + name : name;
-  switch (property) {
-    case "population": return ["people in " + the, "person in " + the];
-    case "number of speakers, writers, or signers": return [name + " speakers", name + " speaker"];
-    case "Instagram followers": return [name + " followers", name + " follower"];
-    case "visitors per year": return ["yearly visitors to " + name, "yearly visitor to " + name];
-    case "patronage": return ["yearly passengers at " + name, "yearly passenger at " + name];
-    case "maximum capacity": return ["people who fit in " + name, "person who fits in " + name];
-    case "number of subscribers": return [name + " subscribers", name + " subscriber"];
-    case "number of deaths": return ["people who died in the " + name, "person who died in the " + name];
-    case "number of registered users/contributors": return [name + " users", name + " user"];
-  }
-}
+// "Rhode Island" -> "Rhode Islands"; names already ending in s ("United States",
+// "Bahamas") and metro names ("Austin-Round Rock-San Marcos, TX") stay as they are
+const plural = name => /s$|,/.test(name) ? name : name + "s";
+const km2 = n => Math.round(n).toLocaleString("en-US") + " km²";
 
 // Size the box to its text (plus its padding, which holds the arrow).
 function fitToContent(input) {
@@ -188,23 +200,16 @@ function fitToContent(input) {
   document.body.appendChild(probe);
   const w = probe.getBoundingClientRect().width;
   probe.remove();
-  // never wider than the page leaves room for: a longer label wraps onto a second line inside the box
+  // never wider than the page leaves room for (a long label on a phone ends in "…" instead of running off)
   const room = document.documentElement.clientWidth - 40;
   input.style.width = Math.min(room, Math.ceil(w + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 4)) + "px";
-  fitHeight(input);
-}
-// the box (a textarea, so a long label can wrap) as tall as its lines
-function fitHeight(input) {
-  input.style.height = "auto";
-  input.style.height = input.scrollHeight + "px";
 }
 
 // A dropdown you can type in, same as the jobs page. items: [{ value, label, section }].
 // Clicking the box shows the sections closed, accordion style: click a section to
 // open or close it. Typing searches every section and shows all matches.
 function makeCombo(root, label, items, onPick) {
-  // a one-row textarea rather than an input, so a label too long for the line wraps inside the box instead of being cut off
-  const input = Object.assign(document.createElement("textarea"), { className: "unit-select combo-input", rows: 1 });
+  const input = Object.assign(document.createElement("input"), { className: "unit-select combo-input", type: "text" });
   input.setAttribute("aria-label", label);
   input.setAttribute("autocomplete", "off");
   input.spellcheck = false;
@@ -262,17 +267,12 @@ function makeCombo(root, label, items, onPick) {
   input.addEventListener("focus", () => {
     input.placeholder = byValue.get(value).label;
     input.value = "";
-    fitHeight(input);
     open.clear();
     list.hidden = false;
     render();
     list.scrollTop = 0;
   });
-  input.addEventListener("input", () => {
-    if (/\n/.test(input.value)) input.value = input.value.replace(/\n/g, " "); // pasted line breaks
-    fitHeight(input);
-    render();
-  });
+  input.addEventListener("input", render);
   input.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown") { e.preventDefault(); setActive(Math.min(active + 1, shown.length - 1)); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setActive(Math.max(active - 1, 0)); }
@@ -291,56 +291,60 @@ function makeCombo(root, label, items, onPick) {
   return combo;
 }
 
-fetch("populations/wikidata/people_counts.json").then(r => r.json()).then(sections => {
-  const people = new Map();
+Promise.all(FILES.map(f => d3.json(f.file))).then(datas => {
+  const places = new Map();
   const items = [];
-  for (const { key, section, items: list } of sections) {
-    // two different places with one name ("Memorial Stadium"): tell them apart by Wikidata ID
-    const seen = {};
-    for (const d of list) seen[d.name] = (seen[d.name] || 0) + 1;
-    for (const d of list) {
-      const name = seen[d.name] > 1 ? `${d.name} (${d.q})` : d.name;
-      const [many, one] = phrases(name, d.property);
-      const value = key + "|" + d.q;
-      people.set(value, { ...d, many, one });
-      items.push({ value, label: many, section });
+  datas.forEach((data, i) => {
+    for (const f of data.features) {
+      const key = FILES[i].group + "|" + f.properties.id;
+      places.set(key, rewind(f));
+      items.push({ value: key, label: f.properties.name, section: FILES[i].group });
     }
-  }
-  const thing = makeCombo(document.getElementById("thing"), "People to measure", items, () => draw());
-  const unit = makeCombo(document.getElementById("unit"), "Unit", items, () => draw());
-  // each count sits under its dropdown, linked to its Wikidata entry
-  const thingCount = Object.assign(document.createElement("span"), { className: "combo-area" });
-  const unitCount = Object.assign(document.createElement("span"), { className: "combo-area" });
-  document.getElementById("thing").append(thingCount);
-  document.getElementById("unit").append(unitCount);
-  thing.set("population|Q30");   // people in the United States
-  // embedded: Cristiano Ronaldo's social media followers; on its own: people who fit in Narendra Modi Stadium
-  unit.set(document.documentElement.classList.contains("embed") ? "followers|Q11571" : "venues|Q3531421");
+  });
+  const thing = makeCombo(document.getElementById("thing"), "Place to measure", items, () => draw());
+  const unit = makeCombo(document.getElementById("unit"), "Unit", items.map(it => ({ ...it, label: plural(it.label) })), () => draw());
+  // each place's area sits under its dropdown
+  const thingArea = Object.assign(document.createElement("span"), { className: "combo-area" });
+  const unitArea = Object.assign(document.createElement("span"), { className: "combo-area" });
+  document.getElementById("thing").append(thingArea);
+  document.getElementById("unit").append(unitArea);
+  thing.set("US states|48"); // Texas
+  unit.set("US states|44");  // Rhode Island
 
-  function showCount(el, p) {
-    el.innerHTML = "";
-    el.append(Object.assign(document.createElement("a"), {
-      href: "https://www.wikidata.org/wiki/" + p.q, target: "_blank", rel: "noopener",
-      textContent: p.count.toLocaleString("en-US"),
-    }));
-  }
+  const svg = d3.select("#map");
 
   function draw() {
-    const t = people.get(thing.get()), u = people.get(unit.get());
-    // "There are 30 teachers for every economist." Under 1 it flips around:
-    // "There is 1 teacher for every 33 economists."
-    const n = fmt(t.count / u.count);
+    const t = places.get(thing.get()), u = places.get(unit.get());
+    const T = t.properties.area_km2, U = u.properties.area_km2;
+    // "California is 1.4 Arizonas." -- singular when it comes out to exactly 1
+    const n = fmt(T / U);
     const result = document.getElementById("result");
     result.innerHTML = "";
-    const b = (text) => Object.assign(document.createElement("b"), { textContent: text });
-    if (n === "1") result.append("There is ", b("1 " + t.one), " for every ", b(u.one), ".");
-    else if (t.count > u.count) result.append("There are ", b(n + " " + t.many), " for every ", b(u.one), ".");
-    else result.append("There is ", b("1 " + t.one), " for every ", b(fmt(u.count / t.count) + " " + u.many), ".");
-    showCount(thingCount, t);
-    showCount(unitCount, u);
+    result.append(t.properties.name + " is ", Object.assign(document.createElement("b"), {
+      textContent: n + " " + (n === "1" ? u.properties.name : plural(u.properties.name)),
+    }), ".");
+    thingArea.textContent = km2(T);
+    unitArea.textContent = km2(U);
+
+    // the bigger shape fills the box; the smaller one is drawn at the same scale on top, centered
+    const outer = T >= U ? t : u, inner = T >= U ? u : t;
+    const node = svg.node();
+    const w = node.clientWidth, h = node.clientHeight;
+    const proj = f => d3.geoAzimuthalEqualArea().rotate(d3.geoCentroid(f).map(x => -x));
+    const po = proj(outer).fitExtent([[10, 10], [w - 10, h - 10]], outer);
+    const [cx, cy] = [w / 2, h / 2];
+    const pi = proj(inner).scale(po.scale()).translate([0, 0]);
+    const [[x0, y0], [x1, y1]] = d3.geoPath(pi).bounds(inner);
+    pi.translate([cx - (x0 + x1) / 2, cy - (y0 + y1) / 2]);
+    const [[ox0, oy0], [ox1, oy1]] = d3.geoPath(po).bounds(outer);
+    po.translate([po.translate()[0] + cx - (ox0 + ox1) / 2, po.translate()[1] + cy - (oy0 + oy1) / 2]);
+
+    svg.selectAll("*").remove();
+    svg.append("path").attr("class", "outer").attr("d", d3.geoPath(po)(outer));
+    svg.append("path").attr("class", "inner-shape").attr("d", d3.geoPath(pi)(inner));
   }
 
-  window.addEventListener("resize", () => { thing.fit(); unit.fit(); });
+  window.addEventListener("resize", () => { thing.fit(); unit.fit(); draw(); });
   draw();
 });
 </script>

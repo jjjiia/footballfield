@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stairs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../site.css">
+  <script>
+    // stairs.html?embed -- shown inside another page (scrolly.html)
+    if (new URLSearchParams(location.search).has("embed")) document.documentElement.classList.add("embed");
+  </script>
+  <style>
+html, body{ background: #FAF8F3; color: #000; }
+.embed .steps{ padding-top: 0; padding-bottom: 0; display: flow-root; } /* flow-root: the last line's margin counts in its height */
+body{ font-family: 'Inter', Arial, sans-serif; }
+b{ font-weight: 700; }
+
+.steps{ padding: 40px 20px; max-width: 900px; }
+
+.step-line{
+  font-size: 40px;
+  font-weight: 300;
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+/* the stair height: a number box and a unit dropdown, underlined like the other pages' dropdowns */
+.step-height, .unit-select{
+  -webkit-appearance: none;
+  appearance: none;
+  background: #FAF8F3;
+  color: #000;
+  border: none;
+  border-bottom: 2px solid #000;
+  border-radius: 0;
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 700;
+  font-size: inherit;
+  line-height: normal;
+  padding: 0 8px;
+}
+.step-height{ width: 2.6em; text-align: center; -moz-appearance: textfield; }
+.step-height::-webkit-inner-spin-button, .step-height::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
+.step-height:focus, .unit-select:focus{ outline: none; }
+/* number boxes get a − before and a + after, sharing the one underline */
+.spin-box{ display: inline-flex; align-items: baseline; border-bottom: 2px solid #000; }
+.spin-box .step-height{ border-bottom: none; }
+.spin-btn{ all: unset; cursor: pointer; padding: 0 0.2em; font-weight: 700; }
+.unit-select{
+  background: #FAF8F3 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 16px center;
+  padding-right: 48px;
+  cursor: pointer;
+}
+
+.source{
+  font-size: 11px;
+  font-weight: 300;
+  line-height: 1.5;
+  margin: 24px 0 0;
+}
+.source a{ color: #000; }
+
+@media (max-width: 700px){
+  .step-line{ font-size: 28px; }
+  .unit-select{ padding-right: 36px; background-position: right 12px center; }
+}
+  </style>
+</head>
+<body>
+
+<div class="steps">
+  <p class="step-line">
+    Measure a stair. If it is
+    <input class="step-height" id="height" type="number" min="1" step="any" value="8" data-step="1" aria-label="Stair height">
+    <select class="unit-select" id="unit" aria-label="Unit">
+      <option value="0.0254" selected>inches</option>
+      <option value="0.01">cm</option>
+    </select>
+    tall,
+  </p>
+  <p class="step-line" id="result"></p>
+  <p class="step-line">
+    If each step takes
+    <input class="step-height" id="pace" type="number" min="0.5" step="any" value="1" data-step="0.5" aria-label="Seconds a step">
+    <span id="seconds-word">second</span>, it would take you <b id="time">…</b> to reach the bottom.
+  </p>
+  <p class="source">
+    Depths, from <a href="../height_data.html">the heights data</a>:
+    average ocean depth 3,682 m (12,080 ft), <a href="https://oceanservice.noaa.gov/facts/oceandepth.html">NOAA</a>.
+  </p>
+</div>
+
+<script>
+// stairs.html?embed&note=N -- the sources are note N at the end of the embedding page, so none here
+{
+  const note = new URLSearchParams(location.search).get("note");
+  if (note) document.querySelector(".source").remove();
+}
+
+// depth in meters, the same as height_data.csv
+const OCEAN = 3682; // Average ocean depth
+
+const heightInput = document.getElementById("height");
+const unitSelect = document.getElementById("unit");
+const result = document.getElementById("result");
+const paceInput = document.getElementById("pace");
+const timeOut = document.getElementById("time");
+
+// 527, 1,052, 2.4: whole numbers from 10 up, two significant digits below
+const fmt = n => n >= 10 ? Math.round(n).toLocaleString("en-US") : String(Number(n.toPrecision(2)));
+const b = text => Object.assign(document.createElement("b"), { textContent: text });
+
+// minutes -> "45 minutes", "5 hours and 45 minutes", "2 days and 3 hours"
+function duration(minutes) {
+  const unit = (n, word) => n.toLocaleString("en-US") + " " + word + (n === 1 ? "" : "s");
+  const total = Math.round(minutes);
+  if (total < 60) return unit(Math.max(1, total), "minute");
+  const days = Math.floor(total / 1440), hours = Math.floor((total % 1440) / 60), mins = total % 60;
+  const parts = days ? [unit(days, "day"), hours && unit(hours, "hour")] : [unit(hours, "hour"), mins && unit(mins, "minute")];
+  return parts.filter(Boolean).join(" and ");
+}
+
+function update() {
+  const meters = Number(heightInput.value) * Number(unitSelect.value);
+  result.innerHTML = "";
+  const secondsPerStep = Number(paceInput.value);
+  document.getElementById("seconds-word").textContent = secondsPerStep === 1 ? "second" : "seconds";
+  timeOut.textContent = meters > 0 && secondsPerStep > 0 ? duration((OCEAN / meters) * secondsPerStep / 60) : "…";
+  if (!(meters > 0)) { result.textContent = "then it would be … steps down to the bottom of the ocean."; return; }
+  result.append("then it would be ", b(fmt(OCEAN / meters) + " steps"), " down to the bottom of the ocean.");
+}
+
+// switching units keeps the same stair: 7 inches becomes 18 cm
+unitSelect.addEventListener("change", () => {
+  const meters = Number(heightInput.value) * Number(unitSelect.dataset.last || 0.0254);
+  if (meters > 0) heightInput.value = Number((meters / Number(unitSelect.value)).toPrecision(2));
+  unitSelect.dataset.last = unitSelect.value;
+  update();
+});
+heightInput.addEventListener("input", update);
+paceInput.addEventListener("input", update);
+
+// − and + around each number box: the stair height by 1, the seconds a step by half a second, never below the box's min
+document.querySelectorAll(".step-height").forEach((input) => {
+  const box = Object.assign(document.createElement("span"), { className: "spin-box" });
+  input.before(box);
+  const button = (label, text, dir) => {
+    const btn = Object.assign(document.createElement("button"), { type: "button", className: "spin-btn", textContent: text });
+    btn.setAttribute("aria-label", label);
+    btn.addEventListener("click", () => {
+      const next = Math.max(Number(input.min) || 0, (Number(input.value) || 0) + dir * Number(input.dataset.step));
+      input.value = Number(next.toPrecision(4));
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    return btn;
+  };
+  box.append(button("Decrease", "−", -1), input, button("Increase", "+", 1));
+});
+update();
+</script>
+</body>
+</html>

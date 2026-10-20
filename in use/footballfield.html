@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="../site.css">
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.css" rel="stylesheet" />
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
@@ -1080,8 +1080,8 @@ function initMapExperience(root, options) {
 // Place and unit data (name/lat/lng/zoom/bearing) lives in places.json and
 // units.json, both tuned with football_tester.html, rather than inline here.
 Promise.all([
-  fetch("places.json").then((r) => r.json()),
-  fetch("units.json").then((r) => r.json())
+  fetch("../places.json").then((r) => r.json()),
+  fetch("../units.json").then((r) => r.json())
 ]).then(([places, units]) => {
     UNITS = units;
 

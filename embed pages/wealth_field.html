@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="site.css">
+  <link rel="stylesheet" href="../site.css">
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
   <style>
@@ -184,7 +184,7 @@
     const placeInput = document.querySelector(".place-input");
     const placeList = document.querySelector(".place-list");
     let presets = [{ name: "Levi's Stadium", center: [-121.96979950341608, 37.403187791716775] }];
-    fetch("places.json").then((r) => r.json()).then((places) => {
+    fetch("../places.json").then((r) => r.json()).then((places) => {
       presets = presets.concat(places.map((p) => ({ name: p.name, center: [p.lng, p.lat] })));
     });
     let shown = [], active = -1, searchId = 0, currentPlace = "the Grand Canyon";

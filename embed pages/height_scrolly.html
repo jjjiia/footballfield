@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="site.css">
+  <link rel="stylesheet" href="../site.css">
   <script>
     // height_scrolly.html?embed -- shown full width inside another page (scrolly.html),
     // with its slides in a column the width of that page's text
@@ -687,7 +687,7 @@
       });
     }
 
-    fetch("height_data.csv")
+    fetch("../height_data.csv")
       .then((r) => r.text())
       .then((text) => {
         parseCSV(text).forEach((d) => { byName[d.name] = d; });

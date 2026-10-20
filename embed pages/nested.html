@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="../site.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
   <script>
     // nested.html?embed -- shown inside another page (scrolly.html): no banner
@@ -150,7 +150,7 @@ b{ font-weight: 700; }
     US states and metropolitan statistical areas: U.S. Census Bureau, 2024 cartographic boundary files (land area).
     Countries: <a href="https://data.worldbank.org/indicator/AG.LND.TOTL.K2">World Bank, Land area (sq. km)</a>, 2024, and World Bank Official Boundaries.
     Lakes and reservoirs of 5,000 km² or more: <a href="https://www.hydrosheds.org/products/hydrolakes">HydroLAKES</a> (Messager et al. 2016).
-    <a href="nested_data_source.html">All areas and sources</a>.
+    <a href="../nested_data_source.html">All areas and sources</a>.
     Shapes are drawn to the same scale on an equal-area projection centered on each place.
   </p>
 <script>
@@ -164,10 +164,10 @@ b{ font-weight: 700; }
 
 <script>
 const FILES = [
-  { file: "areas/states.geojson", group: "US states" },
-  { file: "areas/msas.geojson", group: "US metro areas" },
-  { file: "areas/countries.geojson", group: "Countries" },
-  { file: "areas/lakes.geojson", group: "Lakes and reservoirs" },
+  { file: "../areas/states.geojson", group: "US states" },
+  { file: "../areas/msas.geojson", group: "US metro areas" },
+  { file: "../areas/countries.geojson", group: "Countries" },
+  { file: "../areas/lakes.geojson", group: "Lakes and reservoirs" },
 ];
 
 // d3 draws a polygon's rings clockwise; GeoJSON files wind them the other way,

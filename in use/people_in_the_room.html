@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>People in the Room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../site.css">
+  <style>
+    /* one screen: a single sentence, centered, with a box for how many people you can see */
+    html, body{ background: #FAF8F3; color: #000; }
+    body{ font-family: 'Inter', Arial, sans-serif; margin: 0; }
+    .page{
+      box-sizing: border-box;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .sentence{
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1.5;
+      text-align: center;
+      margin: 0;
+      max-width: 640px;
+    }
+    .sentence b{ font-weight: 700; }
+    /* the number box and the city dropdown inside the sentence; the number box has a − before and a + after,
+       inside one outlined box */
+    .measure{
+      font: inherit;
+      font-weight: 700;
+      color: #000;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid #000; /* underlined, not boxed, like the dropdowns */
+      padding: 0 0.2em;
+      line-height: 1.15; /* less room inside than the sentence's lines, so boxes on lines one above the other don't touch */
+    }
+    /* the dropdown drawn by the page, not the browser, so it is square everywhere (phones round the browser's corners),
+       with its own arrow */
+    select.measure{
+      border: none;
+      border-bottom: 2px solid #000; /* a dropdown is underlined, not boxed, as on the football maps */
+      max-width: 100%;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      border-radius: 0;
+      padding-right: 32px;
+      background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 10px center;
+    }
+    input.measure{ width: 2.6em; text-align: center; -moz-appearance: textfield; appearance: textfield; }
+    input.measure::-webkit-inner-spin-button, input.measure::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
+    .spin-box{ display: inline-flex; align-items: stretch; border-bottom: 2px solid #000; vertical-align: baseline; } /* underlined, like the dropdowns */
+    .spin-box input.measure{ border: none; }
+    .spin-btn{ all: unset; cursor: pointer; padding: 0 0.3em; font-weight: 700; line-height: 1.15; }
+    @media (max-width: 760px){
+      .sentence{ font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <p class="sentence">Count the people you see: <input type="number" class="measure people-seen" value="10" min="1" step="1" aria-label="People you see">. The population of <select class="measure city" aria-label="City">
+        <option value="8584629">New York</option>
+        <option value="3869089">Los Angeles</option>
+        <option value="2731585">Chicago</option>
+        <option value="2397315">Houston</option>
+        <option value="1665481">Phoenix</option>
+        <option value="1574281">Philadelphia</option>
+        <option value="1548422">San Antonio</option>
+        <option value="1406106">San Diego</option>
+        <option value="1329491">Dallas</option>
+        <option value="1002632">Austin</option>
+        <option value="826079">San Francisco</option>
+        <option value="784777">Seattle</option>
+        <option value="740613">Denver</option>
+        <option value="721074">Nashville</option>
+        <option value="693645">Washington, D.C.</option>
+        <option value="672973">Boston</option>
+        <option value="649095">Detroit</option>
+        <option value="562407" selected>Milwaukee</option>
+        <option value="430324">Minneapolis</option>
+        <option value="286233">Madison</option>
+      </select> is <b class="times">56,241</b> times who you see right now.</p>
+  </div>
+
+  <script>
+    // each city's population is its option's value: US Census Bureau estimates for July 1, 2025 (Vintage 2025)
+    const seen = document.querySelector(".people-seen");
+    const city = document.querySelector(".city");
+    function update() {
+      const people = Number(seen.value);
+      document.querySelector(".times").textContent = people > 0 ? Math.round(Number(city.value) / people).toLocaleString() : "…";
+    }
+    seen.addEventListener("input", update);
+
+    // a dropdown is as wide as its longest option; size it to the one picked instead
+    const sizer = document.createElement("span");
+    sizer.style.cssText = "position:absolute;visibility:hidden;white-space:pre;left:-9999px;top:0";
+    document.body.appendChild(sizer);
+    function fitSelect() {
+      const cs = getComputedStyle(city);
+      sizer.style.font = cs.font;
+      sizer.textContent = city.selectedOptions[0].textContent;
+      // the text, plus the box's own padding (the right side holds the arrow) and borders, at whatever size the text is
+      const extra = ["paddingLeft", "paddingRight", "borderLeftWidth", "borderRightWidth"].reduce((sum, k) => sum + parseFloat(cs[k]), 0);
+      city.style.width = Math.ceil(sizer.getBoundingClientRect().width + extra + 2) + "px";
+    }
+    city.addEventListener("change", () => { fitSelect(); update(); });
+    fitSelect();
+    if (document.fonts) document.fonts.ready.then(fitSelect);
+    window.addEventListener("resize", fitSelect); // the embedding page can change the text size, then sends a resize
+
+    // − and + around the number box, stepping by its step and never below its min
+    document.querySelectorAll("input.measure[type=number]").forEach((input) => {
+      const box = document.createElement("span");
+      box.className = "spin-box";
+      input.before(box);
+      const button = (label, text, dir) => {
+        const b = Object.assign(document.createElement("button"), { type: "button", className: "spin-btn", textContent: text });
+        b.setAttribute("aria-label", label);
+        b.addEventListener("click", () => {
+          const step = Number(input.step) || 1;
+          input.value = Math.max(Number(input.min) || 0, (Number(input.value) || 0) + dir * step);
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+        return b;
+      };
+      box.append(button("Decrease", "−", -1), input, button("Increase", "+", 1));
+    });
+    update();
+  </script>
+</body>
+</html>
