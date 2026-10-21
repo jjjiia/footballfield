@@ -21,7 +21,7 @@
     /* Inter — the open-source base of Guggenheim Sans */
     body{ font-family: 'Inter', Arial, sans-serif; background: #FAF8F3; }
     /* every sentence is a cell in a 3-column grid that fills exactly one window, separated by black lines;
-       the window is split into 40 tracks, the top 20 for the first six cells and the bottom 20 for the other seven */
+       the window is split into 40 tracks, shared out down each column in proportion to how long each sentence runs */
     body{ overflow: hidden; }
     .inner{
       max-width: none;
@@ -54,19 +54,20 @@
     /* the center column is split in proportion to how long each sentence runs: walk, forget, hair, give away */
     .cell-walk{ grid-column: 2; grid-row: 1 / span 16; }
     .cell-forget{ grid-column: 2; grid-row: 17 / span 6; }
-    /* "if you drink" sits top right, 1.2 cells tall, with "if you pay" under it at 0.8 */
-    .cell-drink{ grid-column: 3; grid-row: 1 / span 12; }
-    .cell-rent{ grid-column: 3; grid-row: 13 / span 8; }
+    /* "if you drink" sits top right, with "if you pay" under it; the right column holds five cells, down to "if you make a mistake" */
+    .cell-drink{ grid-column: 3; grid-row: 1 / span 10; }
+    .cell-rent{ grid-column: 3; grid-row: 11 / span 8; }
     /* bottom half: the short sentences get less room, the long ones more */
     .cell-climb{ grid-column: 1; grid-row: 19 / span 6; }
     .cell-restaurant{ grid-column: 1; grid-row: 25 / span 7; }
     .cell-sleep{ grid-column: 1; grid-row: 32 / span 9; }
     .cell-hair{ grid-column: 2; grid-row: 23 / span 12; }
     .cell-savings{ grid-column: 2; grid-row: 35 / span 6; }
-    .cell-people{ grid-column: 3; grid-row: 21 / span 11; }
-    .cell-park{ grid-column: 3; grid-row: 32 / span 9; }
+    .cell-people{ grid-column: 3; grid-row: 19 / span 9; }
+    .cell-park{ grid-column: 3; grid-row: 28 / span 7; }
+    .cell-mistake{ grid-column: 3; grid-row: 35 / span 6; }
     /* the bottom row's own bottom border would sit just past the window */
-    .cell-sleep, .cell-savings, .cell-park{ border-bottom: none; }    .madlib{
+    .cell-sleep, .cell-savings, .cell-mistake{ border-bottom: none; }    .madlib{
       box-sizing: border-box;
       width: 100%;
       padding: 16px 22px;
@@ -148,6 +149,7 @@
     #talkAmountInput{ width: 2.14em; }
     #parkActivityInput{ width: 5.71em; max-width: 100%; }
     #parkFrequencyInput, #parkYearsInput{ width: 2.14em; }
+    #mistakeFrequencyInput, #mistakeYearsInput{ width: 2.14em; }
     #dinnerNightsInput, #kidAgeInput{ width: 2.14em; }
     #climbAmountInput{ width: 2.86em; }
     #glassesInput{ width: 2.14em; }
@@ -454,6 +456,15 @@
           <option value="month">month</option>
           <option value="year">year</option>
         </select>, in the next <input type="number" id="parkYearsInput" class="blank-input" value="20" min="1" step="1"> years, you will <span id="parkActivityMirror">go to the park</span> <span class="result" id="parkTimes">–</span> times.
+      </p>
+    </section>
+
+    <section class="slide cell-mistake pal-1">
+      <p class="madlib">
+        If you <select id="mistakeActionSelect" class="inline-select">
+          <option value="make a mistake" selected>make a mistake</option>
+          <option value="do the right thing">do the right thing</option>
+        </select> <input type="number" id="mistakeFrequencyInput" class="blank-input" value="1" min="0" step="1"> <span id="mistakeFrequencyNoun">time</span> a day, in the next <input type="number" id="mistakeYearsInput" class="blank-input" value="20" min="1" step="1"> years, you will <span id="mistakeActionMirror">make a mistake</span> <span class="result" id="mistakeTimes">–</span> times.
       </p>
     </section>
 
@@ -877,6 +888,29 @@
     parkPeriodSelect.addEventListener("change", updatePark);
     parkYearsInput.addEventListener("input", updatePark);
     updatePark();
+
+    // ---- "if you make a mistake 1 time a day..." ----
+    const mistakeActionSelect = document.getElementById("mistakeActionSelect");
+    const mistakeActionMirror = document.getElementById("mistakeActionMirror");
+    const mistakeFrequencyInput = document.getElementById("mistakeFrequencyInput");
+    const mistakeFrequencyNoun = document.getElementById("mistakeFrequencyNoun");
+    const mistakeYearsInput = document.getElementById("mistakeYearsInput");
+    const mistakeTimes = document.getElementById("mistakeTimes");
+
+    function updateMistakes() {
+      mistakeActionMirror.textContent = mistakeActionSelect.value;
+
+      const perDay = Number(mistakeFrequencyInput.value) || 0;
+      mistakeFrequencyNoun.textContent = pluralize(perDay, "time", "times");
+      const years = Number(mistakeYearsInput.value) || 0;
+
+      mistakeTimes.textContent = Math.round(perDay * DAYS_PER_YEAR * years).toLocaleString();
+    }
+
+    mistakeActionSelect.addEventListener("change", updateMistakes);
+    mistakeFrequencyInput.addEventListener("input", updateMistakes);
+    mistakeYearsInput.addEventListener("input", updateMistakes);
+    updateMistakes();
 
     // ---- "if you eat dinner with your kid 5 nights a week..." ----
     const dinnerNightsInput = document.getElementById("dinnerNightsInput");

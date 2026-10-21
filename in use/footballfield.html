@@ -12,41 +12,15 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.css" rel="stylesheet" />
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
-  <script>
-    // footballfield.html?embed -- shown inside another page (scrolly.html): no banner, map fills the frame
-    if (new URLSearchParams(location.search).has("embed")) document.documentElement.classList.add("embed");
-  </script>
   <style>
     html, body { height: 100%; }
-
-.embed .top-banner{ display: none; }
-.embed .map-wrapper{ height: 100vh; }
-
-/* top banner, calculators' font, off-white on black */
-.top-banner{
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  box-sizing: border-box;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  background: #000;
-  color: #FAF8F3;
-  font-family: 'Inter', Arial, sans-serif;
-  font-weight: 400;
-  font-size: 20px;
-  letter-spacing: 1px;
-  padding: 0 20px;
-  margin: 0;
-}
 
 .map-scrolly{
   position: relative;
 }
 .map-wrapper{
   position: relative;
-  height: calc(100vh - 56px); /* fills the screen under the banner */
+  height: 100vh; /* fills the screen */
   overflow: hidden;
 }
 /* map starts in black and white; switches to color once a dropdown is used */
@@ -299,8 +273,6 @@
 </style>
 </head>
 <body>
-
-<h1 class="top-banner">Football field map</h1>
 
 <div class="map-scrolly" id="map-scrolly-2">
   <div class="map-wrapper">
