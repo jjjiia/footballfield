@@ -186,7 +186,7 @@
   border: none;
   border-bottom: 2px solid #000;
   border-radius: 0;
-  padding: 0 4px;
+  padding: 0 4px 0 0;
 }
 .draw-name{ width: 100%; box-sizing: border-box; font-weight: 300; }
 .draw-map{ width: 100%; height: 300px; }
@@ -374,6 +374,16 @@ function populateUnitSelect(selectEl, units) {
       group.appendChild(option);
     });
     selectEl.appendChild(group);
+  });
+}
+
+// Plural of a name typed into "Make your own" ("my backyard" -> "my backyards"):
+// pluralizes the last word only.
+function pluralize(name) {
+  return name.replace(/(\w+)$/, (w) => {
+    if (/[^aeiou]y$/i.test(w)) return w.slice(0, -1) + "ies";
+    if (/(s|x|z|ch|sh)$/i.test(w)) return w + "es";
+    return w + "s";
   });
 }
 
@@ -979,7 +989,7 @@ function initMapExperience(root, options) {
           key: "custom",
           label: name,
           singular: name,
-          plural: name,
+          plural: pluralize(name),
           shape: "polygon",
           points: pts,
           areaM2: polygonAreaMeters2(pts),
@@ -1015,8 +1025,8 @@ function initMapExperience(root, options) {
         setCustomUnit({
           key: "custom",
           label: amount,
-          singular: amount,
-          plural: amount,
+          singular: "square of " + amount,
+          plural: "squares of " + amount,
           widthM: side,
           lengthM: side
         });

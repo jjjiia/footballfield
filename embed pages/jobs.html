@@ -407,7 +407,8 @@ Promise.all([
   // grey out professions not counted in this place, and places that don't count this profession
   profCombo.isDisabled = (p) => !countsIn(areaCombo.get())[p];
   areaCombo.isDisabled = (a) => !countsIn(a)[profCombo.get()];
-  profCombo.set(job.dataset.profession);
+  // jobs.html?profession=dancer starts on that profession instead of teachers
+  profCombo.set(new URLSearchParams(location.search).get("profession") || job.dataset.profession);
   areaCombo.set("US");
 
   function update() {

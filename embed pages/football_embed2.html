@@ -139,10 +139,17 @@
   border: none;
   border-bottom: 2px solid #000;
   border-radius: 0;
-  padding: 0 4px;
+  padding: 0 4px 0 0;
 }
 .draw-name{ width: 100%; box-sizing: border-box; font-weight: 300; }
 .draw-map{ width: 100%; height: 300px; }
+/* the draw map's search: a box over the map, and the places found in a list under it, over the map */
+.draw-search{ position: relative; width: 100%; }
+.draw-search-input{ width: 100%; box-sizing: border-box; font: inherit; font-weight: 300; color: #000; background: transparent; border: none; border-bottom: 2px solid #000; border-radius: 0; padding: 0 4px; }
+.draw-search-list{ position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 5; margin: 0; padding: 4px 0; list-style: none; background: #FAF8F3; border: 2px solid #000; font-size: 16px; max-height: 200px; overflow-y: auto; }
+.draw-search-list[hidden]{ display: none; }
+.draw-search-list li{ padding: 4px 10px; cursor: pointer; }
+.draw-search-list li:hover, .draw-search-list li.active{ background: #000; color: #FAF8F3; }
 .draw-tools{ width: 100%; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 16px; }
 .custom-buttons{ width: 100%; display: flex; gap: 12px; }
 .custom-buttons button, .custom-tabs button, .draw-tools button{
@@ -195,7 +202,7 @@
         <button type="button" data-tab="draw" aria-pressed="false">Draw a shape</button>
       </div>
       <form class="custom-form area-form" data-panel="area">
-        <input class="custom-number" type="number" min="0" step="any" value="100" required aria-label="Amount">
+        <input class="custom-number" type="number" min="0" step="any" value="1000" required aria-label="Amount">
         <select class="unit-select custom-area-unit" aria-label="Area unit"></select>
         <div class="custom-buttons">
           <button type="submit">Use it</button>
@@ -204,6 +211,10 @@
       </form>
       <form class="custom-form draw-form" data-panel="draw" hidden>
         <input class="draw-name" type="text" placeholder="Name your shape" aria-label="Name">
+        <div class="draw-search">
+          <input class="draw-search-input" type="text" placeholder="Search for a place" aria-label="Search for a place" autocomplete="off">
+          <ul class="draw-search-list" hidden></ul>
+        </div>
         <div class="draw-map"></div>
         <div class="draw-tools">
           <span class="draw-hint">Click on the map to add corners.</span>
@@ -395,8 +406,16 @@ function updateAreaText() {
 
 let gridOn = false;
 const gridNote = document.querySelector(".grid-note");
+// The outline only changes when the center, the turn or the unit does, not the zoom. Sending Mapbox the same shape on
+// every frame of a zoom made it redo the shape each time, in the middle of loading imagery, and the moves stuttered;
+// so it is sent only when it has changed
+let lastField = "";
 function redraw() {
-  map.getSource("field").setData({ type: "FeatureCollection", features: [fieldFeature(map)] });
+  const field = JSON.stringify(fieldFeature(map));
+  if (field !== lastField) {
+    lastField = field;
+    map.getSource("field").setData({ type: "FeatureCollection", features: [JSON.parse(field)] });
+  }
   if (gridOn) map.getSource("grid").setData({ type: "FeatureCollection", features: gridFeatures(map) });
   // a coarser grid says so
   gridNote.hidden = !(gridOn && gridScale > 1);
@@ -601,6 +620,16 @@ function unitFitZoom() {
 
 // ---- "Make your own…": a unit of any area (drawn as a square) or a shape drawn on a small map, as on
 // footballfield.html; it joins the dropdown, above "Make your own…" ----
+// Plural of a name typed into "Make your own" ("my backyard" -> "my backyards"):
+// pluralizes the last word only.
+function pluralize(name) {
+  return name.replace(/(\w+)$/, (w) => {
+    if (/[^aeiou]y$/i.test(w)) return w.slice(0, -1) + "ies";
+    if (/(s|x|z|ch|sh)$/i.test(w)) return w + "es";
+    return w + "s";
+  });
+}
+
 const AREA_UNITS = [
   ["sqft", "square foot", "square feet", 0.09290304],
   ["sqyd", "square yard", "square yards", 0.83612736],
@@ -623,7 +652,7 @@ const customForm = document.querySelector(".area-form");
 const customNumber = document.querySelector(".custom-number");
 const customAreaUnit = document.querySelector(".custom-area-unit");
 AREA_UNITS.forEach(([key, , plural]) => customAreaUnit.appendChild(new Option(plural, key)));
-customAreaUnit.value = "acre";
+customAreaUnit.value = "sqft"; // 1000 square feet to start
 let customUnit = null;
 
 function setCustomUnit(u) {
@@ -671,6 +700,53 @@ function redrawDrawn() {
   const src = drawMap && drawMap.getSource("drawn");
   if (src) src.setData(drawnData());
 }
+// the draw map's search: Mapbox's Search Box search once two letters are typed (it knows landmarks and buildings, like
+// the Eiffel Tower, as well as addresses and places), nearer places first; clicking a place, or Enter for the first,
+// moves the draw map there (the corners already added stay where they are)
+const drawSearch = document.querySelector(".draw-search-input");
+const drawSearchList = document.querySelector(".draw-search-list");
+let drawResults = [], drawSearchId = 0, drawSearchTimer = null;
+function showDrawResults(results) {
+  drawResults = results;
+  drawSearchList.innerHTML = "";
+  results.forEach((place, i) => {
+    const li = Object.assign(document.createElement("li"), { textContent: place.place_name });
+    li.addEventListener("mousedown", (e) => { e.preventDefault(); goToDrawResult(i); }); // before the box loses focus
+    drawSearchList.appendChild(li);
+  });
+  drawSearchList.hidden = !results.length;
+}
+function goToDrawResult(i) {
+  const place = drawResults[i];
+  if (!place || !drawMap) return;
+  if (place.bbox) drawMap.fitBounds([[place.bbox[0], place.bbox[1]], [place.bbox[2], place.bbox[3]]], { padding: 20, maxZoom: 17, duration: 0 });
+  else drawMap.jumpTo({ center: place.center, zoom: 16 });
+  drawSearch.value = place.text;
+  showDrawResults([]);
+}
+drawSearch.addEventListener("input", () => {
+  clearTimeout(drawSearchTimer);
+  const words = drawSearch.value.trim();
+  if (words.length < 2) { showDrawResults([]); return; }
+  drawSearchTimer = setTimeout(() => {
+    const id = ++drawSearchId;
+    fetch(`https://api.mapbox.com/search/searchbox/v1/forward?q=${encodeURIComponent(words)}&limit=5&proximity=ip&access_token=${mapboxgl.accessToken}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (id !== drawSearchId || document.activeElement !== drawSearch) return;
+        showDrawResults((data.features || []).map((f) => {
+          const where = f.properties.place_formatted || f.properties.full_address || "";
+          return { text: f.properties.name, place_name: f.properties.name + (where ? ", " + where : ""), center: f.geometry.coordinates, bbox: f.properties.bbox };
+        }));
+      })
+      .catch(() => {});
+  }, 250);
+});
+drawSearch.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") { e.preventDefault(); goToDrawResult(0); } // not "Use it": Enter here searches
+});
+drawSearch.addEventListener("blur", () => showDrawResults([]));
+
 function openDrawMap() {
   if (drawMap) { drawMap.resize(); return; }
   // it opens on the Hyatt Regency in downtown Milwaukee, Wisconsin (333 W Kilbourn Ave), at the units map's zoom
@@ -705,7 +781,7 @@ drawForm.addEventListener("submit", (e) => {
   const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
   pts = pts.map(([x, y]) => [x - (minX + maxX) / 2, y - (minY + maxY) / 2]);
   setCustomUnit({
-    key: "custom", label: name, singular: name, plural: name,
+    key: "custom", label: name, singular: name, plural: pluralize(name),
     shape: "polygon", points: pts, areaM2: polygonAreaMeters2(pts), widthM: maxX - minX, lengthM: maxY - minY
   });
 });
@@ -717,7 +793,7 @@ customForm.addEventListener("submit", (e) => {
   const [, one, many, m2] = AREA_UNITS.find((a) => a[0] === customAreaUnit.value);
   const amount = n.toLocaleString() + " " + (n === 1 ? one : many);
   const side = Math.sqrt(n * m2);
-  setCustomUnit({ key: "custom", label: amount, singular: amount, plural: amount, widthM: side, lengthM: side });
+  setCustomUnit({ key: "custom", label: amount, singular: "square of " + amount, plural: "squares of " + amount, widthM: side, lengthM: side });
 });
 
 function closeCustomPopup() { customPopup.hidden = true; }

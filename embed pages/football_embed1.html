@@ -418,8 +418,16 @@ function updateAreaText() {
 
 let gridOn = false;
 const gridNote = document.querySelector(".grid-note");
+// The outline only changes when the center, the turn or the unit does, not the zoom. Sending Mapbox the same shape on
+// every frame of a zoom made it redo the shape each time, in the middle of loading imagery, and the moves stuttered;
+// so it is sent only when it has changed
+let lastField = "";
 function redraw() {
-  map.getSource("field").setData({ type: "FeatureCollection", features: [fieldFeature(map)] });
+  const field = JSON.stringify(fieldFeature(map));
+  if (field !== lastField) {
+    lastField = field;
+    map.getSource("field").setData({ type: "FeatureCollection", features: [JSON.parse(field)] });
+  }
   if (gridOn) map.getSource("grid").setData({ type: "FeatureCollection", features: gridFeatures(map) });
   // a coarser grid says so
   gridNote.hidden = !(gridOn && gridScale > 1);
