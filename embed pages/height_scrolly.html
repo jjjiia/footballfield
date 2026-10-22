@@ -268,6 +268,16 @@
       <div class="stage"></div>
     </section>
 
+    <section class="slide" data-names="Statue of Liberty, statue alone|Hyperion, coast redwood, California" data-labels="Statue of Liberty|Tallest tree" data-captions="9 giraffes|22 giraffes">
+      <p class="sentence">The tallest tree in the world is about 22 giraffes.</p>
+      <div class="stage"></div>
+    </section>
+
+    <section class="slide" data-names="Statue of Liberty, statue alone|Hyperion, coast redwood, California|Empire State Building, to the tip" data-labels="Statue of Liberty|Tallest tree|Empire State Building" data-captions="9 giraffes|22 giraffes|86 giraffes">
+      <p class="sentence">And the Empire State Building is 86 giraffes.</p>
+      <div class="stage"></div>
+    </section>
+
     <section class="slide crowded axis" data-names="James Michael, giraffe|Grand Canyon, deepest point|Mount Everest|Average ocean depth|Sauroposeidon, dinosaur|Typical airliner cruise|Crater Lake|Hyperion, coast redwood, California|Empire State Building, to the tip|Statue of Liberty, statue alone" data-labels="James Michael|Deepest part of the Grand Canyon|Mount Everest|Average ocean depth|Tallest dinosaur|Airplanes fly at|Crater Lake|Tallest tree|Empire State Building|Statue of Liberty">
       <p class="sentence">Let's measure some things in<br><select class="measure" aria-label="Measure in">
           <option value="James Michael, giraffe" data-plural="giraffes" selected>giraffes</option>
@@ -332,7 +342,9 @@
       const cs = getComputedStyle(select);
       selectSizer.style.font = cs.font;
       selectSizer.textContent = select.selectedOptions[0].textContent;
-      select.style.width = Math.ceil(selectSizer.getBoundingClientRect().width) + 40 + "px"; // room for the arrow
+      // room for the arrow and padding (40px), and 16px to spare: Safari draws a dropdown's text a little wider than
+      // it measures, and without it the end of the word goes under the arrow
+      select.style.width = Math.ceil(selectSizer.getBoundingClientRect().width) + 56 + "px";
     }
     // a picked unit with a note (Robert Wadlow: who he is) shows it under the sentence
     document.querySelectorAll("select.measure").forEach((select) => {
@@ -350,6 +362,8 @@
       select.addEventListener("change", () => { fitSelect(select); drawSlides(); });
     });
     if (document.fonts) document.fonts.ready.then(() => document.querySelectorAll("select.measure").forEach(fitSelect));
+    // and again when the window changes size, or when an embedding page changes the text size and says so with a resize
+    window.addEventListener("resize", () => document.querySelectorAll("select.measure").forEach(fitSelect));
     // − and + around each number box, stepping by its step and staying within its min and max
     document.querySelectorAll("input.measure[type=number]").forEach((input) => {
       const box = document.createElement("span");
@@ -610,6 +624,15 @@
         });
       }, { threshold: 0.5 });
       slides.forEach((slide) => observer.observe(slide));
+    }
+
+    // height_scrolly.html?embed&step=N&labels=A|B -- step N on its own, with these labels on its lines in place of its own
+    // (a line break, %0A, starts a label's second line); presentation.html uses it
+    {
+      const params = new URLSearchParams(location.search);
+      const step = Number(params.get("step")), labels = params.get("labels");
+      const slide = step > 0 && labels && document.querySelectorAll(".inner > .slide")[step - 1];
+      if (slide) slide.dataset.labels = labels;
     }
 
     function drawSlides() {

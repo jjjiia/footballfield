@@ -291,6 +291,16 @@ function makeCombo(root, label, items, onPick) {
   return combo;
 }
 
+// nested.html?embed&steps=US states|44,Lakes and reservoirs|1 -- the unit steps through these places: the embedding
+// page sends { footballStep: n } as it scrolls (as to the football maps), and the unit becomes the nth place. A step
+// sent before the places have loaded waits for them
+const STEP_UNITS = new URLSearchParams(location.search).get("steps")?.split(",");
+let showStep = null, pendingStep = null;
+if (STEP_UNITS) window.addEventListener("message", (e) => {
+  if (!e.data || typeof e.data.footballStep !== "number") return;
+  if (showStep) showStep(e.data.footballStep); else pendingStep = e.data.footballStep;
+});
+
 Promise.all(FILES.map(f => d3.json(f.file))).then(datas => {
   const places = new Map();
   const items = [];
@@ -346,6 +356,14 @@ Promise.all(FILES.map(f => d3.json(f.file))).then(datas => {
 
   window.addEventListener("resize", () => { thing.fit(); unit.fit(); draw(); });
   draw();
+
+  if (STEP_UNITS) {
+    showStep = (n) => {
+      const key = STEP_UNITS[Math.max(0, Math.min(STEP_UNITS.length - 1, n))];
+      if (places.has(key) && key !== unit.get()) { unit.set(key); draw(); }
+    };
+    if (pendingStep !== null) showStep(pendingStep);
+  }
 });
 </script>
 </body>

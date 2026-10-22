@@ -510,6 +510,10 @@ function prefetchViews(views) {
   box.style.cssText = `position:fixed; left:-10000px; top:0; width:${mapDiv.clientWidth}px; height:${mapDiv.clientHeight}px;`;
   document.body.appendChild(box);
   const ghost = new mapboxgl.Map({ container: box, style: STYLE, center: views[0].center, zoom: views[0].zoom, bearing: views[0].bearing || 0, interactive: false });
+  // Mapbox puts a token in every imagery address, a different one for each map; without the on-screen map's token
+  // here, this map fetches addresses the on-screen map never asks for, and none of it is reused
+  ghost._requestManager._skuToken = map._requestManager._skuToken;
+  ghost._requestManager._skuTokenExpiresAt = map._requestManager._skuTokenExpiresAt;
   const settle = () => Promise.race([new Promise((resolve) => ghost.once("idle", resolve)), new Promise((r) => setTimeout(r, 5000))]);
   ghost.once("load", async () => {
     for (const view of views) {

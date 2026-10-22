@@ -1,0 +1,179 @@
+Idiosyncratic and colloquial (title tk)
+
+I changed the way I think about scale when my son asked how many seconds it was until the weekend. The length of one second is a tangible thing to a child, equivalent to a tick-tock sound he can make on his own. Similarly, explanations of large numbers usually worked only when they started with the small and personal — the size of his room, the distance walked every morning to school, the height of scaffolding he likes to climb.
+
+When I trim my son’s nails, I like to hold up a sliver of baby fingernail and say, “this is how much the tectonic plates have moved since we last cut your nails,” all because I read in a decade-old article that “Continents Split Up at the Same Speed Finger Nails Grow.”[1] That factoid stayed with me because the sentence connected this global phenomenon so effectively to my literal fingertip. It reminds me that nothing would be too big or small to build a relationship with, if only we had the right unit of measurement.
+
+Measurement is “the correlation of some target to some comparator or unit.”[2]
+
+Many units of measurement originate in our own bodies: hand, foot, hair, nose, thumb, finger, arm, step. In some cultures they still persist against standards. It is perhaps not only more intuitive but also logical to use our biological attributes as units. After all, part of the world we aim to measure — our built environment — grows out of the human body as its base unit.
+
+Standardized units and systems of measurement are about human communication. While units often have to be separated from their human origins in order to function properly, a shared unit builds connection between two acts of measurement. It does not matter how different the things we measure are. By measuring them we impose the structural system that forces them into existing in the same space.
+
+A colloquial unit both precedes and follows systems of standardized units. Older humanistic units persist today not because of their ability to resist standards, but rather due to their power to manipulate the narrative of standards. These units live where dollars, meters, miles, and the world of feet, hairs, and nails coexist.
+
+Let’s start with a football field.
+
+This is a map that measures the area that is in view in football fields.
+
+Football field map
+
+Maybe your game is baseball, or soccer instead. Maybe your base unit is a place you know really well.
+
+Sports fields map
+
+“The size of Texas”
+
+Some measurements are vague on purpose. They are concepts rather than units of measurements. For example, an asteroid or an iceberg is often a Texas.
+
+Nesting map
+
+Sometimes comparisons can stick, but they remain trivia, and may not bring us any closer to the object of comparison.
+
+Population nesting
+
+There are as many teachers in Abilene, Texas as there are DJs in the whole United States.
+
+We have a large capacity to keep adding context by incorporating the unprecedented amount of data at our fingertips. We can connect them in a million ways in an attempt to generate a single meaningful connection. We can keep generating context until one clicks and becomes part of our experience.
+
+Jobs
+
+Giraffes
+
+Sometimes comparisons take you further rather than closer to the objects you are comparing. When expanding and going outwards fail, another way is to reset and start from the small again. There are analog tools that people use to measure and record. For example, this tape measure is used by carpenters to write notes to themselves of what they have measured.
+
+FastCap ProCarpenter Story Pole tape measure
+
+The same tape measure is also used by parents as a consistent and portable tool to track a child’s growing height. When my son stands at the top of the slide, it is the highest point he can get to in the park, and he is just a little taller than the adult male giraffe James Michael, one of the tallest giraffes currently living in the Bronx zoo.
+
+The slide at Travers Park is 12ft
+
+You on the slide, next to the giraffe
+
+Giraffes standing on each other's heads, next to the Statue of Liberty
+
+Measure some things in giraffes
+
+Steps
+
+When we walk to school, it is 3 city blocks that take about 600 steps, and anywhere between 6 and 30 minutes depending on the day.
+
+If we do it every day, where will we end up at the end of the year?
+
+Steps across
+
+Find a staircase
+
+Measure a stair. If it is 8 inches tall, then it would be 9,139 steps down to the deepest part of the Grand Canyon, or 18,120 to the bottom of the ocean.
+
+Stairs
+
+Count the people in this room
+
+People in the room
+
+Find a thing you already do.
+
+And grow it in scale or shrink it down to size.
+
+Grid of calculators
+
+The size of an atom
+
+Yet all these analogies and translations did not prepare me for when, one afternoon last spring, my son asked me about the size of an atom. It is too small, and I never knew how small. I can say there are a million atoms across a strand of hair, but it doesn’t mean a lot, not even to me. So we started with what we knew how to connect with, a second and a step.
+
+Count atoms
+
+Atoms in steps
+
+Other very large numbers
+
+Wealth in football fields
+
+If an atom was a dollar, then a grain of sand would be all the money in the world × 35,000.
+
+If an atom is a person, then the population of the world would fit in a grain of sand a million times.
+
+If $1 was a hair, then the average American's wealth would be about 2 heads of hair, and Elon Musk's would be every head of hair in Hungary.
+
+If each second is $100, then the average American's net worth is a newborn baby 36 minutes old, and Jeff Bezos's is the oldest person alive in the world, 117 years old.
+
+These are absurd comparisons. But the problem here is not the atom. It is the vast discrepancies that exist in supposedly human scaled numbers. We face increasingly large numbers when we read about extreme wealth, rising temperatures, the scope of casual surveillance, and the size of a natural language model's corpora. When we measure something, it is with the implicit understanding that a thing has value and can be measured. When we try to explain the absurd, we might accidentally become complicit in its justification by placing it in the same realm as the tactile and everyday. Connecting with large numbers is about finding the right units, but it is also an exercise in accepting that some numbers defy explanation, and that is its measure.
+
+End
+
+Maps list
+
+• Football field
+• Nesting
+• Population nesting
+• Jobs
+• Heights
+• Steps across
+• Stairs
+• People in the room
+• Things you can do
+• Atoms in seconds
+• Atoms in steps
+
+Notes – UNFINISHED
+
+1. Intro. The New York Times, “Continents Split Up at the Same Speed Finger Nails Grow” (July 23, 2016).
+2. Measurement. Kaaronen, Manninen, and Eronen, “Body-based units of measure in cultural evolution,” Science (2023).
+3. Map 3, nesting. Areas are land area, leaving out water; lakes and reservoirs are water surface area. US states and metropolitan statistical areas: U.S. Census Bureau, 2024 cartographic boundary files (land area). Countries: World Bank, Land area (sq. km), 2024, and World Bank Official Boundaries. Lakes and reservoirs of 5,000 km² or more: HydroLAKES (Messager et al. 2016). All areas and sources. Shapes are drawn to the same scale on an equal-area projection centered on each place.
+4. Map 4, population nesting. Counts of people from Wikidata: country populations, language speakers, Instagram followers, yearly visitors and passengers, venue capacity, and a few others. Each count under a dropdown links to its Wikidata entry. Wikidata is edited by volunteers, so dates and methods vary from count to count. Left out: visitor and passenger counts under 1,000 a year (wrong in Wikidata), entries with no name, and vaccination and view counts (they count doses and views, not people). Data: people_counts.json.
+5. Map 5, jobs. United States: U.S. Census Bureau, American Community Survey 2020–2024 5-year estimates, table B24114, Detailed Occupation for the Civilian Employed Population 16 Years and Over; occupations are grouped into professions in census_occupation_mapping.json. States and metro areas: U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics, May 2025 state and metropolitan area estimates; occupations are grouped into professions in occupation_mapping.json. Not all areas have published numbers for all occupations.
+6. Map 10, stairs. Depths, from the heights data: average ocean depth 3,682 m (12,080 ft), NOAA.
+7. Conclusion. The average American: the median family net worth, $215,900, from the Federal Reserve’s 2025 Survey of Consumer Finances, press release, October 9, 2026, and “Changes in U.S. Family Finances from 2022 to 2025”; the mean is $1.24 million. Reported by CBS News, Yahoo Finance and Quartz. The 2022 survey: “Changes in U.S. Family Finances from 2019 to 2022”, October 2023, median $192,900. Elon Musk’s net worth, about $970 billion (Bloomberg $966.5 billion, Forbes about $977 billion, October 13, 2026), and Jeff Bezos’s, about $370 billion (Forbes, October 2, 2026); both change daily. Hungary, about 9.5 million people (Hungarian Central Statistical Office, end of 2025). The oldest person alive, Ethel Caterham, born August 21, 1909, 117 years old, Guinness World Records. About 100,000 hairs on a head.
+8. Map 12, things you already do.
+• If you pay rent: Assumes 12 months, 365 days and 8,760 hours per year.
+• If you drink water: A glass: An 8-oz glass; eight glasses is half a gallon a day. A bathtub: ~40 gallons; household tubs hold 30–60. An Olympic pool: 50 m × 25 m × 2 m deep, ~660,000 gallons. The Central Park Reservoir: The reservoir's earthen embankment has a storage capacity of 1,040 million gallons. Every New Yorker: 8,584,629 people, the Census Bureau's July 2025 estimate for New York City.
+• If you eat dinner with your kid: Assumes 52 weeks (12 months) per year, counted from birth to their 18th birthday.
+• If you climb stairs: To the 86th-floor observatory, ~1,050 ft up. Counting flights, that's ~105 at the fitness-tracker convention of ~10 ft per flight. Counting stairs, it's the 1,576 steps of the annual Empire State Building Run-Up.
+• If you talk to a new person: Time: Assumes 60 seconds/minute, 60 minutes/hour, 7 days/week, 30 days/month, 365 days/year. Cities: City-proper populations from Wikipedia's List of largest cities by population in 2026.
+• If you go to a new restaurant: 12,526 food establishments in Manhattan, per NYC DOHMH restaurant inspection data.
+• If you sleep: A month is calculated as 30 days.
+
+References
+
+Objects
+
+1. FastCap, "Pro Carpenter Tape Measures"
+2. CW&T, "Time Since Launch," Kickstarter
+3. 5 year diary
+
+Links
+
+1. Giorgia Lupi, "Data Humanism, My Manifesto for a New Data Wold"
+2. Not a Ship, "Large Numbers"
+3. Worldometer
+4. Odds of Dying
+5. David Aldous, "What really has a 1 in a million chance?"
+6. USGS, "How fast do tectonic plates move?"
+7. The New York Times, on continental drift and tectonic plates (2016)
+8. Charles and Ray Eames, "Powers of Ten" (1977)
+9. Josh Worth, "If the Moon Were Only 1 Pixel"
+10. Lord of Maps, "Highest Mountains"
+11. KEDM, "Why do we measure wetlands loss in football fields?" (2015): “Louisiana loses a football field of land every hour to coastal erosion.”
+12. Merriam-Webster, "Cubit"
+13. Wikipedia, "Biblical and Talmudic units of measurement"
+14. Cornell University Library Digital Collections
+15. Wikipedia, "Hair's breadth"
+16. Wikipedia, "List of human-based units of measurement"
+17. Wikipedia, "List of non-coherent units of measurement"
+18. Kaaronen, Manninen, and Eronen, "Body-based units of measure in cultural evolution," Science (2023)
+19. HiMommy, "Comparing Your Baby's Size to Animals: A Delightful Guide to Fetal Development"
+20. National Nanotechnology Initiative, "Just How Small Is 'Nano'?": “A human hair is approximately 80,000–100,000 nanometers wide.” “A single gold atom is about a third of a nanometer in diameter.”*
+
+* 1,000,000 atoms across a hair is a high estimate of atoms.
+
+21. The Washington Post, wealth comparison graphic (2020)
+22. Mona Chalabi, "9 Ways to Imagine Jeff Bezos' Wealth," The New York Times Magazine (2022)
+23. Elon's net worth today
+24. neal.fun
+25. Ronny Coste, "Wealth, shown to scale"
+26. xkcd, "Million, Billion, Trillion" (#2091)
+27. NPR, "To Make Sense, Put Numbers Into Context" (2008)
+28. Steven Strogatz, "Me, Myself and Math," The New York Times Opinionator (2012)
+29. Wikipedia, "Numerical cognition"
+30. GIJN, "Data Reporting Don'ts: Tips to Avoid Misleading Numbers"

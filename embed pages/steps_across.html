@@ -18,15 +18,17 @@
     /* the map fills the window behind the sentence, the same basemap as the football field page */
     .map{ position: fixed; inset: 0; z-index: 0; }
     .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib{ display: none !important; }
-    /* the + and − zoom buttons at the bottom right: off-white squares with the page's type, as on the football field page */
+    /* the + and − zoom buttons at the bottom right: off-white squares with sharp corners and the bold − and + of the
+       sentence's height box. Mapbox's own stylesheet has more specific rules (its drawn icons, rounded ends, shadow),
+       so these repeat its selectors */
     .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl{ margin: 0 20px 20px 0; }
-    .mapboxgl-ctrl-group{ border-radius: 0; box-shadow: none; background: transparent; display: flex; flex-direction: column; gap: 4px; }
-    .mapboxgl-ctrl-group button{ width: 32px; height: 32px; border-radius: 0; border: none; background: #FAF8F3; }
+    .mapboxgl-ctrl-group, .mapboxgl-ctrl-group:not(:empty){ border-radius: 0; box-shadow: none; background: transparent; display: flex; flex-direction: column; gap: 4px; }
+    .mapboxgl-ctrl-group button, .mapboxgl-ctrl-group button:first-child, .mapboxgl-ctrl-group button:last-child{ width: 32px; height: 32px; border-radius: 0; border: none; background: #FAF8F3; }
     .mapboxgl-ctrl-group button + button{ border-top: none; }
     .mapboxgl-ctrl-group button:not(:disabled):hover{ background-color: #FAF8F3; }
-    .mapboxgl-ctrl button .mapboxgl-ctrl-icon{
+    .mapboxgl-ctrl button.mapboxgl-ctrl-zoom-in .mapboxgl-ctrl-icon, .mapboxgl-ctrl button.mapboxgl-ctrl-zoom-out .mapboxgl-ctrl-icon{
       background-image: none; display: flex; align-items: center; justify-content: center;
-      font-family: 'Inter', Arial, sans-serif; font-size: 24px; font-weight: 300; color: #000;
+      font-family: 'Inter', Arial, sans-serif; font-size: 24px; font-weight: 700; color: #000;
     }
     .mapboxgl-ctrl button.mapboxgl-ctrl-zoom-in .mapboxgl-ctrl-icon::before{ content: "+"; }
     .mapboxgl-ctrl button.mapboxgl-ctrl-zoom-out .mapboxgl-ctrl-icon::before{ content: "\2212"; }
@@ -82,7 +84,7 @@
   <div class="map"></div>
   <div class="page">
     <p class="sentence">
-      <span class="line">If you are <input type="number" class="measure walker-height" value="48" min="20" max="100" step="1" aria-label="Your height in inches"> inches tall, your step length is <b class="walker-step">20 inches</b>. The distance across this map will be <b class="map-steps">…</b> steps.</span>
+      <span class="line">If you are <input type="number" class="measure walker-feet" value="4" min="1" max="8" step="1" aria-label="Your height, feet"> feet <input type="number" class="measure walker-inches" value="0" min="0" max="11" step="1" aria-label="Your height, inches"> inches tall, your step length is <b class="walker-step">20 inches</b>. The distance across this map will be <b class="map-steps">…</b> steps.</span>
       <span class="line">If you walk 10,000 steps a day, it will take you <b class="map-days">…</b>.</span>
       <span class="line hint">Enter your height, and zoom and pan the map, to recalculate the steps.</span>
     </p>
@@ -91,7 +93,9 @@
   <script>
     const STEP_FACTOR = 0.414; // step length as a share of height, as on the heights page
     const STEPS_A_DAY = 10000;
-    const heightInput = document.querySelector(".walker-height");
+    // your height, from its feet and inches boxes, in inches
+    const feetInput = document.querySelector(".walker-feet"), inchesInput = document.querySelector(".walker-inches");
+    const heightInches = () => (Number(feetInput.value) || 0) * 12 + (Number(inchesInput.value) || 0);
 
     // ---- the map: centered on you if your browser shares where you are, otherwise on a city picked at random.
     // It can be dragged and zoomed, not turned or tilted, so "across" is always the window's width ----
@@ -108,11 +112,14 @@
     // it opens zoomed out so the window is 10 days of walking across (100,000 steps at your step length), at that latitude
     const START_DAYS = 10;
     function zoomForDays(lat) {
-      const stepM = Math.round((Number(heightInput.value) || 48) * STEP_FACTOR) * 0.0254;
+      const stepM = Math.round((heightInches() || 48) * STEP_FACTOR) * 0.0254;
       const metersPerPixel = (START_DAYS * STEPS_A_DAY * stepM) / innerWidth;
       return Math.log2((40075016.686 * Math.cos((lat * Math.PI) / 180)) / (512 * metersPerPixel));
     }
-    const start = CITIES[Math.floor(Math.random() * CITIES.length)];
+    // steps_across.html?center=-119.4494,37.1661 -- opens there (longitude, latitude), and doesn't move to where you are
+    const CENTER = new URLSearchParams(location.search).get("center")?.split(",").map(Number);
+    const fixed = CENTER && CENTER.length === 2 && CENTER.every(Number.isFinite);
+    const start = fixed ? CENTER : CITIES[Math.floor(Math.random() * CITIES.length)];
     const map = new mapboxgl.Map({
       container: document.querySelector(".map"), style: STYLE,
       center: start, zoom: zoomForDays(start[1]),
@@ -121,7 +128,27 @@
     });
     map.touchZoomRotate.disableRotation();
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "bottom-right"); // + and −, styled below
-    if (navigator.geolocation) {
+
+    // over the satellite imagery: state (and province) boundaries as thin white lines, and the names of cities and
+    // towns in Inter, from Mapbox's streets data; borders as the US sees them where they're disputed
+    map.on("load", () => {
+      map.addSource("streets", { type: "vector", url: "mapbox://mapbox.mapbox-streets-v8" });
+      const states = ["all", ["==", ["get", "admin_level"], 1], ["!=", ["to-string", ["get", "maritime"]], "true"], ["match", ["get", "worldview"], ["all", "US"], true, false]];
+      map.addLayer({ id: "state-lines-shadow", type: "line", source: "streets", "source-layer": "admin", filter: states,
+        paint: { "line-color": "#000", "line-opacity": 0.35, "line-width": 3, "line-blur": 2 } });
+      map.addLayer({ id: "state-lines", type: "line", source: "streets", "source-layer": "admin", filter: states,
+        paint: { "line-color": "#fff", "line-width": 1.25 } });
+      map.addLayer({ id: "city-names", type: "symbol", source: "streets", "source-layer": "place_label",
+        filter: ["match", ["get", "type"], ["city", "town"], true, false],
+        layout: {
+          "text-field": ["coalesce", ["get", "name_en"], ["get", "name"]],
+          "text-font": ["Inter Bold"],
+          "text-size": ["match", ["get", "type"], "city", 15, 12],
+          "symbol-sort-key": ["get", "symbolrank"], // the bigger places win when names would overlap
+        },
+        paint: { "text-color": "#fff", "text-halo-color": "rgba(0, 0, 0, 0.75)", "text-halo-width": 1.5 } });
+    });
+    if (navigator.geolocation && !fixed) {
       navigator.geolocation.getCurrentPosition((where) => {
         map.flyTo({ center: [where.coords.longitude, where.coords.latitude], zoom: zoomForDays(where.coords.latitude), duration: 1500 });
       });
@@ -132,7 +159,7 @@
     // 527, 1,052, 2.4: whole numbers from 10 up, two significant figures below
     const fmt = (n) => (n >= 10 ? Math.round(n).toLocaleString() : String(Number(n.toPrecision(2))));
     function update() {
-      const stepInches = Math.round((Number(heightInput.value) || 0) * STEP_FACTOR);
+      const stepInches = Math.round(heightInches() * STEP_FACTOR);
       document.querySelector(".walker-step").textContent = stepInches + (stepInches === 1 ? " inch" : " inches");
       // on a web map one pixel is 40,075 km × cos(latitude) / (512 × 2^zoom) across, measured at the center
       const metersPerPixel = (40075016.686 * Math.cos((map.getCenter().lat * Math.PI) / 180)) / (512 * 2 ** map.getZoom());
@@ -143,7 +170,8 @@
     }
     map.on("move", update);
     window.addEventListener("resize", update);
-    heightInput.addEventListener("input", update);
+    feetInput.addEventListener("input", update);
+    inchesInput.addEventListener("input", update);
 
     // − and + around the number box, stepping by its step and staying within its min and max
     document.querySelectorAll("input.measure[type=number]").forEach((input) => {

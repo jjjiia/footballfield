@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Things in scale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+  <style>
+/* index.html's embeds alone, one to a screen, for presenting: the page snaps from one screen to the next, and the
+   football maps take a screen per step, as in the story; numbered circles down the left track where we are */
+html{ scroll-snap-type: y mandatory; }
+html, body{ background: #FAF8F3; }
+
+/* room on the left for the circles */
+body{ padding-left: 72px; }
+@media (max-width: 760px){ body{ padding-left: 44px; } }
+
+/* each embed on a screen of its own, in the middle of it */
+.slide{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  scroll-snap-align: start;
+}
+
+/* the football maps: the map stays on screen for a screen of scrolling per step, each step a stopping point. The
+   stopping points are in the page itself, not added by the script, so the page starts snapped to the first one */
+.map-scrolly{ position: relative; }
+.map-scrolly[data-steps="6"]{ height: 600vh; }
+.map-scrolly[data-steps="5"]{ height: 500vh; }
+.map-scrolly[data-steps="4"]{ height: 400vh; }
+.map-scrolly[data-steps="3"]{ height: 300vh; }
+/* a calculator that steps (the Texas map): held in the middle of the screen while its steps go by */
+.sticky-stage{ position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+.map-scrolly .step-stop{ position: absolute; left: 0; width: 100%; height: 100vh; scroll-snap-align: start; pointer-events: none; }
+
+/* the frames: wider than on index.html, to fill more of a projected screen (the embeds stretch to their frame) */
+/* the maps fill the window from the circles to the right edge */
+.map-frame{
+  position: sticky;
+  top: 0;
+  display: block;
+  width: 100%;
+  margin: 0;
+  height: 100vh;
+  border: 0;
+}
+.nested-frame, .people-frame, .steps-frame, .room-frame, .atoms-frame, .jobs-frame{
+  display: block;
+  width: min(960px, 100% - 40px);
+  margin: 0 auto;
+  border: 0;
+}
+.nested-frame, .people-frame{ height: 480px; }
+@media (max-width: 520px){ .people-frame{ height: 520px; } }
+.steps-frame{ height: 300px; }
+.room-frame{ height: 320px; }
+.atoms-frame, .jobs-frame{ height: 100vh; }
+.grid-frame{ display: block; width: min(960px, 100% - 40px); margin: 0 auto; height: 100vh; border: 0; }
+.atom-step-frame, .wealth-frame, .steps-across-frame{ display: block; width: 100%; margin: 0; height: 100vh; border: 0; }
+.heights-frame{ display: block; width: 100%; height: 80vh; border: 0; }
+
+/* the New York Times article the story starts from, and the tape measure before the giraffes: as tall as fits on
+   the screen */
+.shot{ display: block; max-width: calc(100% - 40px); max-height: 90vh; width: auto; height: auto; margin: 0 auto; border: 1px solid #000; }
+
+/* the titles, in the middle of the screen: the page's title in Open Sans, as in index.html, and each section's in
+   black Inter on the off-white page; larger here, for a projected screen */
+.page-title{
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-size: clamp(36px, 6vw, 88px);
+  text-align: center;
+  margin: 0 20px;
+}
+.section-title{
+  box-sizing: border-box;
+  width: min(1100px, 100% - 40px);
+  margin: 0 auto;
+  padding: 40px 48px;
+  text-align: center;
+  color: #000;
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-size: clamp(30px, 4.5vw, 64px);
+  line-height: 1.2;
+}
+
+/* a quote on a screen of its own, as the story's pull quote: italic, centered, and larger here */
+.quote{
+  font-family: 'Open Sans', sans-serif;
+  font-style: italic;
+  font-size: clamp(28px, 3.6vw, 52px);
+  line-height: 1.35;
+  text-align: center;
+  max-width: min(1000px, 100% - 40px);
+  margin: 0 auto;
+}
+
+/* the circles: one per embed, numbered, down the left; every one up to the embed on screen is filled in, as the
+   heights page's progress dots; sized to fit all of them in the window */
+.progress{
+  --d: min(28px, calc((100vh - 48px) / var(--count) - 6px));
+  position: fixed;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.progress button{
+  all: unset;
+  cursor: pointer;
+  box-sizing: border-box;
+  width: var(--d);
+  height: var(--d);
+  border: 1.5px solid #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: calc(var(--d) * 0.45);
+  font-weight: 700;
+  color: #000;
+  transition: background 0.2s, color 0.2s;
+}
+.progress button.done{ background: #000; color: #FAF8F3; }
+@media (max-width: 760px){
+  .progress{ left: 10px; --d: min(24px, calc((100vh - 48px) / var(--count) - 6px)); }
+}
+  </style>
+</head>
+<body>
+
+<ol class="progress" aria-label="Embeds"></ol>
+
+<section class="slide title-slide"><h1 class="page-title">Things in Scale</h1></section>
+<section class="slide"><img class="shot" src="continents.png" alt="The New York Times, “Continents Split Up at the Same Speed Finger Nails Grow. And That’s Fast.” (July 22, 2016)"></section>
+<section class="slide"><p class="quote">Measurement is “the correlation of some target to some comparator or unit.”</p></section>
+
+<section class="slide title-slide"><h2 class="section-title">Let’s start with a football field.</h2></section>
+<!-- the places from the smallest view to the largest, so the map zooms out as it goes (after Levi's Stadium, where it always starts) -->
+<div class="map-scrolly" data-steps="6">
+  <iframe class="map-frame" src="embed%20pages/football_embed1.html?places=the%20White%20House|the%20Pentagon|the%20Great%20Pyramid%20of%20Giza|the%20Hoover%20Dam|the%20Grand%20Canyon" title="Football field map"></iframe>
+  <div class="step-stop" style="top: 0vh"></div>
+  <div class="step-stop" style="top: 100vh"></div>
+  <div class="step-stop" style="top: 200vh"></div>
+  <div class="step-stop" style="top: 300vh"></div>
+  <div class="step-stop" style="top: 400vh"></div>
+  <div class="step-stop" style="top: 500vh"></div>
+</div>
+
+<div class="map-scrolly" data-steps="4">
+  <iframe class="map-frame" src="embed%20pages/football_embed2.html?place=the%20Great%20Pyramid%20of%20Giza&amp;units=football-field|soccer-field|the-pentagon|central-park" title="Sports fields map"></iframe>
+  <div class="step-stop" style="top: 0vh"></div>
+  <div class="step-stop" style="top: 100vh"></div>
+  <div class="step-stop" style="top: 200vh"></div>
+  <div class="step-stop" style="top: 300vh"></div>
+</div>
+
+<section class="slide title-slide"><h2 class="section-title">“The size of Texas”</h2></section>
+<!-- Texas in Rhode Islands, then a screen of scrolling to the Caspian Sea, and one to Afghanistan -->
+<div class="map-scrolly" data-steps="3">
+  <div class="sticky-stage"><iframe class="nested-frame" src="embed%20pages/nested.html?embed&amp;note=3&amp;steps=US%20states|44,Lakes%20and%20reservoirs|1,Countries|AFG" title="Nesting map"></iframe></div>
+  <div class="step-stop" style="top: 0vh"></div>
+  <div class="step-stop" style="top: 100vh"></div>
+  <div class="step-stop" style="top: 200vh"></div>
+</div>
+<section class="slide"><iframe class="people-frame" src="embed%20pages/nested_people.html?embed&amp;note=4" title="Population nesting"></iframe></section>
+<section class="slide title-slide"><h2 class="section-title">There are as many teachers in Abilene, Texas as there are DJs in the whole United States.</h2></section>
+<section class="slide"><iframe class="jobs-frame" src="embed%20pages/jobs.html?embed&amp;note=5" title="Jobs"></iframe></section>
+<section class="slide"><img class="shot" src="scrolly2_images/tape-measure.jpg" alt="A FastCap ProCarpenter Story Pole tape measure, with a strip along the tape that says Write here!"></section>
+<section class="slide title-slide"><h2 class="section-title">Giraffes</h2></section>
+<section class="slide" data-group="heights"><iframe class="heights-frame no-sentence" src="embed%20pages/height_scrolly.html?embed&amp;step=1" title="The slide at Travers Park is 12ft"></iframe></section>
+<section class="slide" data-group="heights"><iframe class="heights-frame no-sentence" src="embed%20pages/height_scrolly.html?embed&amp;step=2&amp;labels=Sid%2C%20on%20the%20slide%7CGiraffe%0AJames%20Michael" title="You on the slide, next to the giraffe"></iframe></section>
+<section class="slide" data-group="heights"><iframe class="heights-frame" src="embed%20pages/height_scrolly.html?embed&amp;step=3" title="Giraffes standing on each other's heads, next to the Statue of Liberty"></iframe></section>
+<section class="slide" data-group="heights"><iframe class="heights-frame" src="embed%20pages/height_scrolly.html?embed&amp;step=4" title="The tallest tree"></iframe></section>
+<section class="slide" data-group="heights"><iframe class="heights-frame" src="embed%20pages/height_scrolly.html?embed&amp;step=5" title="The tallest tree, next to the Empire State Building"></iframe></section>
+<section class="slide" data-group="heights"><iframe class="heights-frame" src="embed%20pages/height_scrolly.html?embed&amp;calculator" title="Measure some things in giraffes"></iframe></section>
+<!-- the "if you walk 10,000 steps a day" calculator from the calculator grid, alone, then the steps map; one circle -->
+<section class="slide" data-group="steps"><iframe class="grid-frame walk-only" src="embed%20pages/you-grid-2.html?cols=2" title="If you walk 10,000 steps a day"></iframe></section>
+<!-- the steps map opens on New York City (Lower Manhattan, as in the map's own list of cities) -->
+<section class="slide" data-group="steps"><iframe class="steps-across-frame" src="embed%20pages/steps_across.html?embed&amp;center=-74.006,40.7128" title="Steps across"></iframe></section>
+<section class="slide title-slide"><h2 class="section-title">Find a staircase</h2></section>
+<section class="slide"><iframe class="steps-frame" src="embed%20pages/stairs.html?embed&amp;note=6" title="Stairs"></iframe></section>
+<section class="slide"><iframe class="room-frame" src="embed%20pages/people_in_the_room.html" title="People in the room"></iframe></section>
+<section class="slide title-slide"><h2 class="section-title">Find a thing you already do.</h2></section>
+<section class="slide"><iframe class="grid-frame" src="embed%20pages/you-grid-2.html?cols=2" title="Grid of calculators"></iframe></section>
+<section class="slide title-slide"><h2 class="section-title">The size of an atom</h2></section>
+<section class="slide"><iframe class="atoms-frame" src="embed%20pages/atom_seconds.html" title="Count atoms"></iframe></section>
+<section class="slide"><iframe class="atom-step-frame" src="embed%20pages/atom_step.html" title="Atoms in steps"></iframe></section>
+<section class="slide title-slide"><h2 class="section-title">Other very large numbers</h2></section>
+<section class="slide"><iframe class="wealth-frame" src="embed%20pages/wealth_field.html?embed" title="Wealth in football fields"></iframe></section>
+
+<script>
+// The circles: one per screenshot or embed (a football map is one, however many steps, and the giraffe screens,
+// marked data-group="heights", are one), filled up to the one on screen. A title screen goes with what follows it, and
+// clicking a circle goes to its first screen, the title when there is one
+const slides = [...document.querySelectorAll(".map-scrolly, .slide")];
+{
+  const groups = [], groupOf = [];
+  let titles = [];
+  slides.forEach((slide, i) => {
+    if (slide.classList.contains("title-slide")) { titles.push(slide); return; }
+    const last = groups[groups.length - 1];
+    if (!titles.length && slide.dataset.group && last && last[last.length - 1].dataset.group === slide.dataset.group) last.push(slide);
+    else { groups.push([...titles, slide]); titles = []; }
+  });
+  groups.forEach((group, g) => group.forEach((slide) => { groupOf[slides.indexOf(slide)] = g; }));
+  const nav = document.querySelector(".progress");
+  nav.style.setProperty("--count", groups.length);
+  const buttons = groups.map((group, i) => {
+    const slide = group[0], named = group.find((s) => !s.classList.contains("title-slide"));
+    const button = Object.assign(document.createElement("button"), { type: "button", textContent: i + 1 });
+    button.setAttribute("aria-label", "Go to " + (i + 1) + ": " + (slide.querySelector("h1, h2")?.textContent || named.querySelector("iframe")?.title || named.querySelector("img")?.alt || named.textContent.trim()));
+    button.addEventListener("click", () => slide.scrollIntoView({ behavior: "smooth", block: "start" }));
+    const item = document.createElement("li");
+    item.appendChild(button);
+    nav.appendChild(item);
+    return button;
+  });
+  const update = () => {
+    // the embed on screen: the last one whose top is above the middle of the window
+    let current = 0;
+    slides.forEach((slide, i) => { if (slide.getBoundingClientRect().top <= innerHeight / 2) current = groupOf[i]; });
+    buttons.forEach((b, i) => {
+      b.classList.toggle("done", i <= current);
+      if (i === current) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+    });
+  };
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+  update();
+}
+
+// The right and left arrows go to the next and previous stopping point, as Page Down and Page Up do; an embed taller
+// than the window (the calculator grid) is gone through a screen at a time first
+{
+  const stops = () => [...document.querySelectorAll(".slide, .step-stop")].map((el) => el.getBoundingClientRect().top + scrollY).sort((a, b) => a - b);
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    e.preventDefault();
+    const all = stops();
+    let to = e.key === "ArrowRight" ? all.find((y) => y > scrollY + 5) : all.reverse().find((y) => y < scrollY - 5);
+    if (e.key === "ArrowRight") to = Math.min(to ?? document.documentElement.scrollHeight, scrollY + innerHeight);
+    else to = Math.max(to ?? 0, scrollY - innerHeight);
+    scrollTo({ top: to, behavior: "smooth" });
+  });
+}
+
+// Every embed's sentences at one size, larger than on index.html to go with the wider frames: 36px, or 22px on
+// phones; the maps' text 22px
+const EMBED_TEXT = [
+  ".map-line", ".map-line .unit-select",            // the football maps
+  ".nest-line", ".nest-line .unit-select",          // nesting and people
+  ".job .job-line", ".job .job-count", ".job .unit-select", // jobs, its main sentence
+  ".step-line",                                     // stairs
+  ".madlib",                                        // the calculator grid
+  ".sentence:not(.mississippi)",                    // heights, steps, the room, atoms
+].join(", ");
+function sizeEmbedText(frame) {
+  const doc = frame.contentDocument;
+  if (!doc || !doc.head) return;
+  let style = doc.getElementById("scrolly2-text-size");
+  if (!style) {
+    style = Object.assign(doc.createElement("style"), { id: "scrolly2-text-size" });
+    doc.head.appendChild(style);
+  }
+  const isMap = frame.matches(".map-frame, .steps-across-frame, .atom-step-frame, .wealth-frame");
+  const size = isMap ? 22 : (innerWidth <= 760 ? 22 : 36);
+  // the heights page keeps its steps to the story's 700px text column when embedded; here, as wide as the maps
+  const wider = frame.matches(".heights-frame") ? " .embed .slide{ width: min(1100px, 100% - 40px) !important; }" : "";
+  // the first two giraffe screens without their sentences ("The slide at Travers Park is 12ft." and "If he stands at
+  // the top of the slide…"), here only; their room is kept, so the lines don't move from screen to screen
+  const noSentence = frame.matches(".no-sentence") ? " .sentence{ visibility: hidden; }" : "";
+  // the calculator grid in one column, here only, as it is on phones, with more room between the calculators
+  const oneColumn = frame.matches(".grid-frame") ? " .two-cols .inner{ grid-template-columns: 1fr !important; row-gap: 64px !important; }" : "";
+  // the walking calculator, which the two-column grid leaves out, on its own
+  const walkOnly = frame.matches(".walk-only") ? " .two-cols .inner .slide:not(.cell-walk){ display: none !important; } .two-cols .cell-walk{ display: flex !important; }" : "";
+  style.textContent = `${EMBED_TEXT}, .walk-label{ font-size: ${size}px !important; } .map-line.map-hint{ font-size: 12px !important; }${wider}${noSentence}${oneColumn}${walkOnly}`;
+  frame.contentWindow.dispatchEvent(new Event("resize"));
+}
+document.querySelectorAll("iframe").forEach((frame) => {
+  frame.addEventListener("load", () => sizeEmbedText(frame));
+  sizeEmbedText(frame); // in case it has already loaded
+});
+window.addEventListener("resize", () => document.querySelectorAll("iframe").forEach(sizeEmbedText));
+
+// Tell each football map, and the Texas map, which step to show (0, 1, 2, ...), from how far we've scrolled through it
+document.querySelectorAll(".map-scrolly").forEach((mapScrolly) => {
+  const mapFrame = mapScrolly.querySelector("iframe");
+  const lastStep = Number(mapScrolly.dataset.steps) - 1;
+  let sentStep = null;
+  function sendStep(force) {
+    const scrolled = -mapScrolly.getBoundingClientRect().top;
+    const step = Math.max(0, Math.min(lastStep, Math.floor(scrolled / window.innerHeight + 0.5)));
+    if (step === sentStep && !force) return;
+    sentStep = step;
+    mapFrame.contentWindow.postMessage({ footballStep: step }, "*");
+  }
+  window.addEventListener("scroll", () => sendStep(false), { passive: true });
+  mapFrame.addEventListener("load", () => sendStep(true));
+});
+
+// A frame can finish loading before this script runs (often from the cache), so its load event has already passed:
+// run the setup now as well, or the frame keeps its CSS height and its content is cut off
+function onFrameLoad(frame, setup) {
+  frame.addEventListener("load", setup);
+  const doc = frame.contentDocument;
+  if (doc && doc.readyState === "complete" && doc.URL !== "about:blank") setup();
+}
+
+// Fit the nesting, stairs and calculator grid frames to their page's content, as on index.html
+document.querySelectorAll(".nested-frame, .steps-frame, .grid-frame").forEach((frame) => {
+  onFrameLoad(frame, () => {
+    const page = frame.contentDocument.querySelector(".nested, .steps, .inner");
+    const fit = () => { frame.style.height = Math.ceil(page.getBoundingClientRect().height) + "px"; };
+    new ResizeObserver(fit).observe(page);
+    fit();
+  });
+});
+
+// The people and jobs frames: as tall as their page, with room under the lowest dropdown for its open list, as on
+// index.html
+document.querySelectorAll(".people-frame, .jobs-frame").forEach((frame) => {
+  const listRoom = frame.matches(".jobs-frame") ? 340 : 260;
+  onFrameLoad(frame, () => {
+    const doc = frame.contentDocument;
+    const page = doc.querySelector(".nested, .columns");
+    const fit = () => {
+      if (doc.activeElement && doc.activeElement.matches(".combo-input")) return;
+      const listBottom = Math.max(...[...doc.querySelectorAll(".combo")].map((c) => c.getBoundingClientRect().bottom)) + listRoom;
+      frame.style.height = Math.ceil(Math.max(page.getBoundingClientRect().bottom, listBottom)) + "px";
+    };
+    new ResizeObserver(fit).observe(page);
+    fit();
+  });
+});
+</script>
+</body>
+</html>
