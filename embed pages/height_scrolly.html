@@ -160,6 +160,14 @@
        with its own arrow, as on the football field page */
     .measure-note{ font-size: 14px; font-weight: 300; text-align: center; margin: 6px 0 0; }
     .measure-note[hidden]{ display: none; }
+    /* "your own height…": a name and a height in feet and inches, under the sentence, underlined like the dropdown */
+    .own-height{ display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 8px 10px; margin: 10px 0 0; font-size: 16px; }
+    .own-height[hidden]{ display: none; }
+    .own-height input{ font: inherit; font-weight: 700; color: #000; background: transparent; border: none; border-bottom: 2px solid #000; border-radius: 0; padding: 0 4px; }
+    .own-name{ width: 9em; }
+    .own-ft, .own-in{ width: 2.5em; text-align: center; }
+    .own-height button{ font: inherit; border: 2px solid #000; border-radius: 0; background: transparent; color: #000; padding: 2px 10px; cursor: pointer; }
+    .own-height button[type=submit]{ background: #000; color: #FAF8F3; }
     /* the small how-to line, as on the other calculators */
     .measure-hint{ font-size: 12px; font-weight: 300; text-align: center; margin: 6px 0 0; }
     select.measure{
@@ -284,8 +292,16 @@
           <option value="Statue of Liberty, statue alone" data-plural="Statues of Liberty">Statues of Liberty</option>
           <option value="Empire State Building, to the tip" data-plural="Empire State Buildings">Empire State Buildings</option>
           <option value="Robert Wadlow" data-plural="Robert Wadlows" data-note="Robert Wadlow, 8'11&quot;, the tallest man ever recorded">Robert Wadlows</option>
+          <option value="own">your own height…</option>
         </select>.</p>
       <p class="measure-note" hidden></p>
+      <form class="own-height" hidden>
+        <input type="text" class="own-name" placeholder="Name" aria-label="Name" maxlength="40">
+        <input type="number" class="own-ft" value="5" min="0" step="1" aria-label="Feet"> ft
+        <input type="number" class="own-in" value="0" min="0" max="11.9" step="any" aria-label="Inches"> in
+        <button type="submit">Use it</button>
+        <button type="button" class="own-cancel">Cancel</button>
+      </form>
       <p class="measure-hint">Use the dropdown to change the unit of measurement.</p>
       <div class="stage"></div>
     </section>
@@ -346,6 +362,40 @@
       // it measures, and without it the end of the word goes under the arrow
       select.style.width = Math.ceil(selectSizer.getBoundingClientRect().width) + 56 + "px";
     }
+    // "your own height…": a name and a height become a unit of their own, added to the dropdown above that option and
+    // picked, with the height as its note. Until "Use it", the dropdown and the chart stay as they were
+    document.querySelectorAll("select.measure").forEach((select) => {
+      const own = select.querySelector('option[value="own"]');
+      const form = select.closest(".slide").querySelector(".own-height");
+      if (!own || !form) return;
+      let last = select.value, count = 0;
+      const showForm = (show) => { form.hidden = !show; drawSlides(); }; // the chart refits to the room left
+      // in the capture phase, so it runs before the dropdown's other listeners redraw the chart
+      select.addEventListener("change", () => {
+        if (select.value !== "own") { last = select.value; return; }
+        select.value = last;
+        showForm(true);
+        form.querySelector(".own-name").focus();
+      }, true);
+      const plural = (name) => (/(s|x|z|ch|sh)$/i.test(name) ? name + "es" : name + "s");
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = form.querySelector(".own-name").value.trim();
+        const inches = (Number(form.querySelector(".own-ft").value) || 0) * 12 + (Number(form.querySelector(".own-in").value) || 0);
+        if (!name) { form.querySelector(".own-name").focus(); return; }
+        if (!(inches > 0)) { form.querySelector(".own-ft").focus(); return; }
+        const key = "own " + ++count;
+        byName[key] = { name, meters: String(inches * 0.0254), feet: String(inches / 12) };
+        const option = new Option(plural(name), key);
+        option.dataset.plural = plural(name);
+        option.dataset.note = `${name}, ${Math.floor(inches / 12)}'${Number((inches % 12).toFixed(1))}"`;
+        select.insertBefore(option, own);
+        select.value = key;
+        showForm(false);
+        select.dispatchEvent(new Event("change"));
+      });
+      form.querySelector(".own-cancel").addEventListener("click", () => showForm(false));
+    });
     // a picked unit with a note (Robert Wadlow: who he is) shows it under the sentence
     document.querySelectorAll("select.measure").forEach((select) => {
       const note = select.closest(".slide").querySelector(".measure-note");
@@ -627,12 +677,15 @@
     }
 
     // height_scrolly.html?embed&step=N&labels=A|B -- step N on its own, with these labels on its lines in place of its own
-    // (a line break, %0A, starts a label's second line); presentation.html uses it
+    // (a line break, %0A, starts a label's second line); with &names=A|B, these lines in place of its own. The same
+    // for ?embed&calculator, on the "measure some things in" chart. presentation.html uses them
     {
       const params = new URLSearchParams(location.search);
-      const step = Number(params.get("step")), labels = params.get("labels");
-      const slide = step > 0 && labels && document.querySelectorAll(".inner > .slide")[step - 1];
-      if (slide) slide.dataset.labels = labels;
+      const step = Number(params.get("step")), labels = params.get("labels"), names = params.get("names");
+      const slide = step > 0 ? document.querySelectorAll(".inner > .slide")[step - 1]
+        : params.has("calculator") ? document.querySelector(".inner > .slide.axis") : null;
+      if (slide && names) slide.dataset.names = names;
+      if (slide && labels) slide.dataset.labels = labels;
     }
 
     function drawSlides() {

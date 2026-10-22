@@ -64,9 +64,13 @@ body{ padding-left: 72px; }
 .atom-step-frame, .wealth-frame, .steps-across-frame{ display: block; width: 100%; margin: 0; height: 100vh; border: 0; }
 .heights-frame{ display: block; width: 100%; height: 80vh; border: 0; }
 
-/* the New York Times article the story starts from, and the tape measure before the giraffes: as tall as fits on
-   the screen */
+/* the New York Times article the story starts from, the body measurements, the Mars Climate Orbiter, the smoot, and
+   the tape measure before the giraffes: as tall as fits on the screen */
 .shot{ display: block; max-width: calc(100% - 40px); max-height: 90vh; width: auto; height: auto; margin: 0 auto; border: 1px solid #000; }
+/* an image with its source under it, in small type: the image a little shorter, so both fit */
+.shot.cited{ max-height: calc(90vh - 32px); }
+.cite{ font-family: 'Open Sans', sans-serif; font-size: 13px; text-align: center; margin: 10px 20px 0; }
+.cite a{ color: #000; }
 
 /* the titles, in the middle of the screen: the page's title in Open Sans, as in index.html, and each section's in
    black Inter on the off-white page; larger here, for a projected screen */
@@ -78,6 +82,8 @@ body{ padding-left: 72px; }
   text-align: center;
   margin: 0 20px;
 }
+/* a title on the same screen as the calculator under it: less room around it */
+.section-title.with-embed{ padding: 0 48px 32px; }
 .section-title{
   box-sizing: border-box;
   width: min(1100px, 100% - 40px);
@@ -103,10 +109,20 @@ body{ padding-left: 72px; }
   margin: 0 auto;
 }
 
+/* a few lines of text on a screen of their own, in the story's Open Sans, larger here */
+.lines{ box-sizing: border-box; width: min(1000px, 100% - 40px); margin: 0 auto; font-family: 'Open Sans', sans-serif; font-size: clamp(20px, 2.2vw, 32px); line-height: 1.4; }
+.lines p{ margin: 0 0 1em; }
+.lines p:last-child{ margin-bottom: 0; }
+
+/* the last screen: the site's QR code, and its address under it */
+.qr{ display: block; width: min(360px, 45vh); height: auto; margin: 0 auto; image-rendering: pixelated; }
+.link{ font-family: 'Inter', Arial, sans-serif; font-weight: 700; font-size: clamp(20px, 2.4vw, 36px); text-align: center; margin: 16px 20px 0; word-break: break-word; }
+.link a{ color: #000; }
+
 /* the circles: one per embed, numbered, down the left; every one up to the embed on screen is filled in, as the
    heights page's progress dots; sized to fit all of them in the window */
 .progress{
-  --d: min(28px, calc((100vh - 48px) / var(--count) - 6px));
+  --d: min(20px, calc((100vh - 48px) / var(--count) - 4px));
   position: fixed;
   left: 24px;
   top: 50%;
@@ -114,7 +130,7 @@ body{ padding-left: 72px; }
   z-index: 10;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -131,14 +147,14 @@ body{ padding-left: 72px; }
   align-items: center;
   justify-content: center;
   font-family: 'Inter', Arial, sans-serif;
-  font-size: calc(var(--d) * 0.45);
+  font-size: calc(var(--d) * 0.5);
   font-weight: 700;
   color: #000;
   transition: background 0.2s, color 0.2s;
 }
 .progress button.done{ background: #000; color: #FAF8F3; }
 @media (max-width: 760px){
-  .progress{ left: 10px; --d: min(24px, calc((100vh - 48px) / var(--count) - 6px)); }
+  .progress{ left: 10px; --d: min(18px, calc((100vh - 48px) / var(--count) - 4px)); }
 }
   </style>
 </head>
@@ -146,11 +162,14 @@ body{ padding-left: 72px; }
 
 <ol class="progress" aria-label="Embeds"></ol>
 
-<section class="slide title-slide"><h1 class="page-title">Things in Scale</h1></section>
-<section class="slide"><img class="shot" src="continents.png" alt="The New York Times, “Continents Split Up at the Same Speed Finger Nails Grow. And That’s Fast.” (July 22, 2016)"></section>
+<!-- the title, the quote and the article each on a circle of their own -->
+<section class="slide"><h1 class="page-title">Things in Scale</h1></section>
 <section class="slide"><p class="quote">Measurement is “the correlation of some target to some comparator or unit.”</p></section>
+<section class="slide"><img class="shot" src="continents.png" alt="The New York Times, “Continents Split Up at the Same Speed Finger Nails Grow. And That’s Fast.” (July 22, 2016)"></section>
+<section class="slide"><img class="shot cited" src="body_measurements.png" alt="Body-based units of measure: measuring with the span of a hand and the length of the arms and body, in Karelia, among the Mapuche, Yahi and Yup'ik"><p class="cite"><a href="https://www.science.org/doi/10.1126/science.adf1936" target="_blank" rel="noopener">Kaaronen, Manninen, and Eronen, “Body-based units of measure in cultural evolution,” <i>Science</i> (2023)</a></p></section>
+<section class="slide"><img class="shot cited" src="Mars_Climate_Orbiter_2.jpg" alt="NASA's Mars Climate Orbiter, an artist's rendering of the spacecraft above Mars"><p class="cite">Artist’s rendering of the Mars Climate Orbiter. Public domain.</p></section>
+<section class="slide"><img class="shot cited" src="smoot.png" alt="Oliver Smoot lying on the Harvard Bridge next to a chalk smoot mark, with four of the MIT students who measured the bridge with him, October 1958"><p class="cite">“The smoot was created in October 1958 after seven MIT students calibrated the Mass. Ave. bridge using 5’7 Oliver Smoot '62.” – <a href="https://alum.mit.edu/" target="_blank" rel="noopener">alum.mit.edu</a></p></section>
 
-<section class="slide title-slide"><h2 class="section-title">Let’s start with a football field.</h2></section>
 <!-- the places from the smallest view to the largest, so the map zooms out as it goes (after Levi's Stadium, where it always starts) -->
 <div class="map-scrolly" data-steps="6">
   <iframe class="map-frame" src="embed%20pages/football_embed1.html?places=the%20White%20House|the%20Pentagon|the%20Great%20Pyramid%20of%20Giza|the%20Hoover%20Dam|the%20Grand%20Canyon" title="Football field map"></iframe>
@@ -170,7 +189,6 @@ body{ padding-left: 72px; }
   <div class="step-stop" style="top: 300vh"></div>
 </div>
 
-<section class="slide title-slide"><h2 class="section-title">“The size of Texas”</h2></section>
 <!-- Texas in Rhode Islands, then a screen of scrolling to the Caspian Sea, and one to Afghanistan -->
 <div class="map-scrolly" data-steps="3">
   <div class="sticky-stage"><iframe class="nested-frame" src="embed%20pages/nested.html?embed&amp;note=3&amp;steps=US%20states|44,Lakes%20and%20reservoirs|1,Countries|AFG" title="Nesting map"></iframe></div>
@@ -179,35 +197,43 @@ body{ padding-left: 72px; }
   <div class="step-stop" style="top: 200vh"></div>
 </div>
 <section class="slide"><iframe class="people-frame" src="embed%20pages/nested_people.html?embed&amp;note=4" title="Population nesting"></iframe></section>
-<section class="slide title-slide"><h2 class="section-title">There are as many teachers in Abilene, Texas as there are DJs in the whole United States.</h2></section>
 <section class="slide"><iframe class="jobs-frame" src="embed%20pages/jobs.html?embed&amp;note=5" title="Jobs"></iframe></section>
 <section class="slide"><img class="shot" src="scrolly2_images/tape-measure.jpg" alt="A FastCap ProCarpenter Story Pole tape measure, with a strip along the tape that says Write here!"></section>
-<section class="slide title-slide"><h2 class="section-title">Giraffes</h2></section>
-<section class="slide" data-group="heights"><iframe class="heights-frame no-sentence" src="embed%20pages/height_scrolly.html?embed&amp;step=1" title="The slide at Travers Park is 12ft"></iframe></section>
-<section class="slide" data-group="heights"><iframe class="heights-frame no-sentence" src="embed%20pages/height_scrolly.html?embed&amp;step=2&amp;labels=Sid%2C%20on%20the%20slide%7CGiraffe%0AJames%20Michael" title="You on the slide, next to the giraffe"></iframe></section>
-<section class="slide" data-group="heights"><iframe class="heights-frame" src="embed%20pages/height_scrolly.html?embed&amp;step=3" title="Giraffes standing on each other's heads, next to the Statue of Liberty"></iframe></section>
-<section class="slide" data-group="heights"><iframe class="heights-frame" src="embed%20pages/height_scrolly.html?embed&amp;step=4" title="The tallest tree"></iframe></section>
-<section class="slide" data-group="heights"><iframe class="heights-frame" src="embed%20pages/height_scrolly.html?embed&amp;step=5" title="The tallest tree, next to the Empire State Building"></iframe></section>
-<section class="slide" data-group="heights"><iframe class="heights-frame" src="embed%20pages/height_scrolly.html?embed&amp;calculator" title="Measure some things in giraffes"></iframe></section>
-<!-- the "if you walk 10,000 steps a day" calculator from the calculator grid, alone, then the steps map; one circle -->
-<section class="slide" data-group="steps"><iframe class="grid-frame walk-only" src="embed%20pages/you-grid-2.html?cols=2" title="If you walk 10,000 steps a day"></iframe></section>
+<section class="slide"><iframe class="heights-frame no-sentence" src="embed%20pages/height_scrolly.html?embed&amp;step=1" title="The slide at Travers Park is 12ft"></iframe></section>
+<section class="slide"><iframe class="heights-frame no-sentence" src="embed%20pages/height_scrolly.html?embed&amp;step=2&amp;labels=Sid%2C%20on%20the%20slide%7CGiraffe%0AJames%20Michael" title="You on the slide, next to the giraffe"></iframe></section>
+<section class="slide"><iframe class="heights-frame" src="embed%20pages/height_scrolly.html?embed&amp;step=3" title="Giraffes standing on each other's heads, next to the Statue of Liberty"></iframe></section>
+<section class="slide"><iframe class="heights-frame" src="embed%20pages/height_scrolly.html?embed&amp;step=4" title="The tallest tree"></iframe></section>
+<section class="slide"><iframe class="heights-frame" src="embed%20pages/height_scrolly.html?embed&amp;step=5" title="The tallest tree, next to the Empire State Building"></iframe></section>
+<!-- the "measure some things in" chart, here only: Robert Wadlow ("Tallest man") added before James Michael, and
+     without Crater Lake, the deepest part of the Grand Canyon or the average ocean depth -->
+<section class="slide"><iframe class="heights-frame" src="embed%20pages/height_scrolly.html?embed&amp;calculator&amp;names=Robert%20Wadlow%7CJames%20Michael%2C%20giraffe%7CMount%20Everest%7CSauroposeidon%2C%20dinosaur%7CTypical%20airliner%20cruise%7CHyperion%2C%20coast%20redwood%2C%20California%7CEmpire%20State%20Building%2C%20to%20the%20tip%7CStatue%20of%20Liberty%2C%20statue%20alone&amp;labels=Tallest%20man%7CJames%20Michael%7CMount%20Everest%7CTallest%20dinosaur%7CAirplanes%20fly%20at%7CTallest%20tree%7CEmpire%20State%20Building%7CStatue%20of%20Liberty" title="Measure some things in giraffes"></iframe></section>
 <!-- the steps map opens on New York City (Lower Manhattan, as in the map's own list of cities) -->
-<section class="slide" data-group="steps"><iframe class="steps-across-frame" src="embed%20pages/steps_across.html?embed&amp;center=-74.006,40.7128" title="Steps across"></iframe></section>
-<section class="slide title-slide"><h2 class="section-title">Find a staircase</h2></section>
-<section class="slide"><iframe class="steps-frame" src="embed%20pages/stairs.html?embed&amp;note=6" title="Stairs"></iframe></section>
+<section class="slide"><iframe class="steps-across-frame" src="embed%20pages/steps_across.html?embed&amp;center=-74.006,40.7128" title="Steps across"></iframe></section>
+<!-- the title and the stairs calculator on one screen -->
+<section class="slide"><h2 class="section-title with-embed">Find a staircase</h2><iframe class="steps-frame" src="embed%20pages/stairs.html?embed&amp;note=6" title="Stairs"></iframe></section>
 <section class="slide"><iframe class="room-frame" src="embed%20pages/people_in_the_room.html" title="People in the room"></iframe></section>
 <section class="slide title-slide"><h2 class="section-title">Find a thing you already do.</h2></section>
 <section class="slide"><iframe class="grid-frame" src="embed%20pages/you-grid-2.html?cols=2" title="Grid of calculators"></iframe></section>
-<section class="slide title-slide"><h2 class="section-title">The size of an atom</h2></section>
+<!-- this title on a circle of its own, and the atom counter on the next -->
+<section class="slide"><h2 class="section-title">The size of an atom</h2></section>
 <section class="slide"><iframe class="atoms-frame" src="embed%20pages/atom_seconds.html" title="Count atoms"></iframe></section>
 <section class="slide"><iframe class="atom-step-frame" src="embed%20pages/atom_step.html" title="Atoms in steps"></iframe></section>
 <section class="slide title-slide"><h2 class="section-title">Other very large numbers</h2></section>
+<!-- the wealth map's four comparisons on a screen of their own, before the map -->
+<section class="slide"><div class="lines">
+  <p>If an atom was a dollar, then a grain of sand would be all the money in the world × 35,000.</p>
+  <p>If an atom is a person, then the population of the world would fit in a grain of sand a million times.</p>
+  <p>If $1 was a hair, then the average American's wealth would be about 2 heads of hair, and Elon Musk's would be every head of hair in Hungary.</p>
+  <p>If each second is $100, then the average American's net worth is a newborn baby 36 minutes old, and Jeff Bezos’ is the oldest person alive in the world, 117 years old.</p>
+</div></section>
 <section class="slide"><iframe class="wealth-frame" src="embed%20pages/wealth_field.html?embed" title="Wealth in football fields"></iframe></section>
+<!-- the end: the site's address, as a QR code and as text -->
+<section class="slide"><img class="qr" src="qr-footballfield.png" alt="QR code for https://jjjiia.github.io/footballfield/"><p class="link"><a href="https://jjjiia.github.io/footballfield/" target="_blank" rel="noopener">https://jjjiia.github.io/footballfield/</a></p></section>
 
 <script>
-// The circles: one per screenshot or embed (a football map is one, however many steps, and the giraffe screens,
-// marked data-group="heights", are one), filled up to the one on screen. A title screen goes with what follows it, and
-// clicking a circle goes to its first screen, the title when there is one
+// The circles: one per screenshot or embed (a football map is one, however many steps, and screens marked with the
+// same data-group, the walking calculator and the steps map, are one), filled up to the one on screen. A title screen
+// goes with what follows it, and clicking a circle goes to its first screen, the title when there is one
 const slides = [...document.querySelectorAll(".map-scrolly, .slide")];
 {
   const groups = [], groupOf = [];
@@ -225,7 +251,9 @@ const slides = [...document.querySelectorAll(".map-scrolly, .slide")];
     const slide = group[0], named = group.find((s) => !s.classList.contains("title-slide"));
     const button = Object.assign(document.createElement("button"), { type: "button", textContent: i + 1 });
     button.setAttribute("aria-label", "Go to " + (i + 1) + ": " + (slide.querySelector("h1, h2")?.textContent || named.querySelector("iframe")?.title || named.querySelector("img")?.alt || named.textContent.trim()));
-    button.addEventListener("click", () => slide.scrollIntoView({ behavior: "smooth", block: "start" }));
+    // straight there, not a smooth scroll: a long smooth scroll through the snapping stops can end a few screens past
+    // where it was going (Safari especially), so a circle jumps to its first screen at once
+    button.addEventListener("click", () => scrollTo({ top: Math.round(slide.getBoundingClientRect().top + scrollY), behavior: "instant" }));
     const item = document.createElement("li");
     item.appendChild(button);
     nav.appendChild(item);
@@ -287,9 +315,7 @@ function sizeEmbedText(frame) {
   const noSentence = frame.matches(".no-sentence") ? " .sentence{ visibility: hidden; }" : "";
   // the calculator grid in one column, here only, as it is on phones, with more room between the calculators
   const oneColumn = frame.matches(".grid-frame") ? " .two-cols .inner{ grid-template-columns: 1fr !important; row-gap: 64px !important; }" : "";
-  // the walking calculator, which the two-column grid leaves out, on its own
-  const walkOnly = frame.matches(".walk-only") ? " .two-cols .inner .slide:not(.cell-walk){ display: none !important; } .two-cols .cell-walk{ display: flex !important; }" : "";
-  style.textContent = `${EMBED_TEXT}, .walk-label{ font-size: ${size}px !important; } .map-line.map-hint{ font-size: 12px !important; }${wider}${noSentence}${oneColumn}${walkOnly}`;
+  style.textContent = `${EMBED_TEXT}, .walk-label{ font-size: ${size}px !important; } .map-line.map-hint{ font-size: 12px !important; }${wider}${noSentence}${oneColumn}`;
   frame.contentWindow.dispatchEvent(new Event("resize"));
 }
 document.querySelectorAll("iframe").forEach((frame) => {
