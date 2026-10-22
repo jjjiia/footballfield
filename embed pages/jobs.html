@@ -382,9 +382,10 @@ Promise.all([
   SOURCES.acs.occupations = titles(acsMapping);
   SOURCES.bls.us = blsData.employment.US;
   SOURCES.bls.occupations = titles(blsMapping);
-  // the United States from the Census, states and metro areas from BLS
-  const sourceOf = (area) => (area === "US" ? "acs" : "bls");
-  const countsIn = (area) => (area === "US" ? acsData.employment.US : blsData.employment[area]);
+  // the United States from the Census, states and metro areas from BLS; a profession the Census doesn't count on its
+  // own (cartographers are counted together with surveyors there) takes the BLS count for the United States too
+  const sourceOf = (area, p) => (area === "US" && acsData.employment.US[p] ? "acs" : "bls");
+  const countOf = (area, p) => (sourceOf(area, p) === "acs" ? acsData.employment.US : blsData.employment[area] || {})[p];
   const areaList = [["US", "the United States", "country"], ...blsData.areas.filter(([code]) => code !== "US")];
   const allProfessions = [...new Set([...Object.keys(SOURCES.acs.us), ...Object.keys(SOURCES.bls.us)])].sort((a, b) => a.localeCompare(b));
   // set from the selected area's source in update()
@@ -405,18 +406,18 @@ Promise.all([
   const areaCombo = makeCombo(job.querySelector(".area-combo"), "Area",
     areaList.map(([code, title, kind]) => ({ value: code, label: title, section: sections[kind] })), update);
   // grey out professions not counted in this place, and places that don't count this profession
-  profCombo.isDisabled = (p) => !countsIn(areaCombo.get())[p];
-  areaCombo.isDisabled = (a) => !countsIn(a)[profCombo.get()];
+  profCombo.isDisabled = (p) => !countOf(areaCombo.get(), p);
+  areaCombo.isDisabled = (a) => !countOf(a, profCombo.get());
   // jobs.html?profession=dancer starts on that profession instead of teachers
   profCombo.set(new URLSearchParams(location.search).get("profession") || job.dataset.profession);
   areaCombo.set("US");
 
   function update() {
     const area = areaCombo.get();
-    const source = SOURCES[sourceOf(area)];
+    const source = SOURCES[sourceOf(area, profCombo.get())];
     ({ us, occupations } = source);
     professions = Object.keys(us).sort((a, b) => a.localeCompare(b));
-    const n = countsIn(area)[profCombo.get()];
+    const n = countOf(area, profCombo.get());
     job.querySelector(".job-verb").textContent = source.verb;
     job.querySelector(".job-note").textContent = source.note;
     count.textContent = n ? n.toLocaleString("en-US") : "Not reported";
