@@ -76,12 +76,16 @@ body{ padding-left: 72px; }
    black Inter on the off-white page; larger here, for a projected screen */
 .page-title{
   font-family: 'Open Sans', sans-serif;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 1px;
-  font-size: clamp(36px, 6vw, 88px);
+  font-size: 60px;
   text-align: center;
   margin: 0 20px;
 }
+/* under the title: the date, then the author's name */
+.title-name, .title-date{ font-family: 'Open Sans', sans-serif; text-align: center; margin: 0 20px; }
+.title-date{ font-size: 36px; margin-top: 32px; }
+.title-name{ font-size: 24px; margin-top: 32px; }
 /* a title on the same screen as the calculator under it: less room around it */
 .section-title.with-embed{ padding: 0 48px 32px; }
 .section-title{
@@ -102,9 +106,10 @@ body{ padding-left: 72px; }
 .quote{
   font-family: 'Open Sans', sans-serif;
   font-style: italic;
-  font-size: clamp(28px, 3.6vw, 52px);
+  font-size: 48px;
   line-height: 1.35;
-  text-align: center;
+  text-align: left;
+  width: fit-content; /* centered on the screen, its lines lined up on the left */
   max-width: min(1000px, 100% - 40px);
   margin: 0 auto;
 }
@@ -115,7 +120,7 @@ body{ padding-left: 72px; }
 .lines p:last-child{ margin-bottom: 0; }
 
 /* the last screen: the site's QR code, and its address under it */
-.qr{ display: block; width: min(360px, 45vh); height: auto; margin: 0 auto; image-rendering: pixelated; }
+.qr{ display: block; width: min(360px, 45vh); height: auto; margin: 0 auto; image-rendering: pixelated; mix-blend-mode: multiply; } /* its white takes the page's off-white */
 .link{ font-family: 'Inter', Arial, sans-serif; font-weight: 700; font-size: clamp(20px, 2.4vw, 36px); text-align: center; margin: 16px 20px 0; word-break: break-word; }
 .link a{ color: #000; }
 
@@ -163,8 +168,12 @@ body{ padding-left: 72px; }
 <ol class="progress" aria-label="Embeds"></ol>
 
 <!-- the title, the quote and the article each on a circle of their own -->
-<section class="slide"><h1 class="page-title">Things in Scale</h1></section>
-<section class="slide"><p class="quote">Measurement is “the correlation of some target to some comparator or unit.”</p></section>
+<section class="slide">
+  <h1 class="page-title">Things in Scale</h1>
+  <p class="title-date">October 23, 2026</p>
+  <p class="title-name">Jia Zhang</p>
+</section>
+<section class="slide"><p class="quote">“the correlation of some target<br>to some comparator or unit.”</p></section>
 <section class="slide"><img class="shot" src="continents.png" alt="The New York Times, “Continents Split Up at the Same Speed Finger Nails Grow. And That’s Fast.” (July 22, 2016)"></section>
 <section class="slide"><img class="shot cited" src="body_measurements.png" alt="Body-based units of measure: measuring with the span of a hand and the length of the arms and body, in Karelia, among the Mapuche, Yahi and Yup'ik"><p class="cite"><a href="https://www.science.org/doi/10.1126/science.adf1936" target="_blank" rel="noopener">Kaaronen, Manninen, and Eronen, “Body-based units of measure in cultural evolution,” <i>Science</i> (2023)</a></p></section>
 <section class="slide"><img class="shot cited" src="Mars_Climate_Orbiter_2.jpg" alt="NASA's Mars Climate Orbiter, an artist's rendering of the spacecraft above Mars"><p class="cite">Artist’s rendering of the Mars Climate Orbiter. Public domain.</p></section>
